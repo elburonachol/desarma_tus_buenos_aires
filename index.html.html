@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Interactivo - Buenos Aires</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- SortableJS para drag & drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Mapa Interactivo - Provincia de Buenos Aires</h1>
+        
+        <div class="main-content">
+            <!-- Mapa -->
+            <div id="map-container">
+                <div id="map"></div>
+            </div>
+            
+            <!-- Panel de control -->
+            <div class="control-panel">
+                <!-- Cajas de agrupamiento -->
+                <div class="groups-container">
+                    <div class="group-box" data-group-id="1" style="border-left: 4px solid #ff6b6b;">
+                        <h3>Grupo 1</h3>
+                        <div class="group-list" id="group-1"></div>
+                    </div>
+                    <div class="group-box" data-group-id="2" style="border-left: 4px solid #4ecdc4;">
+                        <h3>Grupo 2</h3>
+                        <div class="group-list" id="group-2"></div>
+                    </div>
+                    <div class="group-box" data-group-id="3" style="border-left: 4px solid #45b7d1;">
+                        <h3>Grupo 3</h3>
+                        <div class="group-list" id="group-3"></div>
+                    </div>
+                </div>
+                
+                <!-- Lista completa de departamentos -->
+                <div class="all-departments">
+                    <h3>Todos los Departamentos (135)</h3>
+                    <div id="all-departments-list" class="departments-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
