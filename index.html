@@ -16,9 +16,10 @@
 <body>
     <div class="container">
         <h1>Mapa Interactivo - Provincia de Buenos Aires</h1>
-<div class="controls">
-    <button id="reset-btn" class="reset-button">Reestablecer valores</button>
-</div>
+        
+        <div class="controls">
+            <button id="reset-btn" class="reset-button">Reestablecer valores</button>
+        </div>
         
         <div class="main-content">
             <!-- Mapa -->
@@ -46,7 +47,7 @@
                 
                 <!-- Lista completa de departamentos -->
                 <div class="all-departments">
-                    <h3>Todos los Departamentos (135)</h3>
+                    <h3>Todos los Departamentos (<span id="dept-count">0</span>)</h3>
                     <div id="all-departments-list" class="departments-list"></div>
                 </div>
             </div>
