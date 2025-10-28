@@ -25,6 +25,11 @@ h1 {
 .controls {
     text-align: center;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 .reset-button {
@@ -44,6 +49,25 @@ h1 {
 
 .reset-button:active {
     transform: translateY(1px);
+}
+
+.division-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.division-control label {
+    font-weight: 600;
+    color: #555;
+}
+
+.division-control select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    font-size: 14px;
 }
 
 .main-content {
@@ -160,5 +184,10 @@ h1 {
     
     .control-panel {
         min-width: auto;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 10px;
     }
 }
