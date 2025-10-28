@@ -1,30 +1,29 @@
 // Variables globales
 let map;
 let geoJsonLayer;
-let departmentGroups = {
-    1: { color: '#ff6b6b', departments: [] },
-    2: { color: '#4ecdc4', departments: [] },
-    3: { color: '#45b7d1', departments: [] }
-};
-
-// Nueva variable para almacenar todos los departamentos ordenados
+let departmentGroups = {};
 let allDepartments = [];
+let currentDivisionCount = 3;
+
+// Colores para las divisiones (10 colores distintos)
+const divisionColors = [
+    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', 
+    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'
+];
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
     initializeMap();
     loadGeoJSON().then(() => {
-        initializeDragAndDrop();
+        initializeDivisionBoxes(currentDivisionCount);
         setupResetButton();
+        setupDivisionSelector();
     });
 });
 
 // Inicializar el mapa
 function initializeMap() {
-    // Centrar en Provincia de Buenos Aires
     map = L.map('map').setView([-36.6769, -59.8499], 7);
-
-    // Capa base de OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
@@ -48,7 +47,6 @@ function loadGeoJSON() {
             );
 
             console.log(`Departamentos cargados: ${filteredFeatures.length}`);
-            console.log('Primeros 5 departamentos:', filteredFeatures.slice(0, 5).map(f => f.properties.nam));
 
             // Ordenar alfabéticamente por el campo "nam"
             filteredFeatures.sort((a, b) => {
@@ -72,24 +70,17 @@ function loadGeoJSON() {
                     };
                 },
                 onEachFeature: function(feature, layer) {
-                    // Agregar tooltip con el nombre
                     const nombre = feature.properties.nam || 'Sin nombre';
                     layer.bindTooltip(nombre);
                     
-                    // Al hacer click, resaltar el departamento
                     layer.on('click', function() {
                         highlightDepartment(feature.properties.nam);
                     });
                 }
             }).addTo(map);
 
-            // Ajustar el mapa a los límites de la capa
             map.fitBounds(geoJsonLayer.getBounds());
-
-            // Llenar la lista de todos los departamentos
             populateDepartmentsList(filteredFeatures);
-            
-            // Actualizar contador
             document.getElementById('dept-count').textContent = filteredFeatures.length;
         })
         .catch(error => {
@@ -98,10 +89,64 @@ function loadGeoJSON() {
         });
 }
 
+// Inicializar las cajas de división
+function initializeDivisionBoxes(count) {
+    const container = document.getElementById('division-boxes-container');
+    container.innerHTML = '';
+
+    departmentGroups = {};
+
+    // Guardar departamentos de divisiones que van a ser eliminadas
+    if (count < currentDivisionCount) {
+        for (let i = count + 1; i <= currentDivisionCount; i++) {
+            const groupList = document.getElementById(`division-${i}`);
+            if (groupList) {
+                const items = groupList.querySelectorAll('.department-item');
+                items.forEach(item => {
+                    returnDepartmentToMainList(item.getAttribute('data-dept-name'));
+                });
+            }
+        }
+    }
+
+    currentDivisionCount = count;
+
+    for (let i = 1; i <= count; i++) {
+        const color = divisionColors[i - 1] || '#3388ff';
+        departmentGroups[i] = { color: color, departments: [] };
+
+        const groupBox = document.createElement('div');
+        groupBox.className = 'group-box';
+        groupBox.setAttribute('data-group-id', i);
+        groupBox.style.borderLeft = `4px solid ${color}`;
+
+        groupBox.innerHTML = `
+            <h3>División ${i}</h3>
+            <div class="group-list" id="division-${i}"></div>
+        `;
+
+        container.appendChild(groupBox);
+    }
+
+    initializeDragAndDrop();
+}
+
+// Configurar el selector de número de divisiones
+function setupDivisionSelector() {
+    const selector = document.getElementById('division-count');
+    selector.value = currentDivisionCount;
+    
+    selector.addEventListener('change', function() {
+        const newCount = parseInt(this.value);
+        initializeDivisionBoxes(newCount);
+        updateMapColors();
+    });
+}
+
 // Llenar la lista de departamentos
 function populateDepartmentsList(features) {
     const listContainer = document.getElementById('all-departments-list');
-    listContainer.innerHTML = ''; // Limpiar lista existente
+    listContainer.innerHTML = '';
     
     features.forEach(feature => {
         const nombre = feature.properties.nam;
@@ -116,118 +161,150 @@ function populateDepartmentsList(features) {
 // Inicializar drag and drop
 function initializeDragAndDrop() {
     const allDepartmentsList = document.getElementById('all-departments-list');
-    const groupLists = [
-        document.getElementById('group-1'),
-        document.getElementById('group-2'),
-        document.getElementById('group-3')
-    ];
+    const divisionLists = Array.from({length: currentDivisionCount}, (_, i) => 
+        document.getElementById(`division-${i + 1}`)
+    );
 
-    // Configurar Sortable para la lista principal
+    // Configurar Sortable para la lista principal (listado de departamentos)
     Sortable.create(allDepartmentsList, {
         group: {
             name: 'departments',
             pull: 'clone',
-            put: false // No permitir arrastrar elementos de vuelta a esta lista
+            put: true // Permitir arrastrar elementos de vuelta aquí
         },
-        sort: false,
+        sort: true, // Permitir ordenamiento
         animation: 150,
+        onAdd: function(evt) {
+            // Cuando un elemento se agrega al listado principal, ordenar la lista
+            sortMainList();
+        },
         onEnd: function(evt) {
-            // Solo procesar si el movimiento fue exitoso (a otra lista)
-            if (evt.to !== evt.from) {
-                handleDepartmentMove(evt);
-            }
+            handleDepartmentMove(evt);
         }
     });
 
-    // Configurar Sortable para cada grupo
-    groupLists.forEach((groupList, index) => {
-        Sortable.create(groupList, {
-            group: {
-                name: 'departments',
-                pull: true,
-                put: true
-            },
-            animation: 150,
-            onEnd: function(evt) {
-                // Solo procesar si el movimiento fue exitoso
-                if (evt.to !== evt.from) {
+    // Configurar Sortable para cada división
+    divisionLists.forEach((divisionList, index) => {
+        if (divisionList) {
+            Sortable.create(divisionList, {
+                group: {
+                    name: 'departments',
+                    pull: true,
+                    put: true
+                },
+                animation: 150,
+                onEnd: function(evt) {
                     handleDepartmentMove(evt);
-                }
-            }
-        });
-    });
-}
-
-// Manejar el movimiento de departamentos
-function handleDepartmentMove(evt) {
-    const departmentName = evt.item.getAttribute('data-dept-name');
-    const toGroup = evt.to.id;
-    const fromGroup = evt.from.id;
-
-    console.log(`Moviendo ${departmentName} desde ${fromGroup} a ${toGroup}`);
-
-    // Si viene de la lista principal, eliminar el original
-    if (fromGroup === 'all-departments-list') {
-        // Buscar y eliminar el elemento original de la lista principal
-        const allItems = document.querySelectorAll('#all-departments-list .department-item');
-        allItems.forEach(item => {
-            if (item.getAttribute('data-dept-name') === departmentName) {
-                item.remove();
-            }
-        });
-    }
-
-    // Eliminar el departamento de todas las demás listas
-    removeDepartmentFromAllLists(departmentName, toGroup);
-
-    // Actualizar grupos y colores
-    updateDepartmentGroups();
-    updateMapColors();
-}
-
-// Eliminar departamento de todas las listas excepto la de destino
-function removeDepartmentFromAllLists(departmentName, targetListId) {
-    const allLists = [
-        'all-departments-list',
-        'group-1', 
-        'group-2',
-        'group-3'
-    ];
-
-    allLists.forEach(listId => {
-        if (listId !== targetListId) {
-            const list = document.getElementById(listId);
-            const items = list.querySelectorAll('.department-item');
-            items.forEach(item => {
-                if (item.getAttribute('data-dept-name') === departmentName) {
-                    item.remove();
                 }
             });
         }
     });
 }
 
-// Actualizar la estructura de grupos
-function updateDepartmentGroups() {
-    // Reiniciar grupos
-    Object.keys(departmentGroups).forEach(groupId => {
-        departmentGroups[groupId].departments = [];
+// Ordenar el listado principal alfabéticamente
+function sortMainList() {
+    const listContainer = document.getElementById('all-departments-list');
+    const items = Array.from(listContainer.querySelectorAll('.department-item'));
+    
+    // Ordenar items por nombre
+    items.sort((a, b) => {
+        const nameA = a.getAttribute('data-dept-name').toUpperCase();
+        const nameB = b.getAttribute('data-dept-name').toUpperCase();
+        return nameA.localeCompare(nameB);
     });
+    
+    // Reconstruir la lista en orden
+    listContainer.innerHTML = '';
+    items.forEach(item => {
+        listContainer.appendChild(item);
+    });
+}
 
-    // Llenar con los departamentos actuales en cada grupo
-    Object.keys(departmentGroups).forEach(groupId => {
-        const groupList = document.getElementById(`group-${groupId}`);
-        const items = groupList.querySelectorAll('.department-item');
-        
-        items.forEach(item => {
-            const deptName = item.getAttribute('data-dept-name');
-            if (deptName && !departmentGroups[groupId].departments.includes(deptName)) {
-                departmentGroups[groupId].departments.push(deptName);
+// Devolver un departamento al listado principal
+function returnDepartmentToMainList(departmentName) {
+    const listContainer = document.getElementById('all-departments-list');
+    
+    // Crear el elemento
+    const item = document.createElement('div');
+    item.className = 'department-item';
+    item.textContent = departmentName;
+    item.setAttribute('data-dept-name', departmentName);
+    
+    // Agregar al listado
+    listContainer.appendChild(item);
+    
+    // Ordenar el listado
+    sortMainList();
+}
+
+// Manejar el movimiento de departamentos
+function handleDepartmentMove(evt) {
+    const departmentName = evt.item.getAttribute('data-dept-name');
+    const toElement = evt.to;
+    const fromElement = evt.from;
+
+    // Si el destino es el listado principal, solo necesitamos eliminar de otras listas
+    if (toElement.id === 'all-departments-list') {
+        // Eliminar el departamento de todas las divisiones
+        removeDepartmentFromAllDivisions(departmentName);
+        // Ordenar el listado principal
+        sortMainList();
+    } 
+    // Si viene del listado principal a una división
+    else if (fromElement.id === 'all-departments-list') {
+        // Eliminar el original del listado principal
+        const allItems = document.querySelectorAll('#all-departments-list .department-item');
+        allItems.forEach(item => {
+            if (item.getAttribute('data-dept-name') === departmentName) {
+                item.remove();
             }
         });
-    });
+        // Eliminar de otras divisiones
+        removeDepartmentFromAllDivisions(departmentName, toElement.id);
+    }
+    // Si se mueve entre divisiones
+    else {
+        // Eliminar de otras divisiones (incluyendo la de origen)
+        removeDepartmentFromAllDivisions(departmentName, toElement.id);
+    }
 
-    console.log('Grupos actualizados:', departmentGroups);
+    updateDepartmentGroups();
+    updateMapColors();
+}
+
+// Eliminar departamento de todas las divisiones excepto la especificada
+function removeDepartmentFromAllDivisions(departmentName, exceptDivisionId = null) {
+    for (let i = 1; i <= currentDivisionCount; i++) {
+        const divisionId = `division-${i}`;
+        if (divisionId !== exceptDivisionId) {
+            const divisionList = document.getElementById(divisionId);
+            if (divisionList) {
+                const items = divisionList.querySelectorAll('.department-item');
+                items.forEach(item => {
+                    if (item.getAttribute('data-dept-name') === departmentName) {
+                        item.remove();
+                    }
+                });
+            }
+        }
+    }
+}
+
+// Actualizar la estructura de grupos
+function updateDepartmentGroups() {
+    Object.keys(departmentGroups).forEach(groupId => {
+        departmentGroups[groupId].departments = [];
+        const divisionList = document.getElementById(`division-${groupId}`);
+        if (divisionList) {
+            const items = divisionList.querySelectorAll('.department-item');
+            items.forEach(item => {
+                const deptName = item.getAttribute('data-dept-name');
+                if (deptName) {
+                    departmentGroups[groupId].departments.push(deptName);
+                }
+            });
+        }
+    });
 }
 
 // Actualizar colores en el mapa
@@ -238,14 +315,12 @@ function updateMapColors() {
         const deptName = layer.feature.properties.nam;
         let foundGroup = null;
 
-        // Buscar en qué grupo está este departamento
         Object.keys(departmentGroups).forEach(groupId => {
             if (departmentGroups[groupId].departments.includes(deptName)) {
                 foundGroup = groupId;
             }
         });
 
-        // Aplicar color según el grupo
         if (foundGroup) {
             layer.setStyle({
                 fillColor: departmentGroups[foundGroup].color,
@@ -254,7 +329,6 @@ function updateMapColors() {
                 weight: 2
             });
         } else {
-            // Color por defecto si no está en ningún grupo
             layer.setStyle({
                 fillColor: '#3388ff',
                 fillOpacity: 0.3,
@@ -274,16 +348,16 @@ function setupResetButton() {
 
 // Reestablecer todo al estado inicial
 function resetToInitialState() {
-    console.log('Reestableciendo a estado inicial...');
-    
-    // Limpiar todos los grupos
-    Object.keys(departmentGroups).forEach(groupId => {
-        const groupList = document.getElementById(`group-${groupId}`);
-        groupList.innerHTML = '';
-        departmentGroups[groupId].departments = [];
-    });
+    // Limpiar todas las divisiones
+    for (let i = 1; i <= currentDivisionCount; i++) {
+        const divisionList = document.getElementById(`division-${i}`);
+        if (divisionList) {
+            divisionList.innerHTML = '';
+        }
+        departmentGroups[i].departments = [];
+    }
 
-    // Restaurar la lista completa de departamentos
+    // Restaurar el listado completo de departamentos
     populateDepartmentsList(allDepartments);
 
     // Restablecer colores del mapa
@@ -297,14 +371,13 @@ function resetToInitialState() {
         });
     });
 
-    console.log('Estado reestablecido correctamente');
+    // Restablecer el selector a 3
+    document.getElementById('division-count').value = 3;
+    initializeDivisionBoxes(3);
 }
 
 // Resaltar departamento
 function highlightDepartment(deptName) {
-    console.log('Departamento clickeado:', deptName);
-    
-    // Encontrar el layer y resaltarlo temporalmente
     geoJsonLayer.eachLayer(function(layer) {
         if (layer.feature.properties.nam === deptName) {
             layer.setStyle({
@@ -313,7 +386,6 @@ function highlightDepartment(deptName) {
                 fillOpacity: 0.9
             });
             
-            // Revertir después de 2 segundos
             setTimeout(() => {
                 updateMapColors();
             }, 2000);
