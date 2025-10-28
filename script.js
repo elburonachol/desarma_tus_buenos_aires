@@ -1,4 +1,4 @@
-// Variables globales (sin cambios)
+// Variables globales
 let map;
 let geoJsonLayer;
 let departmentGroups = {
@@ -10,7 +10,7 @@ let departmentGroups = {
 // Nueva variable para almacenar todos los departamentos ordenados
 let allDepartments = [];
 
-// Inicialización (modificada)
+// Inicialización
 document.addEventListener('DOMContentLoaded', function() {
     initializeMap();
     loadGeoJSON().then(() => {
@@ -19,20 +19,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Cargar el GeoJSON (modificada)
+// Inicializar el mapa
+function initializeMap() {
+    // Centrar en Provincia de Buenos Aires
+    map = L.map('map').setView([-36.6769, -59.8499], 7);
+
+    // Capa base de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+}
+
+// Cargar el GeoJSON
 function loadGeoJSON() {
     return fetch('partidos.geojson')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar el archivo GeoJSON');
+            }
+            return response.json();
+        })
         .then(data => {
             // Filtrar features que tienen valor en "arl"
             const filteredFeatures = data.features.filter(feature => 
-                feature.properties.arl !== null && feature.properties.arl !== undefined
+                feature.properties.arl !== null && 
+                feature.properties.arl !== undefined && 
+                feature.properties.arl !== ''
             );
+
+            console.log(`Departamentos cargados: ${filteredFeatures.length}`);
+            console.log('Primeros 5 departamentos:', filteredFeatures.slice(0, 5).map(f => f.properties.nam));
 
             // Ordenar alfabéticamente por el campo "nam"
             filteredFeatures.sort((a, b) => {
-                const nameA = a.properties.nam.toUpperCase();
-                const nameB = b.properties.nam.toUpperCase();
+                const nameA = (a.properties.nam || '').toUpperCase();
+                const nameB = (b.properties.nam || '').toUpperCase();
                 return nameA.localeCompare(nameB);
             });
 
@@ -51,9 +72,11 @@ function loadGeoJSON() {
                     };
                 },
                 onEachFeature: function(feature, layer) {
+                    // Agregar tooltip con el nombre
                     const nombre = feature.properties.nam || 'Sin nombre';
                     layer.bindTooltip(nombre);
                     
+                    // Al hacer click, resaltar el departamento
                     layer.on('click', function() {
                         highlightDepartment(feature.properties.nam);
                     });
@@ -65,11 +88,17 @@ function loadGeoJSON() {
 
             // Llenar la lista de todos los departamentos
             populateDepartmentsList(filteredFeatures);
+            
+            // Actualizar contador
+            document.getElementById('dept-count').textContent = filteredFeatures.length;
         })
-        .catch(error => console.error('Error cargando el GeoJSON:', error));
+        .catch(error => {
+            console.error('Error cargando el GeoJSON:', error);
+            alert('Error al cargar el archivo GeoJSON. Verifica la consola para más detalles.');
+        });
 }
 
-// Llenar la lista de departamentos (modificada)
+// Llenar la lista de departamentos
 function populateDepartmentsList(features) {
     const listContainer = document.getElementById('all-departments-list');
     listContainer.innerHTML = ''; // Limpiar lista existente
@@ -84,7 +113,7 @@ function populateDepartmentsList(features) {
     });
 }
 
-// Inicializar drag and drop (modificada)
+// Inicializar drag and drop
 function initializeDragAndDrop() {
     const allDepartmentsList = document.getElementById('all-departments-list');
     const groupLists = [
@@ -103,11 +132,10 @@ function initializeDragAndDrop() {
         sort: false,
         animation: 150,
         onEnd: function(evt) {
-            // Eliminar el elemento original de la lista principal
-            if (evt.from === allDepartmentsList) {
-                evt.item.remove();
+            // Solo procesar si el movimiento fue exitoso (a otra lista)
+            if (evt.to !== evt.from) {
+                handleDepartmentMove(evt);
             }
-            handleDepartmentMove(evt);
         }
     });
 
@@ -121,25 +149,32 @@ function initializeDragAndDrop() {
             },
             animation: 150,
             onEnd: function(evt) {
-                handleDepartmentMove(evt);
+                // Solo procesar si el movimiento fue exitoso
+                if (evt.to !== evt.from) {
+                    handleDepartmentMove(evt);
+                }
             }
         });
     });
 }
 
-// Manejar el movimiento de departamentos (MODIFICADA COMPLETAMENTE)
+// Manejar el movimiento de departamentos
 function handleDepartmentMove(evt) {
     const departmentName = evt.item.getAttribute('data-dept-name');
     const toGroup = evt.to.id;
     const fromGroup = evt.from.id;
 
-    // Si el departamento viene de la lista principal, crear un nuevo elemento
+    console.log(`Moviendo ${departmentName} desde ${fromGroup} a ${toGroup}`);
+
+    // Si viene de la lista principal, eliminar el original
     if (fromGroup === 'all-departments-list') {
-        const newItem = document.createElement('div');
-        newItem.className = 'department-item';
-        newItem.textContent = departmentName;
-        newItem.setAttribute('data-dept-name', departmentName);
-        evt.item.replaceWith(newItem);
+        // Buscar y eliminar el elemento original de la lista principal
+        const allItems = document.querySelectorAll('#all-departments-list .department-item');
+        allItems.forEach(item => {
+            if (item.getAttribute('data-dept-name') === departmentName) {
+                item.remove();
+            }
+        });
     }
 
     // Eliminar el departamento de todas las demás listas
@@ -150,7 +185,7 @@ function handleDepartmentMove(evt) {
     updateMapColors();
 }
 
-// NUEVA FUNCIÓN: Eliminar departamento de todas las listas excepto la de destino
+// Eliminar departamento de todas las listas excepto la de destino
 function removeDepartmentFromAllLists(departmentName, targetListId) {
     const allLists = [
         'all-departments-list',
@@ -172,15 +207,75 @@ function removeDepartmentFromAllLists(departmentName, targetListId) {
     });
 }
 
-// NUEVA FUNCIÓN: Configurar el botón de reset
+// Actualizar la estructura de grupos
+function updateDepartmentGroups() {
+    // Reiniciar grupos
+    Object.keys(departmentGroups).forEach(groupId => {
+        departmentGroups[groupId].departments = [];
+    });
+
+    // Llenar con los departamentos actuales en cada grupo
+    Object.keys(departmentGroups).forEach(groupId => {
+        const groupList = document.getElementById(`group-${groupId}`);
+        const items = groupList.querySelectorAll('.department-item');
+        
+        items.forEach(item => {
+            const deptName = item.getAttribute('data-dept-name');
+            if (deptName && !departmentGroups[groupId].departments.includes(deptName)) {
+                departmentGroups[groupId].departments.push(deptName);
+            }
+        });
+    });
+
+    console.log('Grupos actualizados:', departmentGroups);
+}
+
+// Actualizar colores en el mapa
+function updateMapColors() {
+    if (!geoJsonLayer) return;
+
+    geoJsonLayer.eachLayer(function(layer) {
+        const deptName = layer.feature.properties.nam;
+        let foundGroup = null;
+
+        // Buscar en qué grupo está este departamento
+        Object.keys(departmentGroups).forEach(groupId => {
+            if (departmentGroups[groupId].departments.includes(deptName)) {
+                foundGroup = groupId;
+            }
+        });
+
+        // Aplicar color según el grupo
+        if (foundGroup) {
+            layer.setStyle({
+                fillColor: departmentGroups[foundGroup].color,
+                fillOpacity: 0.8,
+                color: 'white',
+                weight: 2
+            });
+        } else {
+            // Color por defecto si no está en ningún grupo
+            layer.setStyle({
+                fillColor: '#3388ff',
+                fillOpacity: 0.3,
+                color: 'white',
+                weight: 1
+            });
+        }
+    });
+}
+
+// Configurar el botón de reset
 function setupResetButton() {
     document.getElementById('reset-btn').addEventListener('click', function() {
         resetToInitialState();
     });
 }
 
-// NUEVA FUNCIÓN: Reestablecer todo al estado inicial
+// Reestablecer todo al estado inicial
 function resetToInitialState() {
+    console.log('Reestableciendo a estado inicial...');
+    
     // Limpiar todos los grupos
     Object.keys(departmentGroups).forEach(groupId => {
         const groupList = document.getElementById(`group-${groupId}`);
@@ -201,51 +296,27 @@ function resetToInitialState() {
             opacity: 0.5
         });
     });
+
+    console.log('Estado reestablecido correctamente');
 }
 
-// Las funciones updateDepartmentGroups() y updateMapColors() se mantienen igual
-function updateDepartmentGroups() {
-    Object.keys(departmentGroups).forEach(groupId => {
-        departmentGroups[groupId].departments = [];
-        const groupList = document.getElementById(`group-${groupId}`);
-        const items = groupList.querySelectorAll('.department-item');
-        
-        items.forEach(item => {
-            const deptName = item.getAttribute('data-dept-name');
-            if (deptName) {
-                departmentGroups[groupId].departments.push(deptName);
-            }
-        });
-    });
-}
-
-function updateMapColors() {
-    if (!geoJsonLayer) return;
-
+// Resaltar departamento
+function highlightDepartment(deptName) {
+    console.log('Departamento clickeado:', deptName);
+    
+    // Encontrar el layer y resaltarlo temporalmente
     geoJsonLayer.eachLayer(function(layer) {
-        const deptName = layer.feature.properties.nam;
-        let foundGroup = null;
-
-        Object.keys(departmentGroups).forEach(groupId => {
-            if (departmentGroups[groupId].departments.includes(deptName)) {
-                foundGroup = groupId;
-            }
-        });
-
-        if (foundGroup) {
+        if (layer.feature.properties.nam === deptName) {
             layer.setStyle({
-                fillColor: departmentGroups[foundGroup].color,
-                fillOpacity: 0.8,
-                color: 'white',
-                weight: 2
+                weight: 3,
+                color: '#ff0000',
+                fillOpacity: 0.9
             });
-        } else {
-            layer.setStyle({
-                fillColor: '#3388ff',
-                fillOpacity: 0.3,
-                color: 'white',
-                weight: 1
-            });
+            
+            // Revertir después de 2 segundos
+            setTimeout(() => {
+                updateMapColors();
+            }, 2000);
         }
     });
 }
