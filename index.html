@@ -19,6 +19,21 @@
         
         <div class="controls">
             <button id="reset-btn" class="reset-button">Reestablecer valores</button>
+            <div class="division-control">
+                <label for="division-count">Número de divisiones:</label>
+                <select id="division-count">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+            </div>
         </div>
         
         <div class="main-content">
@@ -29,25 +44,14 @@
             
             <!-- Panel de control -->
             <div class="control-panel">
-                <!-- Cajas de agrupamiento -->
-                <div class="groups-container">
-                    <div class="group-box" data-group-id="1" style="border-left: 4px solid #ff6b6b;">
-                        <h3>Grupo 1</h3>
-                        <div class="group-list" id="group-1"></div>
-                    </div>
-                    <div class="group-box" data-group-id="2" style="border-left: 4px solid #4ecdc4;">
-                        <h3>Grupo 2</h3>
-                        <div class="group-list" id="group-2"></div>
-                    </div>
-                    <div class="group-box" data-group-id="3" style="border-left: 4px solid #45b7d1;">
-                        <h3>Grupo 3</h3>
-                        <div class="group-list" id="group-3"></div>
-                    </div>
+                <!-- Cajas de división de la provincia -->
+                <div id="division-boxes-container" class="groups-container">
+                    <!-- Las cajas se generan dinámicamente aquí -->
                 </div>
                 
-                <!-- Lista completa de departamentos -->
+                <!-- Listado de departamentos -->
                 <div class="all-departments">
-                    <h3>Todos los Departamentos (<span id="dept-count">0</span>)</h3>
+                    <h3>Listado de Departamentos (<span id="dept-count">0</span>)</h3>
                     <div id="all-departments-list" class="departments-list"></div>
                 </div>
             </div>
