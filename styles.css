@@ -138,3 +138,27 @@ h1 {
         min-width: auto;
     }
 }
+
+.controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.reset-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.reset-button:hover {
+    background: #c0392b;
+}
+
+.reset-button:active {
+    transform: translateY(1px);
+}
