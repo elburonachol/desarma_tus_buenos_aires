@@ -7,13 +7,14 @@
     
     <!-- 
     FUNCIONALIDADES PRINCIPALES DE LA PÁGINA:
-    1. Mapa interactivo de la Provincia de Buenos Aires con fondo en escala de grises
-    2. Visualización de departamentos/partidos con datos del campo "arl"
+    1. Mapa interactivo de la Provincia de Buenos Aires con fondo en español
+    2. Visualización correcta de soberanía argentina en Islas Malvinas
     3. Sistema de división provincial mediante cajas de colores
     4. Drag & drop de departamentos entre listado y divisiones
     5. Control dinámico del número de divisiones (1-10)
     6. Reset completo del estado
     7. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
+    8. Distribución espacial optimizada: mapa 3/5, divisiones 1/5, listado 1/5
     -->
     
     <!-- Leaflet CSS -->
@@ -50,9 +51,10 @@
         
         <div class="main-content">
             <!-- 
-            SECCIÓN DEL MAPA:
+            SECCIÓN DEL MAPA (60% del ancho):
             - Muestra la Provincia de Buenos Aires y departamentos
-            - Fondo en escala de grises (sin colores)
+            - Fondo en español con toponimias correctas
+            - Soberanía argentina en Islas Malvinas correctamente representada
             - Departamentos transparentes cuando están en listado
             - Departamentos coloreados cuando están en divisiones
             -->
@@ -61,18 +63,21 @@
             </div>
             
             <!-- 
-            PANEL DE CONTROL:
-            - Divisiones de la provincia (cajas de colores)
-            - Listado completo de departamentos
+            PANEL DE CONTROL (40% del ancho dividido en 2 partes):
+            - Divisiones de la provincia (20% del ancho total)
+            - Listado completo de departamentos (20% del ancho total)
             -->
             <div class="control-panel">
                 <!-- Contenedor de divisiones - se genera dinámicamente -->
-                <div id="division-boxes-container" class="groups-container">
-                    <!-- Las cajas de división se generan aquí mediante JavaScript -->
+                <div class="divisions-section">
+                    <h3>Divisiones de la Provincia</h3>
+                    <div id="division-boxes-container" class="groups-container">
+                        <!-- Las cajas de división se generan aquí mediante JavaScript -->
+                    </div>
                 </div>
                 
                 <!-- Listado permanente de todos los departamentos -->
-                <div class="all-departments">
+                <div class="list-section">
                     <h3>Listado de Departamentos (<span id="dept-count">0</span>)</h3>
                     <div id="all-departments-list" class="departments-list"></div>
                 </div>
