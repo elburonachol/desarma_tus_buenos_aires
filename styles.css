@@ -1,3 +1,11 @@
+/* 
+ * ESTILOS PARA EL MAPA INTERACTIVO DE DIVISIÓN PROVINCIAL
+ * 
+ * Propósito: Estilos para interfaz de división de la Provincia de Buenos Aires
+ * Características: Diseño responsive, colores distintivos, interfaz intuitiva
+ */
+
+/* Reset y configuración base */
 * {
     margin: 0;
     padding: 0;
@@ -22,6 +30,11 @@ h1 {
     color: #2c3e50;
 }
 
+/* 
+ * CONTROLES PRINCIPALES:
+ * - Botón de reset
+ * - Selector de número de divisiones
+ */
 .controls {
     text-align: center;
     margin-bottom: 20px;
@@ -70,13 +83,22 @@ h1 {
     font-size: 14px;
 }
 
+/* 
+ * DISPOSICIÓN PRINCIPAL:
+ * - Mapa a la izquierda (70%)
+ * - Panel de control a la derecha (30%)
+ */
 .main-content {
     display: flex;
     gap: 20px;
     height: 80vh;
 }
 
-/* Mapa */
+/* 
+ * ESTILOS DEL MAPA:
+ * - Contenedor con sombra y bordes redondeados
+ * - Mapa ocupa todo el espacio disponible
+ */
 #map-container {
     flex: 3;
     border-radius: 8px;
@@ -89,7 +111,11 @@ h1 {
     width: 100%;
 }
 
-/* Panel de control */
+/* 
+ * PANEL DE CONTROL:
+ * - Divisiones en la parte superior
+ * - Listado de departamentos en la parte inferior
+ */
 .control-panel {
     flex: 1;
     display: flex;
@@ -98,13 +124,23 @@ h1 {
     min-width: 300px;
 }
 
-/* Grupos */
+/* 
+ * CONTENEDOR DE DIVISIONES:
+ * - Diseño en columna con espaciado
+ * - Cajas con colores distintivos
+ */
 .groups-container {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
+/* 
+ * CAJAS DE DIVISIÓN INDIVIDUALES:
+ * - Fondo blanco con sombra
+ * - Borde izquierdo con color distintivo
+ * - Altura mínima para mejor UX
+ */
 .group-box {
     background: white;
     border-radius: 8px;
@@ -126,7 +162,11 @@ h1 {
     padding: 10px;
 }
 
-/* Lista de todos los departamentos */
+/* 
+ * LISTADO DE DEPARTAMENTOS:
+ * - Contenedor con scroll para muchos elementos
+ * - Fondo blanco con sombra
+ */
 .all-departments {
     background: white;
     border-radius: 8px;
@@ -150,7 +190,12 @@ h1 {
     overflow-y: auto;
 }
 
-/* Items arrastrables */
+/* 
+ * ELEMENTOS DEPARTAMENTO:
+ * - Estilo de tarjeta pequeña
+ * - Efectos hover para feedback
+ * - Cursor move para indicar arrastre
+ */
 .department-item {
     background: #f8f9fa;
     border: 1px solid #e9ecef;
@@ -171,7 +216,11 @@ h1 {
     background: #dee2e6;
 }
 
-/* Responsive */
+/* 
+ * DISEÑO RESPONSIVE:
+ * - En móviles: mapa arriba, panel abajo
+ * - Controles en columna
+ */
 @media (max-width: 768px) {
     .main-content {
         flex-direction: column;
