@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Interactivo - Buenos Aires</title>
+    <title>Mapa Interactivo - División de la Provincia de Buenos Aires</title>
+    
+    <!-- 
+    FUNCIONALIDADES PRINCIPALES DE LA PÁGINA:
+    1. Mapa interactivo de la Provincia de Buenos Aires con fondo en escala de grises
+    2. Visualización de departamentos/partidos con datos del campo "arl"
+    3. Sistema de división provincial mediante cajas de colores
+    4. Drag & drop de departamentos entre listado y divisiones
+    5. Control dinámico del número de divisiones (1-10)
+    6. Reset completo del estado
+    7. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
+    -->
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -15,8 +26,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>Mapa Interactivo - Provincia de Buenos Aires</h1>
+        <h1>Mapa Interactivo - División de la Provincia de Buenos Aires</h1>
         
+        <!-- Controles principales -->
         <div class="controls">
             <button id="reset-btn" class="reset-button">Reestablecer valores</button>
             <div class="division-control">
@@ -37,19 +49,29 @@
         </div>
         
         <div class="main-content">
-            <!-- Mapa -->
+            <!-- 
+            SECCIÓN DEL MAPA:
+            - Muestra la Provincia de Buenos Aires y departamentos
+            - Fondo en escala de grises (sin colores)
+            - Departamentos transparentes cuando están en listado
+            - Departamentos coloreados cuando están en divisiones
+            -->
             <div id="map-container">
                 <div id="map"></div>
             </div>
             
-            <!-- Panel de control -->
+            <!-- 
+            PANEL DE CONTROL:
+            - Divisiones de la provincia (cajas de colores)
+            - Listado completo de departamentos
+            -->
             <div class="control-panel">
-                <!-- Cajas de división de la provincia -->
+                <!-- Contenedor de divisiones - se genera dinámicamente -->
                 <div id="division-boxes-container" class="groups-container">
-                    <!-- Las cajas se generan dinámicamente aquí -->
+                    <!-- Las cajas de división se generan aquí mediante JavaScript -->
                 </div>
                 
-                <!-- Listado de departamentos -->
+                <!-- Listado permanente de todos los departamentos -->
                 <div class="all-departments">
                     <h3>Listado de Departamentos (<span id="dept-count">0</span>)</h3>
                     <div id="all-departments-list" class="departments-list"></div>
