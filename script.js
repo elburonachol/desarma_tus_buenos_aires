@@ -2,16 +2,15 @@
  * MAPA INTERACTIVO - DIVISIÓN DE LA PROVINCIA DE BUENOS AIRES
  * 
  * FUNCIONALIDADES PRINCIPALES:
- * 1. Carga y visualización de mapa con capa base oficial de Argentina (IGN)
+ * 1. Carga y visualización de mapa con capa base oficial de Argentina (IGN) en escala de grises
  * 2. Representación correcta de la soberanía argentina en Malvinas
- * 3. Carga de departamentos desde GeoJSON con filtro por campo "arl"
- * 4. Sistema de divisiones con colores dinámicos (1-10 divisiones)
- * 5. Drag & drop entre listado y divisiones
- * 6. Departamentos transparentes en listado, coloreados en divisiones
- * 7. Gestión inteligente de cambios en número de divisiones
- * 8. Reset completo del estado
- * 9. Ordenamiento alfabético automático en listado
- * 10. Distribución en tres columnas: mapa | divisiones | listado
+ * 3. Carga de departamentos desde GeoJSON con reproyección a EPSG:3857 para coincidir con el mapa base
+ * 4. Sistema de división provincial mediante cajas de colores
+ * 5. Drag & drop de departamentos entre listado y divisiones
+ * 6. Control dinámico del número de divisiones (1-10)
+ * 7. Reset completo del estado
+ * 8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
+ * 9. Distribución en tres columnas: mapa | divisiones | listado
  */
 
 // Variables globales para el estado de la aplicación
@@ -42,24 +41,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /*
  * INICIALIZACIÓN DEL MAPA LEAFLET
- * Configura el mapa con capa base oficial del IGN (Instituto Geográfico Nacional)
+ * Configura el mapa con capa base oficial del IGN en escala de grises
  * Garantiza la representación correcta de la soberanía argentina en Malvinas
  */
 function initializeMap() {
     // Crear mapa centrado en la Provincia de Buenos Aires
     map = L.map('map').setView([-36.6769, -59.8499], 7);
 
-    // Capa base oficial del IGN - Argenmap
-    // Esta capa garantiza la correcta denominación "Malvinas Argentinas"
-    L.tileLayer('https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{y}.png', {
+    // Capa base oficial del IGN - Argenmap en escala de grises
+    // Usamos la versión "gris" del IGN que está en EPSG:3857
+    L.tileLayer('https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/argenmap_gris@EPSG%3A3857@png/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.ign.gob.ar/">Instituto Geográfico Nacional</a>',
         maxZoom: 20
     }).addTo(map);
 }
 
 /*
- * CARGA DEL ARCHIVO GEOJSON
- * Filtra departamentos por campo "arl" y los ordena alfabéticamente
+ * CARGA Y REPROYECCIÓN DEL ARCHIVO GEOJSON
+ * Filtra departamentos por campo "arl", los ordena alfabéticamente
+ * y los reproyecta a EPSG:3857 para que coincidan con el mapa base
  */
 function loadGeoJSON() {
     return fetch('partidos.geojson')
@@ -89,8 +89,9 @@ function loadGeoJSON() {
             // Guardar referencia a todos los departamentos (para reset)
             allDepartments = filteredFeatures;
 
-            // Crear capa GeoJSON en el mapa
+            // Crear capa GeoJSON reproyectada a EPSG:3857
             geoJsonLayer = L.geoJSON(filteredFeatures, {
+                // Opción importante: Leaflet reproyecta automáticamente de EPSG:4326 a EPSG:3857
                 style: function(feature) {
                     // Estilo por defecto: transparente (sin relleno) con borde visible
                     return {
@@ -150,7 +151,10 @@ function loadGeoJSON() {
             }).addTo(map);
 
             // Ajustar vista del mapa para mostrar todos los departamentos
-            map.fitBounds(geoJsonLayer.getBounds());
+            // Usamos fitBounds después de agregar la capa para asegurar la correcta visualización
+            setTimeout(() => {
+                map.fitBounds(geoJsonLayer.getBounds(), { padding: [20, 20] });
+            }, 100);
             
             // Poblar el listado de departamentos
             populateDepartmentsList(filteredFeatures);
