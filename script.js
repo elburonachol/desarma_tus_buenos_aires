@@ -42,17 +42,19 @@ document.addEventListener('DOMContentLoaded', function() {
 /*
  * INICIALIZACIÓN DEL MAPA LEAFLET
  * Configura el mapa con capa base oficial del IGN en escala de grises
+ * Utiliza la URL correcta del servicio TMS del IGN según su documentación oficial
  * Garantiza la representación correcta de la soberanía argentina en Malvinas
  */
 function initializeMap() {
     // Crear mapa centrado en la Provincia de Buenos Aires
     map = L.map('map').setView([-36.6769, -59.8499], 7);
 
-    // Capa base oficial del IGN - Argenmap en escala de grises
-    // Usamos la versión "gris" del IGN que está en EPSG:3857
-    L.tileLayer('https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/argenmap_gris@EPSG%3A3857@png/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.ign.gob.ar/">Instituto Geográfico Nacional</a>',
-        maxZoom: 20
+    // Capa base oficial del IGN - Mapa base gris (según documentación oficial)
+    // URL correcta: https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png
+    L.tileLayer('https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png', {
+        attribution: '<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> | <a href="http://www.ign.gob.ar/AreaServicios/Argenmap/IntroduccionV2" target="_blank">Instituto Geográfico Nacional</a>',
+        minZoom: 3,
+        maxZoom: 18
     }).addTo(map);
 }
 
@@ -91,7 +93,7 @@ function loadGeoJSON() {
 
             // Crear capa GeoJSON reproyectada a EPSG:3857
             geoJsonLayer = L.geoJSON(filteredFeatures, {
-                // Opción importante: Leaflet reproyecta automáticamente de EPSG:4326 a EPSG:3857
+                // Leaflet maneja automáticamente la reproyección de EPSG:4326 a EPSG:3857
                 style: function(feature) {
                     // Estilo por defecto: transparente (sin relleno) con borde visible
                     return {
