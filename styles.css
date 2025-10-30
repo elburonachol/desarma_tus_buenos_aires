@@ -2,7 +2,7 @@
  * ESTILOS PARA EL MAPA INTERACTIVO DE DIVISIÓN PROVINCIAL
  * 
  * Propósito: Estilos para interfaz de división de la Provincia de Buenos Aires
- * Distribución: Mapa 60% | Divisiones 20% | Listado 20%
+ * Distribución: Tres columnas - Mapa | Divisiones | Listado
  * Características: Diseño responsive, colores distintivos, interfaz intuitiva
  */
 
@@ -21,14 +21,14 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px 25px;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     color: #2c3e50;
     font-size: 1.8rem;
 }
@@ -46,23 +46,23 @@ h1 {
     align-items: center;
     gap: 25px;
     flex-wrap: wrap;
-    padding: 15px;
+    padding: 18px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
 .reset-button {
     background: #e74c3c;
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 25px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .reset-button:hover {
@@ -104,20 +104,20 @@ h1 {
 }
 
 /* 
- * DISPOSICIÓN PRINCIPAL:
- * - Mapa a la izquierda (60% del ancho)
- * - Panel de control a la derecha (40% del ancho)
- * - Espacios laterales para diseño armonioso
+ * DISTRIBUCIÓN PRINCIPAL EN TRES COLUMNAS:
+ * - Mapa: 60% del ancho
+ * - Divisiones: 20% del ancho  
+ * - Listado: 20% del ancho
  */
 .main-content {
     display: flex;
     gap: 25px;
     height: 75vh;
-    margin: 0 10px;
+    align-items: stretch;
 }
 
 /* 
- * ESTILOS DEL MAPA (60% del ancho):
+ * COLUMNA 1: MAPA (60% del ancho)
  * - Contenedor con sombra y bordes redondeados
  * - Mapa ocupa todo el espacio disponible
  */
@@ -127,7 +127,7 @@ h1 {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     background: white;
-    padding: 5px;
+    min-width: 0; /* Permite que se reduzca correctamente */
 }
 
 #map {
@@ -137,41 +137,28 @@ h1 {
 }
 
 /* 
- * PANEL DE CONTROL (40% del ancho):
- * - Se divide en dos secciones verticales
- * - Divisiones en la parte superior (50% del panel)
- * - Listado de departamentos en la parte inferior (50% del panel)
+ * COLUMNA 2: DIVISIONES (20% del ancho)
+ * - Panel con scroll para manejar múltiples divisiones
+ * - Diseño de tarjeta con sombra
  */
-.control-panel {
-    flex: 2; /* 40% del espacio (2/5) */
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    min-width: 280px;
-}
-
-/* 
- * SECCIONES DEL PANEL DE CONTROL:
- * - Cada sección ocupa aproximadamente la mitad del panel
- * - Diseño de tarjetas con sombras
- */
-.divisions-section,
-.list-section {
+.divisions-column {
+    flex: 1; /* 20% del espacio (1/5) */
     background: white;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
+    min-width: 280px;
+    max-width: 320px;
 }
 
-.divisions-section h3,
-.list-section h3 {
-    margin-bottom: 15px;
+.divisions-column h3 {
+    margin-bottom: 18px;
     font-size: 16px;
     color: #2c3e50;
     font-weight: 600;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     border-bottom: 2px solid #f1f2f6;
 }
 
@@ -183,11 +170,10 @@ h1 {
 .groups-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 16px;
     flex: 1;
     overflow-y: auto;
-    max-height: 300px;
-    padding-right: 5px;
+    padding-right: 8px;
 }
 
 /* Personalizar scrollbar para mejor UX */
@@ -218,7 +204,7 @@ h1 {
 .group-box {
     background: white;
     border-radius: 8px;
-    padding: 15px;
+    padding: 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     border: 1px solid #e1e8ed;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -230,14 +216,14 @@ h1 {
 }
 
 .group-box h3 {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-size: 14px;
     color: #555;
     font-weight: 600;
 }
 
 .group-list {
-    min-height: 120px;
+    min-height: 130px;
     border: 2px dashed #e1e8ed;
     border-radius: 6px;
     padding: 12px;
@@ -250,9 +236,34 @@ h1 {
 }
 
 /* 
- * LISTADO DE DEPARTAMENTOS:
+ * COLUMNA 3: LISTADO (20% del ancho)
  * - Contenedor con scroll para muchos elementos
  * - Diseño de tarjeta con sombra
+ */
+.list-column {
+    flex: 1; /* 20% del espacio (1/5) */
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.list-column h3 {
+    margin-bottom: 18px;
+    font-size: 16px;
+    color: #2c3e50;
+    font-weight: 600;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f1f2f6;
+}
+
+/* 
+ * LISTADO DE DEPARTAMENTOS:
+ * - Contenedor con scroll para muchos elementos
  */
 .departments-list {
     display: flex;
@@ -260,8 +271,7 @@ h1 {
     gap: 8px;
     flex: 1;
     overflow-y: auto;
-    max-height: 400px;
-    padding-right: 5px;
+    padding-right: 8px;
 }
 
 .departments-list::-webkit-scrollbar {
@@ -318,29 +328,32 @@ h1 {
 
 /* 
  * DISEÑO RESPONSIVE:
- * - En móviles: mapa arriba, panel abajo
- * - Controles en columna
- * - Ajustes de tamaños para mejor legibilidad
+ * - En tablets: tres columnas se apilan en dos filas
+ * - En móviles: una columna
+ * - Controles se adaptan
  */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
     .main-content {
-        flex-direction: column;
+        flex-wrap: wrap;
         height: auto;
-        gap: 20px;
     }
     
     #map-container {
+        flex: 100%;
         height: 50vh;
-        flex: none;
+        order: 1;
     }
     
-    .control-panel {
-        flex: none;
-        min-width: auto;
+    .divisions-column {
+        flex: 1;
+        min-width: 300px;
+        order: 2;
     }
     
-    .groups-container {
-        max-height: 200px;
+    .list-column {
+        flex: 1;
+        min-width: 300px;
+        order: 3;
     }
 }
 
@@ -361,7 +374,14 @@ h1 {
     }
     
     .main-content {
-        margin: 0 5px;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .divisions-column,
+    .list-column {
+        max-width: none;
+        min-width: auto;
     }
     
     h1 {
@@ -374,8 +394,8 @@ h1 {
         padding: 10px;
     }
     
-    .divisions-section,
-    .list-section {
+    .divisions-column,
+    .list-column {
         padding: 15px;
     }
     
@@ -384,6 +404,11 @@ h1 {
         font-size: 12px;
     }
     
+    .reset-button {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+}
     .reset-button {
         padding: 10px 20px;
         font-size: 13px;
