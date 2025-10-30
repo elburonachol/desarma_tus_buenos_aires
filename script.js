@@ -2,8 +2,8 @@
  * MAPA INTERACTIVO - DIVISIÓN DE LA PROVINCIA DE BUENOS AIRES
  * 
  * FUNCIONALIDADES PRINCIPALES:
- * 1. Carga y visualización de mapa con fondo en español
- * 2. Representación correcta de soberanía argentina en Islas Malvinas
+ * 1. Carga y visualización de mapa con capa base oficial de Argentina (IGN)
+ * 2. Representación correcta de la soberanía argentina en Malvinas
  * 3. Carga de departamentos desde GeoJSON con filtro por campo "arl"
  * 4. Sistema de divisiones con colores dinámicos (1-10 divisiones)
  * 5. Drag & drop entre listado y divisiones
@@ -11,7 +11,7 @@
  * 7. Gestión inteligente de cambios en número de divisiones
  * 8. Reset completo del estado
  * 9. Ordenamiento alfabético automático en listado
- * 10. Distribución espacial optimizada (60% mapa, 20% divisiones, 20% listado)
+ * 10. Distribución en tres columnas: mapa | divisiones | listado
  */
 
 // Variables globales para el estado de la aplicación
@@ -42,41 +42,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /*
  * INICIALIZACIÓN DEL MAPA LEAFLET
- * Configura el mapa con centro en Buenos Aires y fondo en español
- * Utiliza capa base con toponimias en español y representación correcta de Islas Malvinas
+ * Configura el mapa con capa base oficial del IGN (Instituto Geográfico Nacional)
+ * Garantiza la representación correcta de la soberanía argentina en Malvinas
  */
 function initializeMap() {
     // Crear mapa centrado en la Provincia de Buenos Aires
     map = L.map('map').setView([-36.6769, -59.8499], 7);
 
-    // Capa base en español con representación correcta de soberanía argentina
-    // Se utiliza OpenStreetMap con estilo que respeta la toponimia en español
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Soberanía Argentina en Islas Malvinas',
+    // Capa base oficial del IGN - Argenmap
+    // Esta capa garantiza la correcta denominación "Malvinas Argentinas"
+    L.tileLayer('https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.ign.gob.ar/">Instituto Geográfico Nacional</a>',
         maxZoom: 20
     }).addTo(map);
-
-    // Agregar capa adicional para asegurar nombres en español y soberanía argentina
-    addSpanishLabelsLayer();
-}
-
-/*
- * CAPA ADICIONAL PARA TOPONIMIAS EN ESPAÑOL
- * Asegura que los nombres geográficos aparezcan en español
- * Corrige específicamente la representación de Islas Malvinas
- */
-function addSpanishLabelsLayer() {
-    // Capa de etiquetas en español - usando un servicio que respeta la toponimia local
-    const spanishLabels = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}.png', {
-        attribution: 'Labels by <a href="http://stamen.com">Stamen Design</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-    }).addTo(map);
-
-    // NOTA: Para la correcta representación de Islas Malvinas como territorio argentino
-    // se podría agregar una capa GeoJSON personalizada con los límites y nombres correctos
-    // Sin embargo, por limitaciones de las capas base públicas, mostramos la capa estándar
-    // En una implementación profesional, se usaría una capa base oficial argentina
 }
 
 /*
@@ -120,8 +98,7 @@ function loadGeoJSON() {
                         fillOpacity: 0,  // Transparente - sin relleno
                         color: '#2c3e50', // Borde azul oscuro
                         weight: 1.5,
-                        opacity: 0.8,
-                        dashArray: '0' // Línea continua
+                        opacity: 0.8
                     };
                 },
                 onEachFeature: function(feature, layer) {
@@ -129,11 +106,10 @@ function loadGeoJSON() {
                     const nombre = feature.properties.nam || 'Sin nombre';
                     layer.bindTooltip(nombre, {
                         permanent: false,
-                        direction: 'auto',
-                        className: 'map-tooltip'
+                        direction: 'auto'
                     });
                     
-                    // Click para resaltar (debugging)
+                    // Click para resaltar
                     layer.on('click', function() {
                         highlightDepartment(feature.properties.nam);
                     });
@@ -591,7 +567,7 @@ function resetToInitialState() {
 
 /*
  * RESALTADO DE DEPARTAMENTO
- * Función auxiliar para debugging - resalta un departamento temporalmente
+ * Función auxiliar para resaltar un departamento temporalmente
  */
 function highlightDepartment(deptName) {
     geoJsonLayer.eachLayer(function(layer) {
