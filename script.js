@@ -73,13 +73,13 @@ function loadGeoJSON() {
         })
         .then(data => {
             // Filtrar features que tienen valor en el campo "arl"
-            const filteredFeatures = data.features.filter(feature => 
-                feature.properties.arl !== null && 
-                feature.properties.arl !== undefined && 
-                feature.properties.arl !== ''
-            );
+            //const filteredFeatures = data.features.filter(feature => 
+            //    feature.properties.arl !== null && 
+            //    feature.properties.arl !== undefined && 
+            //    feature.properties.arl !== ''
+            //);
 
-            console.log(`Departamentos cargados: ${filteredFeatures.length}`);
+            //console.log(`Departamentos cargados: ${filteredFeatures.length}`);
 
             // Ordenar alfabéticamente por el campo "nam"
             filteredFeatures.sort((a, b) => {
