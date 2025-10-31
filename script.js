@@ -4,13 +4,14 @@
  * FUNCIONALIDADES PRINCIPALES:
  * 1. Carga y visualización de mapa con capa base oficial de Argentina (IGN) en escala de grises
  * 2. Representación correcta de la soberanía argentina en Malvinas
- * 3. Carga de departamentos desde GeoJSON con reproyección a EPSG:3857 para coincidir con el mapa base
- * 4. Sistema de división provincial mediante cajas de colores
+ * 3. Carga de departamentos desde PBA.geojson con campos "in1" y "nam"
+ * 4. Sistema de divisiones con paleta de colores armónica (10 colores)
  * 5. Drag & drop de departamentos entre listado y divisiones
  * 6. Control dinámico del número de divisiones (1-10)
  * 7. Reset completo del estado
  * 8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
  * 9. Distribución en tres columnas: mapa | divisiones | listado
+ * 10. Tabla comparativa que muestra cantidad de partidos por división
  */
 
 // Variables globales para el estado de la aplicación
@@ -20,10 +21,19 @@ let departmentGroups = {};  // Objeto que almacena las divisiones y sus departam
 let allDepartments = [];    // Array con todos los departamentos (para reset)
 let currentDivisionCount = 3; // Número actual de divisiones visibles
 
-// Paleta de colores para las divisiones (10 colores distintos)
+// Paleta de colores armónica y bien diferenciable para las divisiones
+// Colores seleccionados para ser distinguibles pero no demasiado chillones
 const divisionColors = [
-    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', 
-    '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9f43'
+    '#1f77b4', // Azul
+    '#ff7f0e', // Naranja
+    '#2ca02c', // Verde
+    '#d62728', // Rojo
+    '#9467bd', // Violeta
+    '#8c564b', // Marrón
+    '#e377c2', // Rosa
+    '#7f7f7f', // Gris
+    '#bcbd22', // Oliva
+    '#17becf'  // Cyan
 ];
 
 /*
@@ -36,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeDivisionBoxes(currentDivisionCount);
         setupResetButton();
         setupDivisionSelector();
+        initializeComparisonTable();
     });
 });
 
@@ -50,7 +61,6 @@ function initializeMap() {
     map = L.map('map').setView([-36.6769, -59.8499], 7);
 
     // Capa base oficial del IGN - Mapa base gris (según documentación oficial)
-    // URL correcta: https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png
     L.tileLayer('https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/mapabase_gris@EPSG%3A3857@png/{z}/{x}/{-y}.png', {
         attribution: '<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> | <a href="http://www.ign.gob.ar/AreaServicios/Argenmap/IntroduccionV2" target="_blank">Instituto Geográfico Nacional</a>',
         minZoom: 3,
@@ -59,9 +69,9 @@ function initializeMap() {
 }
 
 /*
- * CARGA Y REPROYECCIÓN DEL ARCHIVO GEOJSON
- * Filtra departamentos por campo "arl", los ordena alfabéticamente
- * y los reproyecta a EPSG:3857 para que coincidan con el mapa base
+ * CARGA DEL ARCHIVO GEOJSON PBA.geojson
+ * Carga todos los departamentos sin filtrar, usando campos "in1" y "nam"
+ * Los ordena alfabéticamente por el campo "nam"
  */
 function loadGeoJSON() {
     return fetch('PBA.geojson')
@@ -72,27 +82,23 @@ function loadGeoJSON() {
             return response.json();
         })
         .then(data => {
-            // Filtrar features que tienen valor en el campo "arl"
-            //const filteredFeatures = data.features.filter(feature => 
-            //    feature.properties.arl !== null && 
-            //    feature.properties.arl !== undefined && 
-            //    feature.properties.arl !== ''
-            //);
+            // No filtramos - cargamos todos los features
+            const allFeatures = data.features;
 
-            //console.log(`Departamentos cargados: ${filteredFeatures.length}`);
+            console.log(`Departamentos cargados: ${allFeatures.length}`);
 
             // Ordenar alfabéticamente por el campo "nam"
-            filteredFeatures.sort((a, b) => {
+            allFeatures.sort((a, b) => {
                 const nameA = (a.properties.nam || '').toUpperCase();
                 const nameB = (b.properties.nam || '').toUpperCase();
                 return nameA.localeCompare(nameB);
             });
 
             // Guardar referencia a todos los departamentos (para reset)
-            allDepartments = filteredFeatures;
+            allDepartments = allFeatures;
 
-            // Crear capa GeoJSON reproyectada a EPSG:3857
-            geoJsonLayer = L.geoJSON(filteredFeatures, {
+            // Crear capa GeoJSON en el mapa
+            geoJsonLayer = L.geoJSON(allFeatures, {
                 // Leaflet maneja automáticamente la reproyección de EPSG:4326 a EPSG:3857
                 style: function(feature) {
                     // Estilo por defecto: transparente (sin relleno) con borde visible
@@ -107,7 +113,8 @@ function loadGeoJSON() {
                 onEachFeature: function(feature, layer) {
                     // Tooltip con el nombre del departamento
                     const nombre = feature.properties.nam || 'Sin nombre';
-                    layer.bindTooltip(nombre, {
+                    const codigo = feature.properties.in1 || 'N/A';
+                    layer.bindTooltip(`<strong>${nombre}</strong><br>Código: ${codigo}`, {
                         permanent: false,
                         direction: 'auto'
                     });
@@ -153,16 +160,15 @@ function loadGeoJSON() {
             }).addTo(map);
 
             // Ajustar vista del mapa para mostrar todos los departamentos
-            // Usamos fitBounds después de agregar la capa para asegurar la correcta visualización
             setTimeout(() => {
                 map.fitBounds(geoJsonLayer.getBounds(), { padding: [20, 20] });
             }, 100);
             
             // Poblar el listado de departamentos
-            populateDepartmentsList(filteredFeatures);
+            populateDepartmentsList(allFeatures);
             
             // Actualizar contador
-            document.getElementById('dept-count').textContent = filteredFeatures.length;
+            document.getElementById('dept-count').textContent = allFeatures.length;
         })
         .catch(error => {
             console.error('Error cargando el GeoJSON:', error);
@@ -198,7 +204,11 @@ function initializeDivisionBoxes(newCount) {
     // Crear nuevas cajas de división
     for (let i = 1; i <= newCount; i++) {
         const color = divisionColors[i - 1] || '#3388ff';
-        departmentGroups[i] = { color: color, departments: [] };
+        departmentGroups[i] = { 
+            color: color, 
+            departments: [],
+            name: `División ${i}`
+        };
 
         const groupBox = document.createElement('div');
         groupBox.className = 'group-box';
@@ -231,6 +241,73 @@ function initializeDivisionBoxes(newCount) {
     // Actualizar estado y colores del mapa
     updateDepartmentGroups();
     updateMapColors();
+    
+    // Actualizar tabla comparativa
+    updateComparisonTable();
+}
+
+/*
+ * INICIALIZACIÓN DE LA TABLA COMPARATIVA
+ * Configura la estructura inicial de la tabla
+ */
+function initializeComparisonTable() {
+    updateComparisonTable();
+}
+
+/*
+ * ACTUALIZACIÓN DE LA TABLA COMPARATIVA
+ * Genera y actualiza la tabla con las estadísticas de las divisiones
+ */
+function updateComparisonTable() {
+    const table = document.getElementById('comparison-table');
+    const thead = table.querySelector('thead tr');
+    const tbody = table.querySelector('tbody');
+    
+    // Limpiar tabla existente
+    thead.innerHTML = '<th>Variable</th>';
+    tbody.innerHTML = '';
+    
+    // Crear encabezados de columnas (divisiones)
+    for (let i = 1; i <= currentDivisionCount; i++) {
+        const th = document.createElement('th');
+        th.textContent = `División ${i}`;
+        th.style.backgroundColor = departmentGroups[i] ? departmentGroups[i].color : '#f8f9fa';
+        th.style.color = getContrastColor(departmentGroups[i] ? departmentGroups[i].color : '#f8f9fa');
+        thead.appendChild(th);
+    }
+    
+    // Crear fila de "Cantidad de partidos"
+    const row = document.createElement('tr');
+    const variableCell = document.createElement('td');
+    variableCell.textContent = 'Cantidad de partidos';
+    row.appendChild(variableCell);
+    
+    // Calcular y agregar cantidad de partidos por división
+    for (let i = 1; i <= currentDivisionCount; i++) {
+        const countCell = document.createElement('td');
+        const count = departmentGroups[i] ? departmentGroups[i].departments.length : 0;
+        countCell.textContent = count;
+        row.appendChild(countCell);
+    }
+    
+    tbody.appendChild(row);
+}
+
+/*
+ * CALCULAR COLOR DE CONTRASTE PARA TEXTO
+ * Determina si usar texto blanco o negro según el color de fondo
+ */
+function getContrastColor(hexColor) {
+    // Convertir hex a RGB
+    const r = parseInt(hexColor.substr(1, 2), 16);
+    const g = parseInt(hexColor.substr(3, 2), 16);
+    const b = parseInt(hexColor.substr(5, 2), 16);
+    
+    // Calcular luminosidad
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Retornar negro para fondos claros, blanco para fondos oscuros
+    return luminance > 0.5 ? '#000000' : '#FFFFFF';
 }
 
 /*
@@ -365,6 +442,9 @@ function handleDepartmentMove(evt) {
     // Actualizar estado y mapa
     updateDepartmentGroups();
     updateMapColors();
+    
+    // Actualizar tabla comparativa
+    updateComparisonTable();
 }
 
 /*
