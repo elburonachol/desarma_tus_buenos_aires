@@ -64,7 +64,7 @@ function initializeMap() {
  * y los reproyecta a EPSG:3857 para que coincidan con el mapa base
  */
 function loadGeoJSON() {
-    return fetch('partidos.geojson')
+    return fetch('PBA.geojson')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Error al cargar el archivo GeoJSON');
