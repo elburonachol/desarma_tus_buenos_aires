@@ -7,14 +7,16 @@
     
     <!-- 
     FUNCIONALIDADES PRINCIPALES DE LA PÁGINA:
-    1. Mapa interactivo con capa base oficial de Argentina (IGN)
+    1. Mapa interactivo con capa base oficial de Argentina (IGN) en escala de grises
     2. Representación correcta de la soberanía argentina en Malvinas
-    3. Sistema de división provincial mediante cajas de colores
-    4. Drag & drop de departamentos entre listado y divisiones
-    5. Control dinámico del número de divisiones (1-10)
-    6. Reset completo del estado
-    7. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
-    8. Distribución en tres columnas: mapa | divisiones | listado
+    3. Carga de departamentos desde PBA.geojson con campos "in1" y "nam"
+    4. Sistema de división provincial mediante cajas de colores con paleta armónica
+    5. Drag & drop de departamentos entre listado y divisiones
+    6. Control dinámico del número de divisiones (1-10)
+    7. Reset completo del estado
+    8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
+    9. Distribución en tres columnas: mapa | divisiones | listado
+    10. Tabla comparativa dinámica que muestra cantidad de partidos por división
     -->
     
     <!-- Leaflet CSS -->
@@ -73,6 +75,29 @@
             <div class="list-column">
                 <h3>Listado de Departamentos (<span id="dept-count">0</span>)</h3>
                 <div id="all-departments-list" class="departments-list"></div>
+            </div>
+        </div>
+        
+        <!-- 
+        TABLA COMPARATIVA:
+        - Se ubica debajo de las tres columnas principales
+        - Muestra estadísticas comparativas entre divisiones
+        - Se actualiza automáticamente cuando cambian las divisiones
+        -->
+        <div class="comparison-section">
+            <h3>Comparación entre Divisiones</h3>
+            <div class="table-container">
+                <table id="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <!-- Las columnas de divisiones se generan dinámicamente -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de datos se generan dinámicamente -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
