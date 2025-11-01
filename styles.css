@@ -141,6 +141,7 @@ h1 {
  * COLUMNA 2: DIVISIONES (20% del ancho)
  * - Panel con scroll para manejar múltiples divisiones
  * - Diseño de tarjeta con sombra
+ * - Nombres de divisiones editables
  */
 .divisions-column {
     flex: 1; /* 20% del espacio (1/5) */
@@ -201,6 +202,7 @@ h1 {
  * - Fondo blanco con sombra
  * - Borde izquierdo con color distintivo
  * - Altura mínima para mejor UX
+ * - Nombres editables
  */
 .group-box {
     background: white;
@@ -221,6 +223,25 @@ h1 {
     font-size: 14px;
     color: #555;
     font-weight: 600;
+}
+
+/* Estilos para nombres de división editables */
+.editable-division-name {
+    outline: none;
+    border-bottom: 1px dashed transparent;
+    padding: 2px 4px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    border-radius: 3px;
+    min-height: 1.2em; /* Mantener altura incluso cuando está vacío */
+}
+
+.editable-division-name:focus {
+    border-bottom: 1px solid #3498db;
+    background-color: #f0f8ff;
+}
+
+.editable-division-name:hover {
+    border-bottom: 1px dashed #ccc;
 }
 
 .group-list {
@@ -335,16 +356,13 @@ h1 {
 
 /* 
  * ESTILOS PARA DEPARTAMENTOS DEL GRAN BUENOS AIRES:
- * - Texto en negrita para destacar
- * - Borde más marcado
+ * - Texto en negrita para destacar (sin borde rojo)
  */
-.department-item.gba-department {
+.department-item.gba-department-bold {
     font-weight: 700;
-    border-left: 3px solid #e74c3c;
-    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
 }
 
-.department-item.gba-department:hover {
+.department-item.gba-department-bold:hover {
     background: #3498db;
     color: white;
 }
