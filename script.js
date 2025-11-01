@@ -11,9 +11,10 @@
  * 7. Reset completo del estado
  * 8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
  * 9. Distribución en tres columnas: mapa | divisiones | listado
- * 10. Tabla comparativa que muestra cantidad de partidos por división
+ * 10. Tabla comparativa que muestra cantidad de partidos, superficie, población y densidad
  * 11. Contador de departamentos restantes en listado
  * 12. Destacado visual de departamentos del Gran Buenos Aires
+ * 13. Integración con datos externos de superficie y población
  */
 
 // Variables globales para el estado de la aplicación
@@ -22,6 +23,7 @@ let geoJsonLayer;           // Capa GeoJSON con los departamentos
 let departmentGroups = {};  // Objeto que almacena las divisiones y sus departamentos
 let allDepartments = [];    // Array con todos los departamentos (para reset)
 let currentDivisionCount = 3; // Número actual de divisiones visibles
+let partidosData = null;    // Datos cargados desde datos_partidos.json
 
 // Paleta de colores armónica y bien diferenciable para las divisiones
 // Colores seleccionados para ser distinguibles pero no demasiado chillones
@@ -49,17 +51,47 @@ const gbaCodes = [
 /*
  * INICIALIZACIÓN DE LA APLICACIÓN
  * Se ejecuta cuando el DOM está completamente cargado
+ * Ahora carga tanto el GeoJSON como los datos de partidos
  */
 document.addEventListener('DOMContentLoaded', function() {
     initializeMap();
-    loadGeoJSON().then(() => {
+    
+    // Cargar tanto el GeoJSON como los datos de partidos de manera concurrente
+    Promise.all([
+        loadGeoJSON(),
+        loadPartidosData()
+    ]).then(() => {
         initializeDivisionBoxes(currentDivisionCount);
         setupResetButton();
         setupDivisionSelector();
         initializeComparisonTable();
-        updateRemainingCount(); // Inicializar contador de departamentos restantes
+        updateRemainingCount();
+    }).catch(error => {
+        console.error('Error en la inicialización:', error);
     });
 });
+
+/*
+ * CARGA DE DATOS DE PARTIDOS DESDE ARCHIVO JSON
+ * Carga los datos de superficie, población y otras variables
+ * desde datos/datos_partidos.json
+ */
+async function loadPartidosData() {
+    try {
+        const response = await fetch('datos/datos_partidos.json');
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        partidosData = await response.json();
+        console.log('Datos de partidos cargados:', partidosData);
+        console.log(`Variables disponibles: ${Object.keys(partidosData.variables)}`);
+        return true;
+    } catch (error) {
+        console.error('Error cargando datos de partidos:', error);
+        // No bloqueamos la aplicación si falla la carga de datos
+        return true;
+    }
+}
 
 /*
  * INICIALIZACIÓN DEL MAPA LEAFLET
@@ -290,8 +322,68 @@ function initializeComparisonTable() {
 }
 
 /*
+ * OBTENER CÓDIGO CDE POR NOMBRE DE DEPARTAMENTO
+ * Función auxiliar para encontrar el código CDE dado un nombre de departamento
+ */
+function obtenerCodigoCdePorNombre(nombreDepartamento) {
+    const departamento = allDepartments.find(dept => dept.properties.nam === nombreDepartamento);
+    return departamento ? departamento.properties.cde : null;
+}
+
+/*
+ * CALCULAR TOTAL DE UNA VARIABLE PARA UNA DIVISIÓN
+ * Suma los valores de una variable específica para todos los departamentos en una división
+ */
+function calcularTotalDivision(grupoId, variable) {
+    if (!partidosData || !partidosData.datos) {
+        return 0;
+    }
+    
+    const partidosEnGrupo = departmentGroups[grupoId].departments;
+    let total = 0;
+    let partidosConDatos = 0;
+    
+    partidosEnGrupo.forEach(nombrePartido => {
+        const codigoCde = obtenerCodigoCdePorNombre(nombrePartido);
+        if (codigoCde && partidosData.datos[codigoCde] && partidosData.datos[codigoCde][variable]) {
+            total += partidosData.datos[codigoCde][variable];
+            partidosConDatos++;
+        }
+    });
+    
+    // Si no hay datos para ningún partido, retornar 0
+    return partidosConDatos > 0 ? total : 0;
+}
+
+/*
+ * CALCULAR DENSIDAD POBLACIONAL PARA UNA DIVISIÓN
+ * Calcula la densidad (población/superficie) para una división
+ */
+function calcularDensidadDivision(grupoId) {
+    const poblacion = calcularTotalDivision(grupoId, 'poblacion_total');
+    const superficie = calcularTotalDivision(grupoId, 'superficie');
+    
+    if (superficie > 0 && poblacion > 0) {
+        return (poblacion / superficie).toFixed(1);
+    }
+    return '0.0';
+}
+
+/*
+ * FORMATEAR NÚMERO CON SEPARADORES DE MILES
+ * Convierte un número a string con separadores de miles para mejor legibilidad
+ */
+function formatearNumero(numero) {
+    if (numero === 0 || numero === '0') return '0';
+    if (!numero) return '-';
+    
+    return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+/*
  * ACTUALIZACIÓN DE LA TABLA COMPARATIVA
  * Genera y actualiza la tabla con las estadísticas de las divisiones
+ * Ahora incluye superficie, población y densidad
  */
 function updateComparisonTable() {
     const table = document.getElementById('comparison-table');
@@ -312,20 +404,79 @@ function updateComparisonTable() {
     }
     
     // Crear fila de "Cantidad de partidos"
-    const row = document.createElement('tr');
-    const variableCell = document.createElement('td');
-    variableCell.textContent = 'Cantidad de partidos';
-    row.appendChild(variableCell);
+    const filaCantidad = document.createElement('tr');
+    const celdaVariableCantidad = document.createElement('td');
+    celdaVariableCantidad.textContent = 'Cantidad de partidos';
+    filaCantidad.appendChild(celdaVariableCantidad);
     
     // Calcular y agregar cantidad de partidos por división
     for (let i = 1; i <= currentDivisionCount; i++) {
         const countCell = document.createElement('td');
         const count = departmentGroups[i] ? departmentGroups[i].departments.length : 0;
         countCell.textContent = count;
-        row.appendChild(countCell);
+        filaCantidad.appendChild(countCell);
     }
     
-    tbody.appendChild(row);
+    tbody.appendChild(filaCantidad);
+    
+    // Solo agregar las filas de datos si tenemos los datos cargados
+    if (partidosData && partidosData.datos) {
+        // Crear fila de "Superficie total (km²)"
+        const filaSuperficie = document.createElement('tr');
+        const celdaVariableSuperficie = document.createElement('td');
+        celdaVariableSuperficie.textContent = 'Superficie total (km²)';
+        filaSuperficie.appendChild(celdaVariableSuperficie);
+        
+        for (let i = 1; i <= currentDivisionCount; i++) {
+            const superficieCell = document.createElement('td');
+            const superficie = calcularTotalDivision(i, 'superficie');
+            superficieCell.textContent = formatearNumero(superficie);
+            filaSuperficie.appendChild(superficieCell);
+        }
+        
+        tbody.appendChild(filaSuperficie);
+        
+        // Crear fila de "Población total"
+        const filaPoblacion = document.createElement('tr');
+        const celdaVariablePoblacion = document.createElement('td');
+        celdaVariablePoblacion.textContent = 'Población total';
+        filaPoblacion.appendChild(celdaVariablePoblacion);
+        
+        for (let i = 1; i <= currentDivisionCount; i++) {
+            const poblacionCell = document.createElement('td');
+            const poblacion = calcularTotalDivision(i, 'poblacion_total');
+            poblacionCell.textContent = formatearNumero(poblacion);
+            filaPoblacion.appendChild(poblacionCell);
+        }
+        
+        tbody.appendChild(filaPoblacion);
+        
+        // Crear fila de "Densidad (hab/km²)"
+        const filaDensidad = document.createElement('tr');
+        const celdaVariableDensidad = document.createElement('td');
+        celdaVariableDensidad.textContent = 'Densidad (hab/km²)';
+        filaDensidad.appendChild(celdaVariableDensidad);
+        
+        for (let i = 1; i <= currentDivisionCount; i++) {
+            const densidadCell = document.createElement('td');
+            const densidad = calcularDensidadDivision(i);
+            densidadCell.textContent = formatearNumero(densidad);
+            filaDensidad.appendChild(densidadCell);
+        }
+        
+        tbody.appendChild(filaDensidad);
+    } else {
+        // Mostrar mensaje si no hay datos disponibles
+        const filaMensaje = document.createElement('tr');
+        const celdaMensaje = document.createElement('td');
+        celdaMensaje.colSpan = currentDivisionCount + 1;
+        celdaMensaje.textContent = 'Cargando datos de superficie y población...';
+        celdaMensaje.style.textAlign = 'center';
+        celdaMensaje.style.fontStyle = 'italic';
+        celdaMensaje.style.color = '#666';
+        filaMensaje.appendChild(celdaMensaje);
+        tbody.appendChild(filaMensaje);
+    }
 }
 
 /*
