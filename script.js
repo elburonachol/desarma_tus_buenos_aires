@@ -16,6 +16,7 @@
  * 12. Destacado visual de departamentos del Gran Buenos Aires (bordes más gruesos y texto en negrita)
  * 13. Integración con datos externos de superficie y población
  * 14. Nombres de divisiones editables por el usuario
+ * 15. Carga de regiones existentes (secciones electorales y regiones sanitarias)
  */
 
 // Variables globales para el estado de la aplicación
@@ -25,6 +26,8 @@ let departmentGroups = {};  // Objeto que almacena las divisiones y sus departam
 let allDepartments = [];    // Array con todos los departamentos (para reset)
 let currentDivisionCount = 3; // Número actual de divisiones visibles
 let partidosData = null;    // Datos cargados desde datos_partidos.json
+let regionesExistentes = null; // Datos cargados desde regiones_existentes.json
+let currentRegionType = null; // Tipo de región actualmente cargada (null, 'secciones_electorales', 'regiones_sanitarias')
 
 // Paleta de colores armónica y bien diferenciable para las divisiones
 // Colores seleccionados para ser distinguibles pero no demasiado chillones
@@ -52,25 +55,141 @@ const gbaCodes = [
 /*
  * INICIALIZACIÓN DE LA APLICACIÓN
  * Se ejecuta cuando el DOM está completamente cargado
- * Ahora carga tanto el GeoJSON como los datos de partidos
+ * Ahora carga tanto el GeoJSON, datos de partidos y regiones existentes
  */
 document.addEventListener('DOMContentLoaded', function() {
     initializeMap();
     
-    // Cargar tanto el GeoJSON como los datos de partidos de manera concurrente
+    // Cargar tanto el GeoJSON, datos de partidos y regiones existentes de manera concurrente
     Promise.all([
         loadGeoJSON(),
-        loadPartidosData()
+        loadPartidosData(),
+        loadRegionesExistentes()
     ]).then(() => {
         initializeDivisionBoxes(currentDivisionCount);
         setupResetButton();
         setupDivisionSelector();
+        setupRegionSelector(); // Configurar el selector de regiones existentes
         initializeComparisonTable();
         updateRemainingCount();
     }).catch(error => {
         console.error('Error en la inicialización:', error);
     });
 });
+
+/*
+ * CARGA DE DATOS DE REGIONES EXISTENTES DESDE ARCHIVO JSON
+ * Carga los datos de secciones electorales y regiones sanitarias
+ * desde regiones/regiones_existentes.json
+ */
+async function loadRegionesExistentes() {
+    try {
+        const response = await fetch('regiones/regiones_existentes.json');
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        regionesExistentes = await response.json();
+        console.log('Datos de regiones existentes cargados:', regionesExistentes);
+        return true;
+    } catch (error) {
+        console.error('Error cargando datos de regiones existentes:', error);
+        // No bloqueamos la aplicación si falla la carga de datos
+        return true;
+    }
+}
+
+/*
+ * CONFIGURACIÓN DEL SELECTOR DE REGIONES EXISTENTES
+ * Maneja los cambios en el menú desplegable de regiones existentes
+ */
+function setupRegionSelector() {
+    const selector = document.getElementById('existing-regions');
+    
+    selector.addEventListener('change', function() {
+        const selectedOption = this.value;
+        if (selectedOption) {
+            loadExistingRegions(selectedOption);
+        } else {
+            // Si se selecciona la opción por defecto (vacía), restablecer
+            currentRegionType = null;
+        }
+    });
+}
+
+/*
+ * CARGA DE REGIONES EXISTENTES EN LAS DIVISIONES
+ * Carga las regiones existentes (secciones electorales o regiones sanitarias) en las divisiones
+ */
+function loadExistingRegions(tipoRegion) {
+    if (!regionesExistentes) {
+        console.error('No se cargaron los datos de regiones existentes');
+        return;
+    }
+
+    // Obtener las regiones según el tipo seleccionado
+    const regiones = regionesExistentes[tipoRegion];
+    if (!regiones) {
+        console.error(`Tipo de región no válido: ${tipoRegion}`);
+        return;
+    }
+
+    // Guardar el tipo de región actual
+    currentRegionType = tipoRegion;
+
+    // Obtener los nombres de las regiones y ordenarlos
+    const nombresRegiones = Object.keys(regiones).sort();
+    const numeroRegiones = nombresRegiones.length;
+
+    // Actualizar el número de divisiones al número de regiones
+    document.getElementById('division-count').value = numeroRegiones;
+    initializeDivisionBoxes(numeroRegiones);
+
+    // Limpiar el listado principal primero
+    const listContainer = document.getElementById('all-departments-list');
+    listContainer.innerHTML = '';
+
+    // Para cada región, asignar los departamentos correspondientes
+    nombresRegiones.forEach((nombreRegion, index) => {
+        const groupId = index + 1;
+        const departamentosRegion = regiones[nombreRegion];
+
+        // Actualizar el nombre de la división
+        departmentGroups[groupId].name = nombreRegion;
+        const editableName = document.querySelector(`[data-group-id="${groupId}"] .editable-division-name`);
+        if (editableName) {
+            editableName.textContent = nombreRegion;
+        }
+
+        // Obtener el contenedor de la división
+        const divisionList = document.getElementById(`division-${groupId}`);
+        if (divisionList) {
+            // Limpiar la división
+            divisionList.innerHTML = '';
+
+            // Agregar cada departamento de la región
+            departamentosRegion.forEach(depto => {
+                const codigoCde = depto.cde;
+                const nombreDepartamento = depto.municipio_nombre;
+                const isGBA = gbaCodes.includes(codigoCde);
+
+                const item = document.createElement('div');
+                item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
+                item.textContent = nombreDepartamento;
+                item.setAttribute('data-dept-name', nombreDepartamento);
+                item.setAttribute('data-dept-code', codigoCde);
+                divisionList.appendChild(item);
+            });
+        }
+    });
+
+    // Actualizar estado y mapa
+    updateDepartmentGroups();
+    updateMapColors();
+    
+    // Actualizar tabla comparativa y contador
+    updateComparisonTable();
+    updateRemainingCount();
+}
 
 /*
  * CARGA DE DATOS DE PARTIDOS DESDE ARCHIVO JSON
@@ -291,6 +410,11 @@ function initializeDivisionBoxes(newCount) {
         editableName.addEventListener('blur', function() {
             departmentGroups[i].name = this.textContent;
             updateComparisonTable();
+            // Si estamos en modo región existente, deseleccionar
+            if (currentRegionType) {
+                document.getElementById('existing-regions').value = '';
+                currentRegionType = null;
+            }
         });
         
         // Permitir Enter para guardar el nombre
@@ -544,6 +668,11 @@ function setupDivisionSelector() {
         const newCount = parseInt(this.value);
         if (newCount !== currentDivisionCount) {
             initializeDivisionBoxes(newCount);
+            // Si estamos en modo región existente, deseleccionar
+            if (currentRegionType) {
+                document.getElementById('existing-regions').value = '';
+                currentRegionType = null;
+            }
         }
     });
 }
@@ -624,6 +753,7 @@ function initializeDragAndDrop() {
 /*
  * MANEJO DE MOVIMIENTO DE DEPARTAMENTOS
  * Procesa los eventos de drag & drop entre listas
+ * Si se mueve un departamento, se deselecciona la región existente
  */
 function handleDepartmentMove(evt) {
     const departmentName = evt.item.getAttribute('data-dept-name');
@@ -646,6 +776,12 @@ function handleDepartmentMove(evt) {
     else {
         // Eliminar de otras divisiones
         removeDepartmentFromAllDivisions(departmentName, toElement.id);
+    }
+
+    // Si estamos en modo región existente, deseleccionar
+    if (currentRegionType) {
+        document.getElementById('existing-regions').value = '';
+        currentRegionType = null;
     }
 
     // Actualizar estado y mapa
@@ -864,8 +1000,11 @@ function resetToInitialState() {
         });
     });
 
-    // Restablecer selector a 3 divisiones
+    // Restablecer selectores
     document.getElementById('division-count').value = 3;
+    document.getElementById('existing-regions').value = '';
+    currentRegionType = null;
+    
     initializeDivisionBoxes(3);
     
     // Actualizar contador de departamentos restantes
