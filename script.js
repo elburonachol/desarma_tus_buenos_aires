@@ -13,8 +13,9 @@
  * 9. Distribución en tres columnas: mapa | divisiones | listado
  * 10. Tabla comparativa que muestra cantidad de partidos, superficie, población y densidad
  * 11. Contador de departamentos restantes en listado
- * 12. Destacado visual de departamentos del Gran Buenos Aires
+ * 12. Destacado visual de departamentos del Gran Buenos Aires (bordes más gruesos y texto en negrita)
  * 13. Integración con datos externos de superficie y población
+ * 14. Nombres de divisiones editables por el usuario
  */
 
 // Variables globales para el estado de la aplicación
@@ -115,7 +116,7 @@ function initializeMap() {
  * CARGA DEL ARCHIVO GEOJSON PBA.geojson
  * Carga todos los departamentos sin filtrar, usando campos "cde" y "nam"
  * Los ordena alfabéticamente por el campo "nam"
- * Identifica y marca los departamentos del Gran Buenos Aires
+ * Identifica y marca los departamentos del Gran Buenos Aires con bordes más gruesos
  */
 function loadGeoJSON() {
     return fetch('PBA.geojson')
@@ -149,10 +150,11 @@ function loadGeoJSON() {
                     const isGBA = gbaCodes.includes(feature.properties.cde);
                     
                     // Estilo por defecto: transparente (sin relleno) con borde visible
+                    // GBA tiene bordes más gruesos pero mismo color que los demás
                     return {
                         fillColor: '#3388ff',
                         fillOpacity: 0,  // Transparente - sin relleno
-                        color: isGBA ? '#e74c3c' : '#2c3e50', // Borde rojo para GBA, azul oscuro para otros
+                        color: '#2c3e50', // Mismo color para todos los bordes
                         weight: isGBA ? 2.5 : 1.5, // Borde más grueso para GBA
                         opacity: 0.8
                     };
@@ -162,9 +164,8 @@ function loadGeoJSON() {
                     const nombre = feature.properties.nam || 'Sin nombre';
                     const codigo = feature.properties.cde || 'N/A';
                     const isGBA = gbaCodes.includes(codigo);
-                    const gbaBadge = isGBA ? '<br><small style="color: #e74c3c; font-weight: bold;">★ Gran Buenos Aires</small>' : '';
                     
-                    layer.bindTooltip(`<strong>${nombre}</strong><br>Código: ${codigo}${gbaBadge}`, {
+                    layer.bindTooltip(`<strong>${nombre}</strong><br>Código: ${codigo}`, {
                         permanent: false,
                         direction: 'auto'
                     });
@@ -176,9 +177,8 @@ function loadGeoJSON() {
 
                     // Efectos hover para mejor UX
                     layer.on('mouseover', function() {
-                        const isGBA = gbaCodes.includes(feature.properties.cde);
                         layer.setStyle({
-                            weight: isGBA ? 3.5 : 2.5,
+                            weight: 2.5,
                             color: '#e74c3c',
                             fillOpacity: 0.1
                         });
@@ -202,7 +202,7 @@ function loadGeoJSON() {
                             layer.setStyle({
                                 fillColor: '#3388ff',
                                 fillOpacity: 0,
-                                color: isGBA ? '#e74c3c' : '#2c3e50',
+                                color: '#2c3e50',
                                 weight: isGBA ? 2.5 : 1.5,
                                 opacity: 0.8
                             });
@@ -242,6 +242,7 @@ function updateRemainingCount() {
  * INICIALIZACIÓN DE CAJAS DE DIVISIÓN
  * Crea dinámicamente las cajas de división según el número especificado
  * Maneja inteligentemente la reducción de divisiones preservando las superiores
+ * Ahora con nombres editables
  */
 function initializeDivisionBoxes(newCount) {
     const container = document.getElementById('division-boxes-container');
@@ -266,10 +267,11 @@ function initializeDivisionBoxes(newCount) {
     // Crear nuevas cajas de división
     for (let i = 1; i <= newCount; i++) {
         const color = divisionColors[i - 1] || '#3388ff';
+        const defaultName = `División ${i}`;
         departmentGroups[i] = { 
             color: color, 
             departments: [],
-            name: `División ${i}`
+            name: defaultName
         };
 
         const groupBox = document.createElement('div');
@@ -278,11 +280,26 @@ function initializeDivisionBoxes(newCount) {
         groupBox.style.borderLeft = `4px solid ${color}`;
 
         groupBox.innerHTML = `
-            <h3>División ${i}</h3>
+            <h3 class="editable-division-name" contenteditable="true">${defaultName}</h3>
             <div class="group-list" id="division-${i}"></div>
         `;
 
         container.appendChild(groupBox);
+        
+        // Configurar evento para nombres editables
+        const editableName = groupBox.querySelector('.editable-division-name');
+        editableName.addEventListener('blur', function() {
+            departmentGroups[i].name = this.textContent;
+            updateComparisonTable();
+        });
+        
+        // Permitir Enter para guardar el nombre
+        editableName.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.blur();
+            }
+        });
         
         // Si existía esta división antes, restaurar sus departamentos
         if (previousGroups[i] && previousGroups[i].departments) {
@@ -293,7 +310,7 @@ function initializeDivisionBoxes(newCount) {
                 const isGBA = dept && gbaCodes.includes(dept.properties.cde);
                 
                 const item = document.createElement('div');
-                item.className = `department-item ${isGBA ? 'gba-department' : ''}`;
+                item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
                 item.textContent = deptName;
                 item.setAttribute('data-dept-name', deptName);
                 divisionList.appendChild(item);
@@ -384,6 +401,7 @@ function formatearNumero(numero) {
  * ACTUALIZACIÓN DE LA TABLA COMPARATIVA
  * Genera y actualiza la tabla con las estadísticas de las divisiones
  * Ahora incluye superficie, población y densidad
+ * Usa los nombres editables de las divisiones
  */
 function updateComparisonTable() {
     const table = document.getElementById('comparison-table');
@@ -394,10 +412,10 @@ function updateComparisonTable() {
     thead.innerHTML = '<th>Variable</th>';
     tbody.innerHTML = '';
     
-    // Crear encabezados de columnas (divisiones)
+    // Crear encabezados de columnas (divisiones) con nombres editables
     for (let i = 1; i <= currentDivisionCount; i++) {
         const th = document.createElement('th');
-        th.textContent = `División ${i}`;
+        th.textContent = departmentGroups[i] ? departmentGroups[i].name : `División ${i}`;
         th.style.backgroundColor = departmentGroups[i] ? departmentGroups[i].color : '#f8f9fa';
         th.style.color = getContrastColor(departmentGroups[i] ? departmentGroups[i].color : '#f8f9fa');
         thead.appendChild(th);
@@ -533,7 +551,7 @@ function setupDivisionSelector() {
 /*
  * POBLADO DEL LISTADO DE DEPARTAMENTOS
  * Llena la lista principal con todos los departamentos ordenados
- * Aplica estilos especiales a los departamentos del Gran Buenos Aires
+ * Aplica texto en negrita a los departamentos del Gran Buenos Aires
  */
 function populateDepartmentsList(features) {
     const listContainer = document.getElementById('all-departments-list');
@@ -545,7 +563,7 @@ function populateDepartmentsList(features) {
         const isGBA = gbaCodes.includes(codigo);
         
         const item = document.createElement('div');
-        item.className = `department-item ${isGBA ? 'gba-department' : ''}`;
+        item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
         item.textContent = nombre;
         item.setAttribute('data-dept-name', nombre);
         item.setAttribute('data-dept-code', codigo);
@@ -753,8 +771,8 @@ function updateMapColors() {
             layer.setStyle({
                 fillColor: '#3388ff',
                 fillOpacity: 0,  // Transparente
-                color: isGBA ? '#e74c3c' : '#2c3e50',
-                weight: isGBA ? 2.5 : 1.5,
+                color: '#2c3e50', // Mismo color para todos
+                weight: isGBA ? 2.5 : 1.5, // Borde más grueso para GBA
                 opacity: 0.8
             });
         }
@@ -795,7 +813,7 @@ function returnDepartmentToMainList(departmentName) {
     const isGBA = dept && gbaCodes.includes(dept.properties.cde);
     
     const item = document.createElement('div');
-    item.className = `department-item ${isGBA ? 'gba-department' : ''}`;
+    item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
     item.textContent = departmentName;
     item.setAttribute('data-dept-name', departmentName);
     item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
@@ -827,6 +845,7 @@ function resetToInitialState() {
         }
         if (departmentGroups[i]) {
             departmentGroups[i].departments = [];
+            departmentGroups[i].name = `División ${i}`; // Restaurar nombre por defecto
         }
     }
 
@@ -839,7 +858,7 @@ function resetToInitialState() {
         layer.setStyle({
             fillColor: '#3388ff',
             fillOpacity: 0,
-            color: isGBA ? '#e74c3c' : '#2c3e50',
+            color: '#2c3e50',
             weight: isGBA ? 2.5 : 1.5,
             opacity: 0.8
         });
