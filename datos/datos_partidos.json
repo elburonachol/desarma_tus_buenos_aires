@@ -1,0 +1,712 @@
+{
+  "metadata": {
+    "ultima_actualizacion": "2025-11-01",
+    "fuentes_principales": [
+      "INDEC, Censo Nacional de Población, Hogares y Viviendas 2022. Resultados definitivos.",
+      "Instituto Geográfico Nacional (IGN): Determinación de la superficie correspondiente al Territorio Continental, Antártico e Insular de la República Argentina. Tablas 12 y 13."
+    ],
+    "elaboracion": "Datos procesados para mapa interactivo de división provincial",
+    "version_estructura": "1.0"
+  },
+  "variables": {
+    "cde": {
+      "nombre": "Código de Departamento",
+      "tipo": "texto",
+      "descripcion": "Código único identificador del departamento/partido",
+      "operacion": "no_aplica"
+    },
+    "superficie": {
+      "nombre": "Superficie",
+      "tipo": "entero",
+      "unidad": "km²",
+      "descripcion": "Superficie del departamento en kilómetros cuadrados. Fuente: IGN, Determinación de la superficie correspondiente al Territorio Continental, Antártico e Insular de la República Argentina. Tabla 13: Valores de superficie correspondientes a los partidos de la provincia de Buenos Aires, pág. 27.",
+      "operacion": "suma",
+      "fuente": "Instituto Geográfico Nacional (IGN)"
+    },
+    "poblacion_total": {
+      "nombre": "Población Total",
+      "tipo": "entero",
+      "unidad": "personas",
+      "descripcion": "Población total según Censo 2022",
+      "operacion": "suma",
+      "fuente": "INDEC, Censo Nacional de Población, Hogares y Viviendas 2022. Resultados definitivos."
+    }
+  },
+  "datos": {
+    "06028": {
+      "cde": "06028",
+      "superficie": 129,
+      "poblacion_total": 584827
+    },
+    "06035": {
+      "cde": "06035",
+      "superficie": 56,
+      "poblacion_total": 367554
+    },
+    "06091": {
+      "cde": "06091",
+      "superficie": 220,
+      "poblacion_total": 358712
+    },
+    "06260": {
+      "cde": "06260",
+      "superficie": 121,
+      "poblacion_total": 338480
+    },
+    "06270": {
+      "cde": "06270",
+      "superficie": 238,
+      "poblacion_total": 201511
+    },
+    "06274": {
+      "cde": "06274",
+      "superficie": 190,
+      "poblacion_total": 496433
+    },
+    "06371": {
+      "cde": "06371",
+      "superficie": 57,
+      "poblacion_total": 450518
+    },
+    "06408": {
+      "cde": "06408",
+      "superficie": 36,
+      "poblacion_total": 185641
+    },
+    "06410": {
+      "cde": "06410",
+      "superficie": 38,
+      "poblacion_total": 180232
+    },
+    "06412": {
+      "cde": "06412",
+      "superficie": 50,
+      "poblacion_total": 326992
+    },
+    "06427": {
+      "cde": "06427",
+      "superficie": 327,
+      "poblacion_total": 1841247
+    },
+    "06434": {
+      "cde": "06434",
+      "superficie": 50,
+      "poblacion_total": 461267
+    },
+    "06490": {
+      "cde": "06490",
+      "superficie": 89,
+      "poblacion_total": 690480
+    },
+    "06515": {
+      "cde": "06515",
+      "superficie": 63,
+      "poblacion_total": 350674
+    },
+    "06539": {
+      "cde": "06539",
+      "superficie": 174,
+      "poblacion_total": 582486
+    },
+    "06560": {
+      "cde": "06560",
+      "superficie": 186,
+      "poblacion_total": 576632
+    },
+    "06568": {
+      "cde": "06568",
+      "superficie": 55,
+      "poblacion_total": 331183
+    },
+    "06658": {
+      "cde": "06658",
+      "superficie": 92,
+      "poblacion_total": 633391
+    },
+    "06749": {
+      "cde": "06749",
+      "superficie": 993,
+      "poblacion_total": 171616
+    },
+    "06756": {
+      "cde": "06756",
+      "superficie": 52,
+      "poblacion_total": 297282
+    },
+    "06760": {
+      "cde": "06760",
+      "superficie": 83,
+      "poblacion_total": 328835
+    },
+    "06805": {
+      "cde": "06805",
+      "superficie": 394,
+      "poblacion_total": 446949
+    },
+    "06840": {
+      "cde": "06840",
+      "superficie": 45,
+      "poblacion_total": 364176
+    },
+    "06861": {
+      "cde": "06861",
+      "superficie": 35,
+      "poblacion_total": 282280
+    },
+    "06007": {
+      "cde": "06007",
+      "superficie": 5882,
+      "poblacion_total": 17552
+    },
+    "06014": {
+      "cde": "06014",
+      "superficie": 3789,
+      "poblacion_total": 12914
+    },
+    "06021": {
+      "cde": "06021",
+      "superficie": 1123,
+      "poblacion_total": 12982
+    },
+    "06077": {
+      "cde": "06077",
+      "superficie": 1244,
+      "poblacion_total": 32215
+    },
+    "06042": {
+      "cde": "06042",
+      "superficie": 6756,
+      "poblacion_total": 21977
+    },
+    "06049": {
+      "cde": "06049",
+      "superficie": 6538,
+      "poblacion_total": 75905
+    },
+    "06056": {
+      "cde": "06056",
+      "superficie": 2240,
+      "poblacion_total": 336557
+    },
+    "06063": {
+      "cde": "06063",
+      "superficie": 4120,
+      "poblacion_total": 48982
+    },
+    "06070": {
+      "cde": "06070",
+      "superficie": 1530,
+      "poblacion_total": 40002
+    },
+    "06084": {
+      "cde": "06084",
+      "superficie": 5336,
+      "poblacion_total": 22292
+    },
+    "06098": {
+      "cde": "06098",
+      "superficie": 145,
+      "poblacion_total": 100930
+    },
+    "06105": {
+      "cde": "06105",
+      "superficie": 4935,
+      "poblacion_total": 37594
+    },
+    "06112": {
+      "cde": "06112",
+      "superficie": 2199,
+      "poblacion_total": 46504
+    },
+    "06119": {
+      "cde": "06119",
+      "superficie": 1114,
+      "poblacion_total": 32448
+    },
+    "06126": {
+      "cde": "06126",
+      "superficie": 986,
+      "poblacion_total": 110566
+    },
+    "06134": {
+      "cde": "06134",
+      "superficie": 1186,
+      "poblacion_total": 70684
+    },
+    "06140": {
+      "cde": "06140",
+      "superficie": 549,
+      "poblacion_total": 15965
+    },
+    "06147": {
+      "cde": "06147",
+      "superficie": 2532,
+      "poblacion_total": 23100
+    },
+    "06154": {
+      "cde": "06154",
+      "superficie": 3912,
+      "poblacion_total": 14079
+    },
+    "06161": {
+      "cde": "06161",
+      "superficie": 1061,
+      "poblacion_total": 17499
+    },
+    "06168": {
+      "cde": "06168",
+      "superficie": 2113,
+      "poblacion_total": 9594
+    },
+    "06210": {
+      "cde": "06210",
+      "superficie": 2290,
+      "poblacion_total": 52729
+    },
+    "06218": {
+      "cde": "06218",
+      "superficie": 3159,
+      "poblacion_total": 42452
+    },
+    "06224": {
+      "cde": "06224",
+      "superficie": 2059,
+      "poblacion_total": 70839
+    },
+    "06175": {
+      "cde": "06175",
+      "superficie": 1001,
+      "poblacion_total": 27504
+    },
+    "06182": {
+      "cde": "06182",
+      "superficie": 1290,
+      "poblacion_total": 67503
+    },
+    "06189": {
+      "cde": "06189",
+      "superficie": 5845,
+      "poblacion_total": 15968
+    },
+    "06196": {
+      "cde": "06196",
+      "superficie": 5257,
+      "poblacion_total": 24420
+    },
+    "06203": {
+      "cde": "06203",
+      "superficie": 5984,
+      "poblacion_total": 42110
+    },
+    "06231": {
+      "cde": "06231",
+      "superficie": 3823,
+      "poblacion_total": 18422
+    },
+    "06238": {
+      "cde": "06238",
+      "superficie": 1978,
+      "poblacion_total": 32032
+    },
+    "06245": {
+      "cde": "06245",
+      "superficie": 114,
+      "poblacion_total": 63997
+    },
+    "06252": {
+      "cde": "06252",
+      "superficie": 301,
+      "poblacion_total": 256268
+    },
+    "06266": {
+      "cde": "06266",
+      "superficie": 637,
+      "poblacion_total": 40159
+    },
+    "06277": {
+      "cde": "06277",
+      "superficie": 1813,
+      "poblacion_total": 10790
+    },
+    "06280": {
+      "cde": "06280",
+      "superficie": 1628,
+      "poblacion_total": 45526
+    },
+    "06287": {
+      "cde": "06287",
+      "superficie": 3366,
+      "poblacion_total": 12631
+    },
+    "06294": {
+      "cde": "06294",
+      "superficie": 1486,
+      "poblacion_total": 16350
+    },
+    "06301": {
+      "cde": "06301",
+      "superficie": 1858,
+      "poblacion_total": 20791
+    },
+    "06308": {
+      "cde": "06308",
+      "superficie": 2326,
+      "poblacion_total": 3174
+    },
+    "06315": {
+      "cde": "06315",
+      "superficie": 2982,
+      "poblacion_total": 22624
+    },
+    "06322": {
+      "cde": "06322",
+      "superficie": 4814,
+      "poblacion_total": 11618
+    },
+    "06329": {
+      "cde": "06329",
+      "superficie": 751,
+      "poblacion_total": 18022
+    },
+    "06336": {
+      "cde": "06336",
+      "superficie": 2705,
+      "poblacion_total": 4870
+    },
+    "06343": {
+      "cde": "06343",
+      "superficie": 1200,
+      "poblacion_total": 14207
+    },
+    "06351": {
+      "cde": "06351",
+      "superficie": 2558,
+      "poblacion_total": 12941
+    },
+    "06357": {
+      "cde": "06357",
+      "superficie": 1462,
+      "poblacion_total": 667082
+    },
+    "06364": {
+      "cde": "06364",
+      "superficie": 367,
+      "poblacion_total": 142709
+    },
+    "06385": {
+      "cde": "06385",
+      "superficie": 2140,
+      "poblacion_total": 22649
+    },
+    "06392": {
+      "cde": "06392",
+      "superficie": 7262,
+      "poblacion_total": 35251
+    },
+    "06399": {
+      "cde": "06399",
+      "superficie": 4824,
+      "poblacion_total": 11801
+    },
+    "06406": {
+      "cde": "06406",
+      "superficie": 1645,
+      "poblacion_total": 10661
+    },
+    "06413": {
+      "cde": "06413",
+      "superficie": 2255,
+      "poblacion_total": 103787
+    },
+    "06420": {
+      "cde": "06420",
+      "superficie": 234,
+      "poblacion_total": 100689
+    },
+    "06441": {
+      "cde": "06441",
+      "superficie": 893,
+      "poblacion_total": 768547
+    },
+    "06448": {
+      "cde": "06448",
+      "superficie": 3448,
+      "poblacion_total": 11646
+    },
+    "06455": {
+      "cde": "06455",
+      "superficie": 3341,
+      "poblacion_total": 27239
+    },
+    "06462": {
+      "cde": "06462",
+      "superficie": 1606,
+      "poblacion_total": 17266
+    },
+    "06466": {
+      "cde": "06466",
+      "superficie": 1047,
+      "poblacion_total": 6221
+    },
+    "06469": {
+      "cde": "06469",
+      "superficie": 5778,
+      "poblacion_total": 45506
+    },
+    "06476": {
+      "cde": "06476",
+      "superficie": 4720,
+      "poblacion_total": 18243
+    },
+    "06483": {
+      "cde": "06483",
+      "superficie": 1726,
+      "poblacion_total": 41760
+    },
+    "06497": {
+      "cde": "06497",
+      "superficie": 771,
+      "poblacion_total": 111251
+    },
+    "06505": {
+      "cde": "06505",
+      "superficie": 1850,
+      "poblacion_total": 26613
+    },
+    "06511": {
+      "cde": "06511",
+      "superficie": 2604,
+      "poblacion_total": 11323
+    },
+    "06518": {
+      "cde": "06518",
+      "superficie": 3089,
+      "poblacion_total": 33110
+    },
+    "06525": {
+      "cde": "06525",
+      "superficie": 422,
+      "poblacion_total": 67011
+    },
+    "06532": {
+      "cde": "06532",
+      "superficie": 1050,
+      "poblacion_total": 72980
+    },
+    "06547": {
+      "cde": "06547",
+      "superficie": 1876,
+      "poblacion_total": 24868
+    },
+    "06553": {
+      "cde": "06553",
+      "superficie": 200,
+      "poblacion_total": 8465
+    },
+    "06574": {
+      "cde": "06574",
+      "superficie": 1620,
+      "poblacion_total": 19899
+    },
+    "06581": {
+      "cde": "06581",
+      "superficie": 4566,
+      "poblacion_total": 102110
+    },
+    "06588": {
+      "cde": "06588",
+      "superficie": 4291,
+      "poblacion_total": 52607
+    },
+    "06595": {
+      "cde": "06595",
+      "superficie": 7666,
+      "poblacion_total": 125751
+    },
+    "06602": {
+      "cde": "06602",
+      "superficie": 13564,
+      "poblacion_total": 37646
+    },
+    "06609": {
+      "cde": "06609",
+      "superficie": 4523,
+      "poblacion_total": 44783
+    },
+    "06616": {
+      "cde": "06616",
+      "superficie": 1821,
+      "poblacion_total": 7143
+    },
+    "06623": {
+      "cde": "06623",
+      "superficie": 3005,
+      "poblacion_total": 115340
+    },
+    "06630": {
+      "cde": "06630",
+      "superficie": 3449,
+      "poblacion_total": 4642
+    },
+    "06638": {
+      "cde": "06638",
+      "superficie": 385,
+      "poblacion_total": 394754
+    },
+    "06644": {
+      "cde": "06644",
+      "superficie": 66,
+      "poblacion_total": 39449
+    },
+    "06648": {
+      "cde": "06648",
+      "superficie": 122,
+      "poblacion_total": 102106
+    },
+    "06651": {
+      "cde": "06651",
+      "superficie": 6376,
+      "poblacion_total": 16613
+    },
+    "06655": {
+      "cde": "06655",
+      "superficie": 1605,
+      "poblacion_total": 12297
+    },
+    "06665": {
+      "cde": "06665",
+      "superficie": 1048,
+      "poblacion_total": 39730
+    },
+    "06672": {
+      "cde": "06672",
+      "superficie": 4313,
+      "poblacion_total": 16635
+    },
+    "06679": {
+      "cde": "06679",
+      "superficie": 3955,
+      "poblacion_total": 19849
+    },
+    "06686": {
+      "cde": "06686",
+      "superficie": 2060,
+      "poblacion_total": 25627
+    },
+    "06693": {
+      "cde": "06693",
+      "superficie": 1556,
+      "poblacion_total": 13977
+    },
+    "06700": {
+      "cde": "06700",
+      "superficie": 3546,
+      "poblacion_total": 22347
+    },
+    "06707": {
+      "cde": "06707",
+      "superficie": 2706,
+      "poblacion_total": 35656
+    },
+    "06721": {
+      "cde": "06721",
+      "superficie": 796,
+      "poblacion_total": 9427
+    },
+    "06714": {
+      "cde": "06714",
+      "superficie": 1611,
+      "poblacion_total": 39425
+    },
+    "06728": {
+      "cde": "06728",
+      "superficie": 1129,
+      "poblacion_total": 26510
+    },
+    "06735": {
+      "cde": "06735",
+      "superficie": 862,
+      "poblacion_total": 26897
+    },
+    "06742": {
+      "cde": "06742",
+      "superficie": 2997,
+      "poblacion_total": 8994
+    },
+    "06763": {
+      "cde": "06763",
+      "superficie": 681,
+      "poblacion_total": 168041
+    },
+    "06770": {
+      "cde": "06770",
+      "superficie": 1357,
+      "poblacion_total": 68613
+    },
+    "06778": {
+      "cde": "06778",
+      "superficie": 661,
+      "poblacion_total": 98215
+    },
+    "06784": {
+      "cde": "06784",
+      "superficie": 943,
+      "poblacion_total": 11786
+    },
+    "06791": {
+      "cde": "06791",
+      "superficie": 4855,
+      "poblacion_total": 145575
+    },
+    "06798": {
+      "cde": "06798",
+      "superficie": 4169,
+      "poblacion_total": 10783
+    },
+    "06812": {
+      "cde": "06812",
+      "superficie": 1334,
+      "poblacion_total": 2542
+    },
+    "06819": {
+      "cde": "06819",
+      "superficie": 4160,
+      "poblacion_total": 14810
+    },
+    "06826": {
+      "cde": "06826",
+      "superficie": 5498,
+      "poblacion_total": 49499
+    },
+    "06833": {
+      "cde": "06833",
+      "superficie": 5927,
+      "poblacion_total": 62426
+    },
+    "06847": {
+      "cde": "06847",
+      "superficie": 1252,
+      "poblacion_total": 9164
+    },
+    "06854": {
+      "cde": "06854",
+      "superficie": 4789,
+      "poblacion_total": 35563
+    },
+    "06868": {
+      "cde": "06868",
+      "superficie": 164,
+      "poblacion_total": 37463
+    },
+    "06875": {
+      "cde": "06875",
+      "superficie": 10399,
+      "poblacion_total": 32717
+    },
+    "06882": {
+      "cde": "06882",
+      "superficie": 1185,
+      "poblacion_total": 132221
+    }
+  }
+}
