@@ -262,6 +262,12 @@ h1 {
     border-bottom: 2px solid #f1f2f6;
 }
 
+.count-info {
+    font-size: 14px;
+    font-weight: normal;
+    color: #666;
+}
+
 /* 
  * LISTADO DE DEPARTAMENTOS:
  * - Contenedor con scroll para muchos elementos
@@ -325,6 +331,22 @@ h1 {
     background: #2980b9;
     color: white;
     transform: rotate(2deg);
+}
+
+/* 
+ * ESTILOS PARA DEPARTAMENTOS DEL GRAN BUENOS AIRES:
+ * - Texto en negrita para destacar
+ * - Borde más marcado
+ */
+.department-item.gba-department {
+    font-weight: 700;
+    border-left: 3px solid #e74c3c;
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+}
+
+.department-item.gba-department:hover {
+    background: #3498db;
+    color: white;
 }
 
 /* 
@@ -470,6 +492,12 @@ h1 {
     .comparison-section {
         padding: 20px;
     }
+    
+    .count-info {
+        display: block;
+        margin-top: 5px;
+        font-size: 13px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -503,5 +531,9 @@ h1 {
     #comparison-table th,
     #comparison-table td {
         padding: 8px 10px;
+    }
+    
+    .count-info {
+        font-size: 12px;
     }
 }
