@@ -4,7 +4,7 @@
  * FUNCIONALIDADES PRINCIPALES:
  * 1. Carga y visualización de mapa con capa base oficial de Argentina (IGN) en escala de grises
  * 2. Representación correcta de la soberanía argentina en Malvinas
- * 3. Carga de departamentos desde PBA.geojson con campos "in1" y "nam"
+ * 3. Carga de departamentos desde PBA.geojson con campos "cde" y "nam"
  * 4. Sistema de divisiones con paleta de colores armónica (10 colores)
  * 5. Drag & drop de departamentos entre listado y divisiones
  * 6. Control dinámico del número de divisiones (1-10)
@@ -12,6 +12,8 @@
  * 8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
  * 9. Distribución en tres columnas: mapa | divisiones | listado
  * 10. Tabla comparativa que muestra cantidad de partidos por división
+ * 11. Contador de departamentos restantes en listado
+ * 12. Destacado visual de departamentos del Gran Buenos Aires
  */
 
 // Variables globales para el estado de la aplicación
@@ -36,6 +38,14 @@ const divisionColors = [
     '#17becf'  // Cyan
 ];
 
+// Códigos de departamentos que pertenecen al Gran Buenos Aires
+const gbaCodes = [
+    '06028', '06035', '06091', '06260', '06270', '06274', 
+    '06371', '06408', '06410', '06412', '06427', '06434', 
+    '06490', '06515', '06539', '06560', '06568', '06658', 
+    '06749', '06756', '06760', '06805', '06840', '06861'
+];
+
 /*
  * INICIALIZACIÓN DE LA APLICACIÓN
  * Se ejecuta cuando el DOM está completamente cargado
@@ -47,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupResetButton();
         setupDivisionSelector();
         initializeComparisonTable();
+        updateRemainingCount(); // Inicializar contador de departamentos restantes
     });
 });
 
@@ -70,8 +81,9 @@ function initializeMap() {
 
 /*
  * CARGA DEL ARCHIVO GEOJSON PBA.geojson
- * Carga todos los departamentos sin filtrar, usando campos "in1" y "nam"
+ * Carga todos los departamentos sin filtrar, usando campos "cde" y "nam"
  * Los ordena alfabéticamente por el campo "nam"
+ * Identifica y marca los departamentos del Gran Buenos Aires
  */
 function loadGeoJSON() {
     return fetch('PBA.geojson')
@@ -101,20 +113,26 @@ function loadGeoJSON() {
             geoJsonLayer = L.geoJSON(allFeatures, {
                 // Leaflet maneja automáticamente la reproyección de EPSG:4326 a EPSG:3857
                 style: function(feature) {
+                    // Verificar si es un departamento del GBA
+                    const isGBA = gbaCodes.includes(feature.properties.cde);
+                    
                     // Estilo por defecto: transparente (sin relleno) con borde visible
                     return {
                         fillColor: '#3388ff',
                         fillOpacity: 0,  // Transparente - sin relleno
-                        color: '#2c3e50', // Borde azul oscuro
-                        weight: 1.5,
+                        color: isGBA ? '#e74c3c' : '#2c3e50', // Borde rojo para GBA, azul oscuro para otros
+                        weight: isGBA ? 2.5 : 1.5, // Borde más grueso para GBA
                         opacity: 0.8
                     };
                 },
                 onEachFeature: function(feature, layer) {
-                    // Tooltip con el nombre del departamento
+                    // Tooltip con el nombre del departamento y código
                     const nombre = feature.properties.nam || 'Sin nombre';
-                    const codigo = feature.properties.in1 || 'N/A';
-                    layer.bindTooltip(`<strong>${nombre}</strong><br>Código: ${codigo}`, {
+                    const codigo = feature.properties.cde || 'N/A';
+                    const isGBA = gbaCodes.includes(codigo);
+                    const gbaBadge = isGBA ? '<br><small style="color: #e74c3c; font-weight: bold;">★ Gran Buenos Aires</small>' : '';
+                    
+                    layer.bindTooltip(`<strong>${nombre}</strong><br>Código: ${codigo}${gbaBadge}`, {
                         permanent: false,
                         direction: 'auto'
                     });
@@ -126,8 +144,9 @@ function loadGeoJSON() {
 
                     // Efectos hover para mejor UX
                     layer.on('mouseover', function() {
+                        const isGBA = gbaCodes.includes(feature.properties.cde);
                         layer.setStyle({
-                            weight: 2.5,
+                            weight: isGBA ? 3.5 : 2.5,
                             color: '#e74c3c',
                             fillOpacity: 0.1
                         });
@@ -136,6 +155,7 @@ function loadGeoJSON() {
                     layer.on('mouseout', function() {
                         // Volver al estilo original según si está en división o no
                         const deptName = feature.properties.nam;
+                        const isGBA = gbaCodes.includes(feature.properties.cde);
                         const inDivision = isDepartmentInDivision(deptName);
                         
                         if (inDivision) {
@@ -150,8 +170,8 @@ function loadGeoJSON() {
                             layer.setStyle({
                                 fillColor: '#3388ff',
                                 fillOpacity: 0,
-                                color: '#2c3e50',
-                                weight: 1.5,
+                                color: isGBA ? '#e74c3c' : '#2c3e50',
+                                weight: isGBA ? 2.5 : 1.5,
                                 opacity: 0.8
                             });
                         }
@@ -167,13 +187,23 @@ function loadGeoJSON() {
             // Poblar el listado de departamentos
             populateDepartmentsList(allFeatures);
             
-            // Actualizar contador
+            // Actualizar contadores
             document.getElementById('dept-count').textContent = allFeatures.length;
         })
         .catch(error => {
             console.error('Error cargando el GeoJSON:', error);
             alert('Error al cargar el archivo GeoJSON. Verifica la consola para más detalles.');
         });
+}
+
+/*
+ * ACTUALIZACIÓN DEL CONTADOR DE DEPARTAMENTOS RESTANTES
+ * Calcula y muestra cuántos departamentos quedan en el listado principal
+ */
+function updateRemainingCount() {
+    const listContainer = document.getElementById('all-departments-list');
+    const remainingCount = listContainer.querySelectorAll('.department-item').length;
+    document.getElementById('dept-remaining-count').textContent = remainingCount;
 }
 
 /*
@@ -226,8 +256,12 @@ function initializeDivisionBoxes(newCount) {
         if (previousGroups[i] && previousGroups[i].departments) {
             const divisionList = document.getElementById(`division-${i}`);
             previousGroups[i].departments.forEach(deptName => {
+                // Recuperar el departamento de allDepartments para obtener su código
+                const dept = allDepartments.find(d => d.properties.nam === deptName);
+                const isGBA = dept && gbaCodes.includes(dept.properties.cde);
+                
                 const item = document.createElement('div');
-                item.className = 'department-item';
+                item.className = `department-item ${isGBA ? 'gba-department' : ''}`;
                 item.textContent = deptName;
                 item.setAttribute('data-dept-name', deptName);
                 divisionList.appendChild(item);
@@ -242,8 +276,9 @@ function initializeDivisionBoxes(newCount) {
     updateDepartmentGroups();
     updateMapColors();
     
-    // Actualizar tabla comparativa
+    // Actualizar tabla comparativa y contador
     updateComparisonTable();
+    updateRemainingCount();
 }
 
 /*
@@ -347,6 +382,7 @@ function setupDivisionSelector() {
 /*
  * POBLADO DEL LISTADO DE DEPARTAMENTOS
  * Llena la lista principal con todos los departamentos ordenados
+ * Aplica estilos especiales a los departamentos del Gran Buenos Aires
  */
 function populateDepartmentsList(features) {
     const listContainer = document.getElementById('all-departments-list');
@@ -354,10 +390,14 @@ function populateDepartmentsList(features) {
     
     features.forEach(feature => {
         const nombre = feature.properties.nam;
+        const codigo = feature.properties.cde;
+        const isGBA = gbaCodes.includes(codigo);
+        
         const item = document.createElement('div');
-        item.className = 'department-item';
+        item.className = `department-item ${isGBA ? 'gba-department' : ''}`;
         item.textContent = nombre;
         item.setAttribute('data-dept-name', nombre);
+        item.setAttribute('data-dept-code', codigo);
         listContainer.appendChild(item);
     });
 }
@@ -398,7 +438,7 @@ function initializeDragAndDrop() {
         if (divisionList) {
             Sortable.create(divisionList, {
                 group: {
-                    name: 'departments',
+                    name: 'departamentos',
                     pull: true,
                     put: true
                 },
@@ -443,8 +483,9 @@ function handleDepartmentMove(evt) {
     updateDepartmentGroups();
     updateMapColors();
     
-    // Actualizar tabla comparativa
+    // Actualizar tabla comparativa y contador
     updateComparisonTable();
+    updateRemainingCount();
 }
 
 /*
@@ -537,6 +578,7 @@ function updateMapColors() {
 
     geoJsonLayer.eachLayer(function(layer) {
         const deptName = layer.feature.properties.nam;
+        const isGBA = gbaCodes.includes(layer.feature.properties.cde);
         let foundGroup = null;
 
         // Buscar en qué división está este departamento
@@ -560,8 +602,8 @@ function updateMapColors() {
             layer.setStyle({
                 fillColor: '#3388ff',
                 fillOpacity: 0,  // Transparente
-                color: '#2c3e50',
-                weight: 1.5,
+                color: isGBA ? '#e74c3c' : '#2c3e50',
+                weight: isGBA ? 2.5 : 1.5,
                 opacity: 0.8
             });
         }
@@ -597,10 +639,15 @@ function sortMainList() {
 function returnDepartmentToMainList(departmentName) {
     const listContainer = document.getElementById('all-departments-list');
     
+    // Recuperar el departamento de allDepartments para obtener su código
+    const dept = allDepartments.find(d => d.properties.nam === departmentName);
+    const isGBA = dept && gbaCodes.includes(dept.properties.cde);
+    
     const item = document.createElement('div');
-    item.className = 'department-item';
+    item.className = `department-item ${isGBA ? 'gba-department' : ''}`;
     item.textContent = departmentName;
     item.setAttribute('data-dept-name', departmentName);
+    item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
     
     listContainer.appendChild(item);
     sortMainList();
@@ -637,11 +684,12 @@ function resetToInitialState() {
 
     // Restablecer estilo del mapa (transparente)
     geoJsonLayer.eachLayer(function(layer) {
+        const isGBA = gbaCodes.includes(layer.feature.properties.cde);
         layer.setStyle({
             fillColor: '#3388ff',
             fillOpacity: 0,
-            color: '#2c3e50',
-            weight: 1.5,
+            color: isGBA ? '#e74c3c' : '#2c3e50',
+            weight: isGBA ? 2.5 : 1.5,
             opacity: 0.8
         });
     });
@@ -649,6 +697,9 @@ function resetToInitialState() {
     // Restablecer selector a 3 divisiones
     document.getElementById('division-count').value = 3;
     initializeDivisionBoxes(3);
+    
+    // Actualizar contador de departamentos restantes
+    updateRemainingCount();
 }
 
 /*
