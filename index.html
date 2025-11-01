@@ -9,7 +9,7 @@
     FUNCIONALIDADES PRINCIPALES DE LA PÁGINA:
     1. Mapa interactivo con capa base oficial de Argentina (IGN) en escala de grises
     2. Representación correcta de la soberanía argentina en Malvinas
-    3. Carga de departamentos desde PBA.geojson con campos "in1" y "nam"
+    3. Carga de departamentos desde PBA.geojson con campos "cde" y "nam"
     4. Sistema de división provincial mediante cajas de colores con paleta armónica
     5. Drag & drop de departamentos entre listado y divisiones
     6. Control dinámico del número de divisiones (1-10)
@@ -17,6 +17,8 @@
     8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
     9. Distribución en tres columnas: mapa | divisiones | listado
     10. Tabla comparativa dinámica que muestra cantidad de partidos por división
+    11. Contador de departamentos restantes en listado
+    12. Destacado visual de departamentos del Gran Buenos Aires
     -->
     
     <!-- Leaflet CSS -->
@@ -73,7 +75,9 @@
             
             <!-- Columna 3: Listado de departamentos -->
             <div class="list-column">
-                <h3>Listado de Departamentos (<span id="dept-count">0</span>)</h3>
+                <h3>Listado de Departamentos 
+                    <span class="count-info">(Total: <span id="dept-count">0</span> | Restantes: <span id="dept-remaining-count">0</span>)</span>
+                </h3>
                 <div id="all-departments-list" class="departments-list"></div>
             </div>
         </div>
