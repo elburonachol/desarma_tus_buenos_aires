@@ -5,23 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Interactivo - División de la Provincia de Buenos Aires</title>
     
-    <!-- 
-    FUNCIONALIDADES PRINCIPALES DE LA PÁGINA:
-    1. Mapa interactivo con capa base oficial de Argentina (IGN) en escala de grises
-    2. Representación correcta de la soberanía argentina en Malvinas
-    3. Carga de departamentos desde PBA.geojson con campos "cde" y "nam"
-    4. Sistema de división provincial mediante cajas de colores con paleta armónica
-    5. Drag & drop de departamentos entre listado y divisiones
-    6. Control dinámico del número de divisiones (1-10)
-    7. Reset completo del estado
-    8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
-    9. Distribución en tres columnas: mapa | divisiones | listado
-    10. Tabla comparativa dinámica que muestra cantidad de partidos por división
-    11. Contador de departamentos restantes en listado
-    12. Destacado visual de departamentos del Gran Buenos Aires (bordes más gruesos y texto en negrita)
-    13. Nombres de divisiones editables por el usuario
-    -->
-    
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -37,6 +20,17 @@
         <!-- Controles principales -->
         <div class="controls">
             <button id="reset-btn" class="reset-button">Reestablecer valores</button>
+            
+            <!-- Nuevo control: Regiones ya existentes -->
+            <div class="region-control">
+                <label for="existing-regions">Regiones ya existentes:</label>
+                <select id="existing-regions">
+                    <option value="">-- Seleccione una región --</option>
+                    <option value="secciones_electorales">Secciones electorales</option>
+                    <option value="regiones_sanitarias">Regiones sanitarias</option>
+                </select>
+            </div>
+            
             <div class="division-control">
                 <label for="division-count">Número de divisiones:</label>
                 <select id="division-count">
