@@ -18,7 +18,8 @@
     9. Distribución en tres columnas: mapa | divisiones | listado
     10. Tabla comparativa dinámica que muestra cantidad de partidos por división
     11. Contador de departamentos restantes en listado
-    12. Destacado visual de departamentos del Gran Buenos Aires
+    12. Destacado visual de departamentos del Gran Buenos Aires (bordes más gruesos y texto en negrita)
+    13. Nombres de divisiones editables por el usuario
     -->
     
     <!-- Leaflet CSS -->
@@ -87,6 +88,7 @@
         - Se ubica debajo de las tres columnas principales
         - Muestra estadísticas comparativas entre divisiones
         - Se actualiza automáticamente cuando cambian las divisiones
+        - Usa los nombres editables de las divisiones
         -->
         <div class="comparison-section">
             <h3>Comparación entre Divisiones</h3>
@@ -106,7 +108,7 @@
         </div>
     </div>
 
-    <!-- Leaflet JS -->
+    <!-- Leaflet JS (cargado una única vez) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
 </body>
