@@ -1,0 +1,1132 @@
+{
+  "metadata": {
+    "ultima_actualizacion": "2025-11-01",
+    "fuente": "Datos de regiones existentes proporcionados para el mapa interactivo",
+    "elaboracion": "Datos procesados para mapa interactivo de división provincial",
+    "version_estructura": "1.0"
+  },
+  "secciones_electorales": {
+    "Sección VI": [
+      {
+        "cde": "06007",
+        "municipio_nombre": "Adolfo Alsina"
+      },
+      {
+        "cde": "06014",
+        "municipio_nombre": "Adolfo Gonzales Chaves"
+      },
+      {
+        "cde": "06056",
+        "municipio_nombre": "Bahía Blanca"
+      },
+      {
+        "cde": "06084",
+        "municipio_nombre": "Benito Juárez"
+      },
+      {
+        "cde": "06182",
+        "municipio_nombre": "Coronel de Marina Leonardo Rosales"
+      },
+      {
+        "cde": "06189",
+        "municipio_nombre": "Coronel Dorrego"
+      },
+      {
+        "cde": "06196",
+        "municipio_nombre": "Coronel Pringles"
+      },
+      {
+        "cde": "06203",
+        "municipio_nombre": "Coronel Suárez"
+      },
+      {
+        "cde": "06231",
+        "municipio_nombre": "Daireaux"
+      },
+      {
+        "cde": "06322",
+        "municipio_nombre": "General La Madrid"
+      },
+      {
+        "cde": "06399",
+        "municipio_nombre": "Guaminí"
+      },
+      {
+        "cde": "06448",
+        "municipio_nombre": "Laprida"
+      },
+      {
+        "cde": "06553",
+        "municipio_nombre": "Monte Hermoso"
+      },
+      {
+        "cde": "06602",
+        "municipio_nombre": "Patagones"
+      },
+      {
+        "cde": "06616",
+        "municipio_nombre": "Pellegrini"
+      },
+      {
+        "cde": "06651",
+        "municipio_nombre": "Puán"
+      },
+      {
+        "cde": "06700",
+        "municipio_nombre": "Saavedra"
+      },
+      {
+        "cde": "06721",
+        "municipio_nombre": "Salliqueló"
+      },
+      {
+        "cde": "06819",
+        "municipio_nombre": "Tornquist"
+      },
+      {
+        "cde": "06833",
+        "municipio_nombre": "Tres Arroyos"
+      },
+      {
+        "cde": "06847",
+        "municipio_nombre": "Tres Lomas"
+      },
+      {
+        "cde": "06875",
+        "municipio_nombre": "Villarino"
+      }
+    ],
+    "Sección IV": [
+      {
+        "cde": "06021",
+        "municipio_nombre": "Alberti"
+      },
+      {
+        "cde": "06112",
+        "municipio_nombre": "Bragado"
+      },
+      {
+        "cde": "06147",
+        "municipio_nombre": "Carlos Casares"
+      },
+      {
+        "cde": "06154",
+        "municipio_nombre": "Carlos Tejedor"
+      },
+      {
+        "cde": "06210",
+        "municipio_nombre": "Chacabuco"
+      },
+      {
+        "cde": "06224",
+        "municipio_nombre": "Chivilcoy"
+      },
+      {
+        "cde": "06277",
+        "municipio_nombre": "Florentino Ameghino"
+      },
+      {
+        "cde": "06294",
+        "municipio_nombre": "General Arenales"
+      },
+      {
+        "cde": "06351",
+        "municipio_nombre": "General Pinto"
+      },
+      {
+        "cde": "06385",
+        "municipio_nombre": "General Viamonte"
+      },
+      {
+        "cde": "06392",
+        "municipio_nombre": "General Villegas"
+      },
+      {
+        "cde": "06406",
+        "municipio_nombre": "Hipólito Yrigoyen"
+      },
+      {
+        "cde": "06413",
+        "municipio_nombre": "Junín"
+      },
+      {
+        "cde": "06462",
+        "municipio_nombre": "Leandro N. Alem"
+      },
+      {
+        "cde": "06469",
+        "municipio_nombre": "Lincoln"
+      },
+      {
+        "cde": "06588",
+        "municipio_nombre": "9 de Julio"
+      },
+      {
+        "cde": "06609",
+        "municipio_nombre": "Pehuajó"
+      },
+      {
+        "cde": "06679",
+        "municipio_nombre": "Rivadavia"
+      },
+      {
+        "cde": "06826",
+        "municipio_nombre": "Trenque Lauquen"
+      }
+    ],
+    "Sección III": [
+      {
+        "cde": "06028",
+        "municipio_nombre": "Almirante Brown"
+      },
+      {
+        "cde": "06035",
+        "municipio_nombre": "Avellaneda"
+      },
+      {
+        "cde": "06091",
+        "municipio_nombre": "Berazategui"
+      },
+      {
+        "cde": "06098",
+        "municipio_nombre": "Berisso"
+      },
+      {
+        "cde": "06119",
+        "municipio_nombre": "Brandsen"
+      },
+      {
+        "cde": "06134",
+        "municipio_nombre": "Cañuelas"
+      },
+      {
+        "cde": "06245",
+        "municipio_nombre": "Ensenada"
+      },
+      {
+        "cde": "06260",
+        "municipio_nombre": "Esteban Echeverría"
+      },
+      {
+        "cde": "06270",
+        "municipio_nombre": "Ezeiza"
+      },
+      {
+        "cde": "06274",
+        "municipio_nombre": "Florencio Varela"
+      },
+      {
+        "cde": "06427",
+        "municipio_nombre": "La Matanza"
+      },
+      {
+        "cde": "06434",
+        "municipio_nombre": "Lanús"
+      },
+      {
+        "cde": "06483",
+        "municipio_nombre": "Lobos"
+      },
+      {
+        "cde": "06490",
+        "municipio_nombre": "Lomas de Zamora"
+      },
+      {
+        "cde": "06505",
+        "municipio_nombre": "Magdalena"
+      },
+      {
+        "cde": "06648",
+        "municipio_nombre": "Presidente Perón"
+      },
+      {
+        "cde": "06655",
+        "municipio_nombre": "Punta Indio"
+      },
+      {
+        "cde": "06658",
+        "municipio_nombre": "Quilmes"
+      },
+      {
+        "cde": "06778",
+        "municipio_nombre": "San Vicente"
+      }
+    ],
+    "Sección V": [
+      {
+        "cde": "06042",
+        "municipio_nombre": "Ayacucho"
+      },
+      {
+        "cde": "06063",
+        "municipio_nombre": "Balcarce"
+      },
+      {
+        "cde": "06168",
+        "municipio_nombre": "Castelli"
+      },
+      {
+        "cde": "06218",
+        "municipio_nombre": "Chascomús"
+      },
+      {
+        "cde": "06238",
+        "municipio_nombre": "Dolores"
+      },
+      {
+        "cde": "06280",
+        "municipio_nombre": "General Alvarado"
+      },
+      {
+        "cde": "06301",
+        "municipio_nombre": "General Belgrano"
+      },
+      {
+        "cde": "06308",
+        "municipio_nombre": "General Guido"
+      },
+      {
+        "cde": "06315",
+        "municipio_nombre": "General Juan Madariaga"
+      },
+      {
+        "cde": "06336",
+        "municipio_nombre": "General Lavalle"
+      },
+      {
+        "cde": "06343",
+        "municipio_nombre": "General Paz"
+      },
+      {
+        "cde": "06357",
+        "municipio_nombre": "General Pueyrredón"
+      },
+      {
+        "cde": "06420",
+        "municipio_nombre": "La Costa"
+      },
+      {
+        "cde": "06455",
+        "municipio_nombre": "Las Flores"
+      },
+      {
+        "cde": "06466",
+        "municipio_nombre": "Lezama"
+      },
+      {
+        "cde": "06476",
+        "municipio_nombre": "Lobería"
+      },
+      {
+        "cde": "06511",
+        "municipio_nombre": "Maipú"
+      },
+      {
+        "cde": "06518",
+        "municipio_nombre": "Mar Chiquita"
+      },
+      {
+        "cde": "06547",
+        "municipio_nombre": "Monte"
+      },
+      {
+        "cde": "06581",
+        "municipio_nombre": "Necochea"
+      },
+      {
+        "cde": "06630",
+        "municipio_nombre": "Pila"
+      },
+      {
+        "cde": "06644",
+        "municipio_nombre": "Pinamar"
+      },
+      {
+        "cde": "06672",
+        "municipio_nombre": "Rauch"
+      },
+      {
+        "cde": "06742",
+        "municipio_nombre": "San Cayetano"
+      },
+      {
+        "cde": "06791",
+        "municipio_nombre": "Tandil"
+      },
+      {
+        "cde": "06812",
+        "municipio_nombre": "Tordillo"
+      },
+      {
+        "cde": "06868",
+        "municipio_nombre": "Villa Gesell"
+      }
+    ],
+    "Sección VII": [
+      {
+        "cde": "06049",
+        "municipio_nombre": "Azul"
+      },
+      {
+        "cde": "06105",
+        "municipio_nombre": "Bolívar"
+      },
+      {
+        "cde": "06287",
+        "municipio_nombre": "General Alvear"
+      },
+      {
+        "cde": "06595",
+        "municipio_nombre": "Olavarría"
+      },
+      {
+        "cde": "06693",
+        "municipio_nombre": "Roque Pérez"
+      },
+      {
+        "cde": "06707",
+        "municipio_nombre": "Saladillo"
+      },
+      {
+        "cde": "06798",
+        "municipio_nombre": "Tapalqué"
+      },
+      {
+        "cde": "06854",
+        "municipio_nombre": "25 de Mayo"
+      }
+    ],
+    "Sección II": [
+      {
+        "cde": "06070",
+        "municipio_nombre": "Baradero"
+      },
+      {
+        "cde": "06077",
+        "municipio_nombre": "Arrecifes"
+      },
+      {
+        "cde": "06140",
+        "municipio_nombre": "Capitán Sarmiento"
+      },
+      {
+        "cde": "06161",
+        "municipio_nombre": "Carmen de Areco"
+      },
+      {
+        "cde": "06175",
+        "municipio_nombre": "Colón"
+      },
+      {
+        "cde": "06266",
+        "municipio_nombre": "Exaltación de la Cruz"
+      },
+      {
+        "cde": "06623",
+        "municipio_nombre": "Pergamino"
+      },
+      {
+        "cde": "06665",
+        "municipio_nombre": "Ramallo"
+      },
+      {
+        "cde": "06686",
+        "municipio_nombre": "Rojas"
+      },
+      {
+        "cde": "06714",
+        "municipio_nombre": "Salto"
+      },
+      {
+        "cde": "06728",
+        "municipio_nombre": "San Andrés de Giles"
+      },
+      {
+        "cde": "06735",
+        "municipio_nombre": "San Antonio de Areco"
+      },
+      {
+        "cde": "06763",
+        "municipio_nombre": "San Nicolás"
+      },
+      {
+        "cde": "06770",
+        "municipio_nombre": "San Pedro"
+      },
+      {
+        "cde": "06882",
+        "municipio_nombre": "Zárate"
+      }
+    ],
+    "Sección I": [
+      {
+        "cde": "06126",
+        "municipio_nombre": "Campana"
+      },
+      {
+        "cde": "06252",
+        "municipio_nombre": "Escobar"
+      },
+      {
+        "cde": "06329",
+        "municipio_nombre": "General Las Heras"
+      },
+      {
+        "cde": "06364",
+        "municipio_nombre": "General Rodríguez"
+      },
+      {
+        "cde": "06371",
+        "municipio_nombre": "General San Martín"
+      },
+      {
+        "cde": "06408",
+        "municipio_nombre": "Hurlingham"
+      },
+      {
+        "cde": "06410",
+        "municipio_nombre": "Ituzaingó"
+      },
+      {
+        "cde": "06412",
+        "municipio_nombre": "José C. Paz"
+      },
+      {
+        "cde": "06497",
+        "municipio_nombre": "Luján"
+      },
+      {
+        "cde": "06515",
+        "municipio_nombre": "Malvinas Argentinas"
+      },
+      {
+        "cde": "06525",
+        "municipio_nombre": "Marcos Paz"
+      },
+      {
+        "cde": "06532",
+        "municipio_nombre": "Mercedes"
+      },
+      {
+        "cde": "06539",
+        "municipio_nombre": "Merlo"
+      },
+      {
+        "cde": "06560",
+        "municipio_nombre": "Moreno"
+      },
+      {
+        "cde": "06568",
+        "municipio_nombre": "Morón"
+      },
+      {
+        "cde": "06574",
+        "municipio_nombre": "Navarro"
+      },
+      {
+        "cde": "06638",
+        "municipio_nombre": "Pilar"
+      },
+      {
+        "cde": "06749",
+        "municipio_nombre": "San Fernando"
+      },
+      {
+        "cde": "06756",
+        "municipio_nombre": "San Isidro"
+      },
+      {
+        "cde": "06760",
+        "municipio_nombre": "San Miguel"
+      },
+      {
+        "cde": "06784",
+        "municipio_nombre": "Suipacha"
+      },
+      {
+        "cde": "06805",
+        "municipio_nombre": "Tigre"
+      },
+      {
+        "cde": "06840",
+        "municipio_nombre": "Tres de Febrero"
+      },
+      {
+        "cde": "06861",
+        "municipio_nombre": "Vicente López"
+      }
+    ],
+    "Sección VIII": [
+      {
+        "cde": "06441",
+        "municipio_nombre": "La Plata"
+      }
+    ]
+  },
+  "regiones_sanitarias": {
+    "R. Sanitaria I": [
+      {
+        "cde": "06007",
+        "municipio_nombre": "Adolfo Alsina"
+      },
+      {
+        "cde": "06014",
+        "municipio_nombre": "Adolfo Gonzales Chaves"
+      },
+      {
+        "cde": "06056",
+        "municipio_nombre": "Bahía Blanca"
+      },
+      {
+        "cde": "06182",
+        "municipio_nombre": "Coronel de Marina Leonardo Rosales"
+      },
+      {
+        "cde": "06189",
+        "municipio_nombre": "Coronel Dorrego"
+      },
+      {
+        "cde": "06196",
+        "municipio_nombre": "Coronel Pringles"
+      },
+      {
+        "cde": "06203",
+        "municipio_nombre": "Coronel Suárez"
+      },
+      {
+        "cde": "06399",
+        "municipio_nombre": "Guaminí"
+      },
+      {
+        "cde": "06553",
+        "municipio_nombre": "Monte Hermoso"
+      },
+      {
+        "cde": "06602",
+        "municipio_nombre": "Patagones"
+      },
+      {
+        "cde": "06651",
+        "municipio_nombre": "Puán"
+      },
+      {
+        "cde": "06700",
+        "municipio_nombre": "Saavedra"
+      },
+      {
+        "cde": "06819",
+        "municipio_nombre": "Tornquist"
+      },
+      {
+        "cde": "06833",
+        "municipio_nombre": "Tres Arroyos"
+      },
+      {
+        "cde": "06875",
+        "municipio_nombre": "Villarino"
+      }
+    ],
+    "R. Sanitaria X": [
+      {
+        "cde": "06021",
+        "municipio_nombre": "Alberti"
+      },
+      {
+        "cde": "06112",
+        "municipio_nombre": "Bragado"
+      },
+      {
+        "cde": "06224",
+        "municipio_nombre": "Chivilcoy"
+      },
+      {
+        "cde": "06483",
+        "municipio_nombre": "Lobos"
+      },
+      {
+        "cde": "06532",
+        "municipio_nombre": "Mercedes"
+      },
+      {
+        "cde": "06574",
+        "municipio_nombre": "Navarro"
+      },
+      {
+        "cde": "06693",
+        "municipio_nombre": "Roque Pérez"
+      },
+      {
+        "cde": "06707",
+        "municipio_nombre": "Saladillo"
+      },
+      {
+        "cde": "06784",
+        "municipio_nombre": "Suipacha"
+      },
+      {
+        "cde": "06854",
+        "municipio_nombre": "25 de Mayo"
+      }
+    ],
+    "R. Sanitaria VI": [
+      {
+        "cde": "06028",
+        "municipio_nombre": "Almirante Brown"
+      },
+      {
+        "cde": "06035",
+        "municipio_nombre": "Avellaneda"
+      },
+      {
+        "cde": "06091",
+        "municipio_nombre": "Berazategui"
+      },
+      {
+        "cde": "06260",
+        "municipio_nombre": "Esteban Echeverría"
+      },
+      {
+        "cde": "06270",
+        "municipio_nombre": "Ezeiza"
+      },
+      {
+        "cde": "06274",
+        "municipio_nombre": "Florencio Varela"
+      },
+      {
+        "cde": "06434",
+        "municipio_nombre": "Lanús"
+      },
+      {
+        "cde": "06490",
+        "municipio_nombre": "Lomas de Zamora"
+      },
+      {
+        "cde": "06658",
+        "municipio_nombre": "Quilmes"
+      }
+    ],
+    "R. Sanitaria VIII": [
+      {
+        "cde": "06042",
+        "municipio_nombre": "Ayacucho"
+      },
+      {
+        "cde": "06063",
+        "municipio_nombre": "Balcarce"
+      },
+      {
+        "cde": "06280",
+        "municipio_nombre": "General Alvarado"
+      },
+      {
+        "cde": "06308",
+        "municipio_nombre": "General Guido"
+      },
+      {
+        "cde": "06315",
+        "municipio_nombre": "General Juan Madariaga"
+      },
+      {
+        "cde": "06336",
+        "municipio_nombre": "General Lavalle"
+      },
+      {
+        "cde": "06357",
+        "municipio_nombre": "General Pueyrredón"
+      },
+      {
+        "cde": "06420",
+        "municipio_nombre": "La Costa"
+      },
+      {
+        "cde": "06476",
+        "municipio_nombre": "Lobería"
+      },
+      {
+        "cde": "06511",
+        "municipio_nombre": "Maipú"
+      },
+      {
+        "cde": "06518",
+        "municipio_nombre": "Mar Chiquita"
+      },
+      {
+        "cde": "06581",
+        "municipio_nombre": "Necochea"
+      },
+      {
+        "cde": "06644",
+        "municipio_nombre": "Pinamar"
+      },
+      {
+        "cde": "06742",
+        "municipio_nombre": "San Cayetano"
+      },
+      {
+        "cde": "06791",
+        "municipio_nombre": "Tandil"
+      },
+      {
+        "cde": "06868",
+        "municipio_nombre": "Villa Gesell"
+      }
+    ],
+    "R. Sanitaria IX": [
+      {
+        "cde": "06049",
+        "municipio_nombre": "Azul"
+      },
+      {
+        "cde": "06084",
+        "municipio_nombre": "Benito Juárez"
+      },
+      {
+        "cde": "06105",
+        "municipio_nombre": "Bolívar"
+      },
+      {
+        "cde": "06287",
+        "municipio_nombre": "General Alvear"
+      },
+      {
+        "cde": "06322",
+        "municipio_nombre": "General La Madrid"
+      },
+      {
+        "cde": "06448",
+        "municipio_nombre": "Laprida"
+      },
+      {
+        "cde": "06455",
+        "municipio_nombre": "Las Flores"
+      },
+      {
+        "cde": "06595",
+        "municipio_nombre": "Olavarría"
+      },
+      {
+        "cde": "06672",
+        "municipio_nombre": "Rauch"
+      },
+      {
+        "cde": "06798",
+        "municipio_nombre": "Tapalqué"
+      }
+    ],
+    "R. Sanitaria IV": [
+      {
+        "cde": "06070",
+        "municipio_nombre": "Baradero"
+      },
+      {
+        "cde": "06077",
+        "municipio_nombre": "Arrecifes"
+      },
+      {
+        "cde": "06140",
+        "municipio_nombre": "Capitán Sarmiento"
+      },
+      {
+        "cde": "06161",
+        "municipio_nombre": "Carmen de Areco"
+      },
+      {
+        "cde": "06175",
+        "municipio_nombre": "Colón"
+      },
+      {
+        "cde": "06623",
+        "municipio_nombre": "Pergamino"
+      },
+      {
+        "cde": "06665",
+        "municipio_nombre": "Ramallo"
+      },
+      {
+        "cde": "06686",
+        "municipio_nombre": "Rojas"
+      },
+      {
+        "cde": "06714",
+        "municipio_nombre": "Salto"
+      },
+      {
+        "cde": "06728",
+        "municipio_nombre": "San Andrés de Giles"
+      },
+      {
+        "cde": "06735",
+        "municipio_nombre": "San Antonio de Areco"
+      },
+      {
+        "cde": "06763",
+        "municipio_nombre": "San Nicolás"
+      },
+      {
+        "cde": "06770",
+        "municipio_nombre": "San Pedro"
+      }
+    ],
+    "R. Sanitaria XI": [
+      {
+        "cde": "06098",
+        "municipio_nombre": "Berisso"
+      },
+      {
+        "cde": "06119",
+        "municipio_nombre": "Brandsen"
+      },
+      {
+        "cde": "06134",
+        "municipio_nombre": "Cañuelas"
+      },
+      {
+        "cde": "06168",
+        "municipio_nombre": "Castelli"
+      },
+      {
+        "cde": "06218",
+        "municipio_nombre": "Chascomús"
+      },
+      {
+        "cde": "06238",
+        "municipio_nombre": "Dolores"
+      },
+      {
+        "cde": "06245",
+        "municipio_nombre": "Ensenada"
+      },
+      {
+        "cde": "06301",
+        "municipio_nombre": "General Belgrano"
+      },
+      {
+        "cde": "06343",
+        "municipio_nombre": "General Paz"
+      },
+      {
+        "cde": "06441",
+        "municipio_nombre": "La Plata"
+      },
+      {
+        "cde": "06466",
+        "municipio_nombre": "Lezama"
+      },
+      {
+        "cde": "06505",
+        "municipio_nombre": "Magdalena"
+      },
+      {
+        "cde": "06547",
+        "municipio_nombre": "Monte"
+      },
+      {
+        "cde": "06630",
+        "municipio_nombre": "Pila"
+      },
+      {
+        "cde": "06648",
+        "municipio_nombre": "Presidente Perón"
+      },
+      {
+        "cde": "06655",
+        "municipio_nombre": "Punta Indio"
+      },
+      {
+        "cde": "06778",
+        "municipio_nombre": "San Vicente"
+      },
+      {
+        "cde": "06812",
+        "municipio_nombre": "Tordillo"
+      }
+    ],
+    "R. Sanitaria V": [
+      {
+        "cde": "06126",
+        "municipio_nombre": "Campana"
+      },
+      {
+        "cde": "06252",
+        "municipio_nombre": "Escobar"
+      },
+      {
+        "cde": "06266",
+        "municipio_nombre": "Exaltación de la Cruz"
+      },
+      {
+        "cde": "06371",
+        "municipio_nombre": "General San Martín"
+      },
+      {
+        "cde": "06412",
+        "municipio_nombre": "José C. Paz"
+      },
+      {
+        "cde": "06515",
+        "municipio_nombre": "Malvinas Argentinas"
+      },
+      {
+        "cde": "06638",
+        "municipio_nombre": "Pilar"
+      },
+      {
+        "cde": "06749",
+        "municipio_nombre": "San Fernando"
+      },
+      {
+        "cde": "06756",
+        "municipio_nombre": "San Isidro"
+      },
+      {
+        "cde": "06760",
+        "municipio_nombre": "San Miguel"
+      },
+      {
+        "cde": "06805",
+        "municipio_nombre": "Tigre"
+      },
+      {
+        "cde": "06861",
+        "municipio_nombre": "Vicente López"
+      },
+      {
+        "cde": "06882",
+        "municipio_nombre": "Zárate"
+      }
+    ],
+    "R. Sanitaria II": [
+      {
+        "cde": "06147",
+        "municipio_nombre": "Carlos Casares"
+      },
+      {
+        "cde": "06154",
+        "municipio_nombre": "Carlos Tejedor"
+      },
+      {
+        "cde": "06231",
+        "municipio_nombre": "Daireaux"
+      },
+      {
+        "cde": "06392",
+        "municipio_nombre": "General Villegas"
+      },
+      {
+        "cde": "06406",
+        "municipio_nombre": "Hipólito Yrigoyen"
+      },
+      {
+        "cde": "06588",
+        "municipio_nombre": "9 de Julio"
+      },
+      {
+        "cde": "06609",
+        "municipio_nombre": "Pehuajó"
+      },
+      {
+        "cde": "06616",
+        "municipio_nombre": "Pellegrini"
+      },
+      {
+        "cde": "06679",
+        "municipio_nombre": "Rivadavia"
+      },
+      {
+        "cde": "06721",
+        "municipio_nombre": "Salliqueló"
+      },
+      {
+        "cde": "06826",
+        "municipio_nombre": "Trenque Lauquen"
+      },
+      {
+        "cde": "06847",
+        "municipio_nombre": "Tres Lomas"
+      }
+    ],
+    "R. Sanitaria III": [
+      {
+        "cde": "06210",
+        "municipio_nombre": "Chacabuco"
+      },
+      {
+        "cde": "06277",
+        "municipio_nombre": "Florentino Ameghino"
+      },
+      {
+        "cde": "06294",
+        "municipio_nombre": "General Arenales"
+      },
+      {
+        "cde": "06351",
+        "municipio_nombre": "General Pinto"
+      },
+      {
+        "cde": "06385",
+        "municipio_nombre": "General Viamonte"
+      },
+      {
+        "cde": "06413",
+        "municipio_nombre": "Junín"
+      },
+      {
+        "cde": "06462",
+        "municipio_nombre": "Leandro N. Alem"
+      },
+      {
+        "cde": "06469",
+        "municipio_nombre": "Lincoln"
+      }
+    ],
+    "R. Sanitaria VII": [
+      {
+        "cde": "06329",
+        "municipio_nombre": "General Las Heras"
+      },
+      {
+        "cde": "06364",
+        "municipio_nombre": "General Rodríguez"
+      },
+      {
+        "cde": "06408",
+        "municipio_nombre": "Hurlingham"
+      },
+      {
+        "cde": "06410",
+        "municipio_nombre": "Ituzaingó"
+      },
+      {
+        "cde": "06497",
+        "municipio_nombre": "Luján"
+      },
+      {
+        "cde": "06525",
+        "municipio_nombre": "Marcos Paz"
+      },
+      {
+        "cde": "06539",
+        "municipio_nombre": "Merlo"
+      },
+      {
+        "cde": "06560",
+        "municipio_nombre": "Moreno"
+      },
+      {
+        "cde": "06568",
+        "municipio_nombre": "Morón"
+      },
+      {
+        "cde": "06840",
+        "municipio_nombre": "Tres de Febrero"
+      }
+    ],
+    "R. Sanitaria XII": [
+      {
+        "cde": "06427",
+        "municipio_nombre": "La Matanza"
+      }
+    ]
+  }
+}
