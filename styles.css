@@ -1,3 +1,5 @@
+[file name]: styles.css
+[file content begin]
 /* 
  * ESTILOS PARA EL MAPA INTERACTIVO DE DIVISIÓN PROVINCIAL
  * 
@@ -6,7 +8,39 @@
  * Características: Diseño responsive, colores distintivos, interfaz intuitiva
  */
 
-/* ... (estilos existentes se mantienen igual) ... */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f7fa;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+h3 {
+    color: #34495e;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
 
 /* 
  * CONTROLES PRINCIPALES:
@@ -108,7 +142,214 @@
     border-color: #3498db;
 }
 
-/* ... (el resto de los estilos se mantienen igual) ... */
+/* 
+ * DISTRIBUCIÓN EN TRES COLUMNAS PRINCIPALES
+ */
+.main-content {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 30px;
+    height: 70vh;
+}
+
+/* Columna 1: Mapa */
+#map-container {
+    flex: 3;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+/* Columna 2: Divisiones */
+.divisions-column {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.group-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.group-box:hover {
+    transform: translateY(-2px);
+}
+
+.group-box h3 {
+    margin-bottom: 12px;
+    color: #2c3e50;
+    font-size: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.editable-division-name {
+    cursor: text;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.editable-division-name:hover {
+    background-color: #e9ecef;
+}
+
+.editable-division-name:focus {
+    outline: 2px solid #3498db;
+    background-color: white;
+}
+
+.group-list {
+    min-height: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px dashed #dee2e6;
+    border-radius: 5px;
+    padding: 10px;
+    background: white;
+}
+
+/* Columna 3: Listado de departamentos */
+.list-column {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.count-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: normal;
+    margin-left: 8px;
+}
+
+.departments-list {
+    height: calc(100% - 60px);
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background: white;
+}
+
+/* 
+ * ELEMENTOS DE LISTA (DEPARTAMENTOS)
+ */
+.department-item {
+    padding: 10px 12px;
+    margin: 5px 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    cursor: move;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    color: #495057;
+}
+
+.department-item:hover {
+    background: #e3f2fd;
+    border-color: #3498db;
+    transform: translateX(3px);
+}
+
+.department-item:active {
+    cursor: grabbing;
+}
+
+.department-item.gba-department-bold {
+    font-weight: 700;
+    color: #2c3e50;
+    border-left: 3px solid #e74c3c;
+}
+
+/* Estado de arrastre */
+.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg);
+}
+
+/* 
+ * TABLA COMPARATIVA
+ */
+.comparison-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+#comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+#comparison-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px 15px;
+    text-align: center;
+    font-weight: 600;
+    border-right: 1px solid #2c3e50;
+}
+
+#comparison-table th:first-child {
+    text-align: left;
+    background: #2c3e50;
+}
+
+#comparison-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
+    text-align: center;
+}
+
+#comparison-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+    background: #f8f9fa;
+}
+
+#comparison-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+#comparison-table tr:hover {
+    background: #e3f2fd;
+}
 
 /* 
  * DISEÑO RESPONSIVE:
@@ -226,3 +467,4 @@
         font-size: 12px;
     }
 }
+[file content end]
