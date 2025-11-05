@@ -45,6 +45,7 @@ h3 {
 /* 
  * CONTROLES PRINCIPALES:
  * - Botón de reset
+ * - Botón de polígono
  * - Selector de regiones existentes
  * - Selector de número de divisiones
  */
@@ -83,6 +84,51 @@ h3 {
 
 .reset-button:active {
     transform: translateY(0);
+}
+
+/* Nuevo estilo para el botón de polígono */
+.polygon-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.polygon-button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.polygon-button.active {
+    background: #2c3e50;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+/* Información del modo polígono */
+.polygon-info {
+    background: #e3f2fd;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.polygon-info p {
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+#point-counter {
+    font-weight: bold;
+    color: #e74c3c;
 }
 
 /* Nuevo estilo para el control de regiones existentes */
@@ -159,6 +205,7 @@ h3 {
     border-radius: 10px;
     box-shadow: 0 3px 15px rgba(0,0,0,0.1);
     overflow: hidden;
+    position: relative;
 }
 
 #map {
@@ -281,10 +328,10 @@ h3 {
     cursor: grabbing;
 }
 
+/* Cambio: Solo negrita para GBA, sin franja roja */
 .department-item.gba-department-bold {
     font-weight: 700;
     color: #2c3e50;
-    border-left: 3px solid #e74c3c;
 }
 
 /* Estado de arrastre */
@@ -445,7 +492,8 @@ h3 {
         font-size: 12px;
     }
     
-    .reset-button {
+    .reset-button,
+    .polygon-button {
         padding: 10px 20px;
         font-size: 13px;
     }
