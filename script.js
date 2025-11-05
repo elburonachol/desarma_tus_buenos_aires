@@ -1,3 +1,5 @@
+[file name]: script.js
+[file content begin]
 /*
  * MAPA INTERACTIVO - DIVISIÓN DE LA PROVINCIA DE BUENOS AIRES
  * 
@@ -18,6 +20,7 @@
  * 14. Nombres de divisiones editables por el usuario
  * 15. Carga de regiones existentes (secciones electorales y regiones sanitarias)
  * 16. Selección por polígono de múltiples departamentos
+ * 17. Arrastre de múltiples departamentos seleccionados
  */
 
 // Variables globales para el estado de la aplicación
@@ -36,6 +39,10 @@ let polygonPoints = [];     // Almacena los puntos del polígono en construcció
 let polygonLayer = null;    // Capa del polígono actual
 let polylineLayer = null;   // Capa de la línea actual
 let selectedDepartments = []; // Departamentos seleccionados por el polígono
+
+// Variables para el arrastre múltiple
+let isMultiDrag = false;
+let dragSource = null;
 
 // Paleta de colores armónica y bien diferenciable para las divisiones
 // Colores seleccionados para ser distinguibles pero no demasiado chillones
@@ -278,13 +285,36 @@ function finalizePolygon() {
         // Mover departamentos seleccionados al listado principal si no están ya
         moveSelectedToMainList();
         
-        alert(`Se seleccionaron ${selectedDepartments.length} departamentos`);
+        // Marcar departamentos seleccionados visualmente en el listado
+        highlightSelectedInList();
+        
+        alert(`Se seleccionaron ${selectedDepartments.length} departamentos. Ahora puedes arrastrar cualquiera de ellos para mover todo el grupo.`);
     } else {
         alert('No se encontraron departamentos dentro del polígono');
     }
     
     // Desactivar modo polígono
     deactivatePolygonMode();
+}
+
+/*
+ * RESALTADO DE DEPARTAMENTOS SELECCIONADOS EN EL LISTADO
+ * Aplica un estilo especial a los departamentos seleccionados en el listado
+ */
+function highlightSelectedInList() {
+    // Remover resaltado anterior
+    const allItems = document.querySelectorAll('.department-item');
+    allItems.forEach(item => {
+        item.classList.remove('selected-department');
+    });
+    
+    // Aplicar resaltado a los seleccionados
+    selectedDepartments.forEach(deptName => {
+        const items = document.querySelectorAll(`[data-dept-name="${deptName}"]`);
+        items.forEach(item => {
+            item.classList.add('selected-department');
+        });
+    });
 }
 
 /*
@@ -978,6 +1008,7 @@ function populateDepartmentsList(features) {
 /*
  * INICIALIZACIÓN DEL SISTEMA DRAG & DROP
  * Configura SortableJS para todas las listas
+ * Ahora con soporte para arrastre múltiple
  */
 function initializeDragAndDrop() {
     const allDepartmentsList = document.getElementById('all-departments-list');
@@ -995,6 +1026,9 @@ function initializeDragAndDrop() {
         sort: true,
         animation: 150,
         ghostClass: 'dragging',
+        onChoose: function(evt) {
+            handleDragStart(evt);
+        },
         onAdd: function(evt) {
             // Ordenar automáticamente cuando se agrega un elemento
             setTimeout(() => {
@@ -1017,6 +1051,9 @@ function initializeDragAndDrop() {
                 },
                 animation: 150,
                 ghostClass: 'dragging',
+                onChoose: function(evt) {
+                    handleDragStart(evt);
+                },
                 onEnd: function(evt) {
                     handleDepartmentMove(evt);
                 }
@@ -1026,14 +1063,77 @@ function initializeDragAndDrop() {
 }
 
 /*
+ * MANEJO DEL INICIO DE ARRASTRE
+ * Determina si se está arrastrando un departamento individual o múltiple
+ */
+function handleDragStart(evt) {
+    const departmentName = evt.item.getAttribute('data-dept-name');
+    
+    // Verificar si el departamento está en la selección múltiple
+    if (selectedDepartments.length > 0 && selectedDepartments.includes(departmentName)) {
+        isMultiDrag = true;
+        dragSource = evt.from;
+    } else {
+        isMultiDrag = false;
+        dragSource = null;
+    }
+}
+
+/*
  * MANEJO DE MOVIMIENTO DE DEPARTAMENTOS
  * Procesa los eventos de drag & drop entre listas
  * Si se mueve un departamento, se deselecciona la región existente
+ * Ahora soporta arrastre múltiple
  */
 function handleDepartmentMove(evt) {
     const departmentName = evt.item.getAttribute('data-dept-name');
     const toElement = evt.to;
     const fromElement = evt.from;
+
+    // Si es un arrastre múltiple
+    if (isMultiDrag && selectedDepartments.length > 0) {
+        // Mover todos los departamentos seleccionados a la división de destino
+        selectedDepartments.forEach(deptName => {
+            // No mover el departamento que ya se movió (Sortable ya lo hizo)
+            if (deptName !== departmentName) {
+                // Remover de todas las ubicaciones anteriores
+                removeDepartmentFromAllDivisions(deptName, toElement.id);
+                removeDepartmentFromMainList(deptName);
+                
+                // Agregar a la división de destino
+                const divisionList = document.getElementById(toElement.id);
+                if (divisionList) {
+                    // Recuperar el departamento de allDepartments para obtener su código
+                    const dept = allDepartments.find(d => d.properties.nam === deptName);
+                    const isGBA = dept && gbaCodes.includes(dept.properties.cde);
+                    
+                    const item = document.createElement('div');
+                    item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
+                    item.textContent = deptName;
+                    item.setAttribute('data-dept-name', deptName);
+                    item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
+                    
+                    divisionList.appendChild(item);
+                }
+            }
+        });
+        
+        // Limpiar la selección múltiple
+        selectedDepartments = [];
+        isMultiDrag = false;
+        
+        // Actualizar estado y mapa
+        updateDepartmentGroups();
+        updateMapColors();
+        
+        // Actualizar tabla comparativa y contador
+        updateComparisonTable();
+        updateRemainingCount();
+        
+        return; // Salir de la función, ya procesamos el arrastre múltiple
+    }
+
+    // Código normal para arrastre individual (el que ya teníamos)
 
     // Si el destino es el listado principal
     if (toElement.id === 'all-departments-list') {
@@ -1253,6 +1353,10 @@ function resetToInitialState() {
         deactivatePolygonMode();
     }
     
+    // Limpiar selección múltiple
+    selectedDepartments = [];
+    isMultiDrag = false;
+    
     // Limpiar todas las divisiones
     for (let i = 1; i <= currentDivisionCount; i++) {
         const divisionList = document.getElementById(`division-${i}`);
@@ -1310,3 +1414,4 @@ function highlightDepartment(deptName) {
         }
     });
 }
+[file content end]
