@@ -513,3 +513,10 @@ h3 {
         font-size: 12px;
     }
 }
+
+/* Estilo para departamentos seleccionados en el listado */
+.department-item.selected-department {
+    background-color: #fff3cd !important;
+    border-color: #ffeaa7 !important;
+    box-shadow: 0 0 0 2px #f39c12;
+}
