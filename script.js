@@ -1,3 +1,5 @@
+[file name]: script.js
+[file content begin]
 /*
  * MAPA INTERACTIVO - DIVISIÓN DE LA PROVINCIA DE BUENOS AIRES
  * 
@@ -13,10 +15,11 @@
  * 9. Distribución en tres columnas: mapa | divisiones | listado
  * 10. Tabla comparativa que muestra cantidad de partidos, superficie, población y densidad
  * 11. Contador de departamentos restantes en listado
- * 12. Destacado visual de departamentos del Gran Buenos Aires (bordes más gruesos y texto en negrita)
+ * 12. Destacado visual de departamentos del Gran Buenos Aires (texto en negrita)
  * 13. Integración con datos externos de superficie y población
  * 14. Nombres de divisiones editables por el usuario
  * 15. Carga de regiones existentes (secciones electorales y regiones sanitarias)
+ * 16. Selección por polígono de múltiples departamentos
  */
 
 // Variables globales para el estado de la aplicación
@@ -28,6 +31,13 @@ let currentDivisionCount = 3; // Número actual de divisiones visibles
 let partidosData = null;    // Datos cargados desde datos_partidos.json
 let regionesExistentes = null; // Datos cargados desde regiones_existentes.json
 let currentRegionType = null; // Tipo de región actualmente cargada (null, 'secciones_electorales', 'regiones_sanitarias')
+
+// Variables para la funcionalidad de polígono
+let polygonMode = false;    // Indica si estamos en modo de dibujo de polígono
+let polygonPoints = [];     // Almacena los puntos del polígono en construcción
+let polygonLayer = null;    // Capa del polígono actual
+let polylineLayer = null;   // Capa de la línea actual
+let selectedDepartments = []; // Departamentos seleccionados por el polígono
 
 // Paleta de colores armónica y bien diferenciable para las divisiones
 // Colores seleccionados para ser distinguibles pero no demasiado chillones
@@ -70,12 +80,296 @@ document.addEventListener('DOMContentLoaded', function() {
         setupResetButton();
         setupDivisionSelector();
         setupRegionSelector(); // Configurar el selector de regiones existentes
+        setupPolygonButton();  // Configurar el botón de polígono
         initializeComparisonTable();
         updateRemainingCount();
     }).catch(error => {
         console.error('Error en la inicialización:', error);
     });
 });
+
+/*
+ * CONFIGURACIÓN DEL BOTÓN DE POLÍGONO
+ * Maneja la activación/desactivación del modo de dibujo de polígono
+ */
+function setupPolygonButton() {
+    const polygonBtn = document.getElementById('polygon-btn');
+    
+    polygonBtn.addEventListener('click', function() {
+        if (polygonMode) {
+            // Si ya está activo, desactivar
+            deactivatePolygonMode();
+        } else {
+            // Activar modo polígono
+            activatePolygonMode();
+        }
+    });
+}
+
+/*
+ * ACTIVACIÓN DEL MODO POLÍGONO
+ * Prepara el mapa y la interfaz para el dibujo de polígonos
+ */
+function activatePolygonMode() {
+    polygonMode = true;
+    polygonPoints = [];
+    selectedDepartments = [];
+    
+    // Actualizar interfaz
+    document.getElementById('polygon-btn').classList.add('active');
+    document.getElementById('polygon-info').style.display = 'block';
+    updatePointCounter();
+    
+    // Cambiar cursor del mapa
+    map.getContainer().style.cursor = 'crosshair';
+    
+    // Configurar eventos del mapa para modo polígono
+    map.on('click', handleMapClick);
+    map.on('contextmenu', handleMapRightClick);
+    
+    console.log('Modo polígono activado');
+}
+
+/*
+ * DESACTIVACIÓN DEL MODO POLÍGONO
+ * Restaura el estado normal del mapa y la interfaz
+ */
+function deactivatePolygonMode() {
+    polygonMode = false;
+    
+    // Actualizar interfaz
+    document.getElementById('polygon-btn').classList.remove('active');
+    document.getElementById('polygon-info').style.display = 'none';
+    
+    // Restaurar cursor del mapa
+    map.getContainer().style.cursor = '';
+    
+    // Limpiar capas de polígono
+    if (polygonLayer) {
+        map.removeLayer(polygonLayer);
+        polygonLayer = null;
+    }
+    if (polylineLayer) {
+        map.removeLayer(polylineLayer);
+        polylineLayer = null;
+    }
+    
+    // Remover eventos del mapa
+    map.off('click', handleMapClick);
+    map.off('contextmenu', handleMapRightClick);
+    
+    console.log('Modo polígono desactivado');
+}
+
+/*
+ * MANEJO DE CLICK IZQUIERDO EN EL MAPA (MODO POLÍGONO)
+ * Agrega un punto al polígono en construcción
+ */
+function handleMapClick(e) {
+    if (!polygonMode) return;
+    
+    // Agregar punto a la lista
+    polygonPoints.push(e.latlng);
+    updatePointCounter();
+    
+    // Dibujar/actualizar el polígono
+    drawPolygon();
+    
+    // Si tenemos al menos 2 puntos, dibujar la línea
+    if (polygonPoints.length >= 2) {
+        drawPolyline();
+    }
+    
+    // Si alcanzamos 100 puntos, finalizar automáticamente
+    if (polygonPoints.length >= 100) {
+        finalizePolygon();
+    }
+}
+
+/*
+ * MANEJO DE CLICK DERECHO EN EL MAPA (MODO POLÍGONO)
+ * Finaliza el polígono y selecciona los departamentos
+ */
+function handleMapRightClick(e) {
+    if (!polygonMode || polygonPoints.length < 3) return;
+    
+    e.originalEvent.preventDefault(); // Prevenir menú contextual
+    finalizePolygon();
+}
+
+/*
+ * ACTUALIZACIÓN DEL CONTADOR DE PUNTOS
+ * Muestra cuántos puntos se han agregado al polígono
+ */
+function updatePointCounter() {
+    document.getElementById('point-counter').textContent = polygonPoints.length;
+}
+
+/*
+ * DIBUJO DEL POLÍGONO
+ * Crea o actualiza la capa del polígono en el mapa
+ */
+function drawPolygon() {
+    // Remover polígono anterior si existe
+    if (polygonLayer) {
+        map.removeLayer(polygonLayer);
+    }
+    
+    // Crear nuevo polígono si hay al menos 3 puntos
+    if (polygonPoints.length >= 3) {
+        polygonLayer = L.polygon(polygonPoints, {
+            color: '#3498db',
+            weight: 2,
+            fillColor: '#3498db',
+            fillOpacity: 0.2
+        }).addTo(map);
+    }
+}
+
+/*
+ * DIBUJO DE LA LÍNEA
+ * Crea o actualiza la capa de línea que conecta los puntos
+ */
+function drawPolyline() {
+    // Remover línea anterior si existe
+    if (polylineLayer) {
+        map.removeLayer(polylineLayer);
+    }
+    
+    // Crear nueva línea
+    polylineLayer = L.polyline(polygonPoints, {
+        color: '#e74c3c',
+        weight: 2,
+        opacity: 0.8,
+        dashArray: '5, 10'
+    }).addTo(map);
+}
+
+/*
+ * FINALIZACIÓN DEL POLÍGONO
+ * Identifica los departamentos dentro del polígono y los selecciona
+ */
+function finalizePolygon() {
+    if (polygonPoints.length < 3) {
+        alert('Se necesitan al menos 3 puntos para crear un polígono válido');
+        return;
+    }
+    
+    // Crear polígono Leaflet
+    const polygon = L.polygon(polygonPoints);
+    
+    // Identificar departamentos que intersectan con el polígono
+    selectedDepartments = [];
+    
+    geoJsonLayer.eachLayer(function(layer) {
+        if (polygon.getBounds().intersects(layer.getBounds())) {
+            // Verificar intersección más precisa
+            if (polygonsIntersect(polygon, layer)) {
+                const deptName = layer.feature.properties.nam;
+                selectedDepartments.push(deptName);
+            }
+        }
+    });
+    
+    // Mostrar resultados
+    if (selectedDepartments.length > 0) {
+        // Resaltar departamentos seleccionados
+        highlightSelectedDepartments();
+        
+        // Mover departamentos seleccionados al listado principal si no están ya
+        moveSelectedToMainList();
+        
+        alert(`Se seleccionaron ${selectedDepartments.length} departamentos`);
+    } else {
+        alert('No se encontraron departamentos dentro del polígono');
+    }
+    
+    // Desactivar modo polígono
+    deactivatePolygonMode();
+}
+
+/*
+ * VERIFICACIÓN DE INTERSECCIÓN ENTRE POLÍGONOS
+ * Función auxiliar para determinar si dos polígonos se intersectan
+ */
+function polygonsIntersect(polygon1, polygon2) {
+    // Método simplificado: verificar si algún punto del polígono 2 está dentro del polígono 1
+    const polygon1Bounds = polygon1.getBounds();
+    const polygon2Bounds = polygon2.getBounds();
+    
+    // Si los bounds no se intersectan, los polígonos tampoco
+    if (!polygon1Bounds.intersects(polygon2Bounds)) {
+        return false;
+    }
+    
+    // Verificación más precisa: punto central del departamento
+    const center = polygon2.getBounds().getCenter();
+    return polygon1.getBounds().contains(center);
+}
+
+/*
+ * RESALTADO DE DEPARTAMENTOS SELECCIONADOS
+ * Aplica un estilo especial a los departamentos seleccionados por el polígono
+ */
+function highlightSelectedDepartments() {
+    geoJsonLayer.eachLayer(function(layer) {
+        const deptName = layer.feature.properties.nam;
+        if (selectedDepartments.includes(deptName)) {
+            layer.setStyle({
+                fillColor: '#f39c12',
+                fillOpacity: 0.7,
+                color: '#e67e22',
+                weight: 3
+            });
+            
+            // Quitar el resaltado después de 5 segundos
+            setTimeout(() => {
+                updateMapColors();
+            }, 5000);
+        }
+    });
+}
+
+/*
+ * MOVIMIENTO DE DEPARTAMENTOS SELECCIONADOS AL LISTADO PRINCIPAL
+ * Asegura que los departamentos seleccionados estén disponibles en el listado
+ */
+function moveSelectedToMainList() {
+    const listContainer = document.getElementById('all-departments-list');
+    
+    selectedDepartments.forEach(deptName => {
+        // Verificar si el departamento ya está en el listado
+        const existingItems = listContainer.querySelectorAll('.department-item');
+        let alreadyInList = false;
+        
+        existingItems.forEach(item => {
+            if (item.getAttribute('data-dept-name') === deptName) {
+                alreadyInList = true;
+            }
+        });
+        
+        // Si no está en el listado, agregarlo
+        if (!alreadyInList) {
+            // Recuperar el departamento de allDepartments para obtener su código
+            const dept = allDepartments.find(d => d.properties.nam === deptName);
+            const isGBA = dept && gbaCodes.includes(dept.properties.cde);
+            
+            const item = document.createElement('div');
+            item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
+            item.textContent = deptName;
+            item.setAttribute('data-dept-name', deptName);
+            item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
+            
+            listContainer.appendChild(item);
+        }
+    });
+    
+    // Ordenar el listado
+    sortMainList();
+    
+    // Actualizar contador
+    updateRemainingCount();
+}
 
 /*
  * CARGA DE DATOS DE REGIONES EXISTENTES DESDE ARCHIVO JSON
@@ -235,7 +529,7 @@ function initializeMap() {
  * CARGA DEL ARCHIVO GEOJSON PBA.geojson
  * Carga todos los departamentos sin filtrar, usando campos "cde" y "nam"
  * Los ordena alfabéticamente por el campo "nam"
- * Identifica y marca los departamentos del Gran Buenos Aires con bordes más gruesos
+ * Identifica y marca los departamentos del Gran Buenos Aires con texto en negrita
  */
 function loadGeoJSON() {
     return fetch('PBA.geojson')
@@ -270,11 +564,12 @@ function loadGeoJSON() {
                     
                     // Estilo por defecto: transparente (sin relleno) con borde visible
                     // GBA tiene bordes más gruesos pero mismo color que los demás
+                    // Cambio: bordes menos gruesos (reducido de 1.5/2.5 a 1/2)
                     return {
                         fillColor: '#3388ff',
                         fillOpacity: 0,  // Transparente - sin relleno
                         color: '#2c3e50', // Mismo color para todos los bordes
-                        weight: isGBA ? 2.5 : 1.5, // Borde más grueso para GBA
+                        weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
                         opacity: 0.8
                     };
                 },
@@ -297,7 +592,7 @@ function loadGeoJSON() {
                     // Efectos hover para mejor UX
                     layer.on('mouseover', function() {
                         layer.setStyle({
-                            weight: 2.5,
+                            weight: 2,
                             color: '#e74c3c',
                             fillOpacity: 0.1
                         });
@@ -315,14 +610,14 @@ function loadGeoJSON() {
                                 fillColor: departmentGroups[groupId].color,
                                 fillOpacity: 0.8,
                                 color: 'white',
-                                weight: 2
+                                weight: 1.5
                             });
                         } else {
                             layer.setStyle({
                                 fillColor: '#3388ff',
                                 fillOpacity: 0,
                                 color: '#2c3e50',
-                                weight: isGBA ? 2.5 : 1.5,
+                                weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
                                 opacity: 0.8
                             });
                         }
@@ -680,7 +975,7 @@ function setupDivisionSelector() {
 /*
  * POBLADO DEL LISTADO DE DEPARTAMENTOS
  * Llena la lista principal con todos los departamentos ordenados
- * Aplica texto en negrita a los departamentos del Gran Buenos Aires
+ * Aplica texto en negrita a los departamentos del Gran Buenos Aires (sin franja roja)
  */
 function populateDepartmentsList(features) {
     const listContainer = document.getElementById('all-departments-list');
@@ -899,7 +1194,7 @@ function updateMapColors() {
                 fillColor: departmentGroups[foundGroup].color,
                 fillOpacity: 0.8,
                 color: 'white',
-                weight: 2,
+                weight: 1.5, // Borde reducido
                 opacity: 1
             });
         } else {
@@ -908,7 +1203,7 @@ function updateMapColors() {
                 fillColor: '#3388ff',
                 fillOpacity: 0,  // Transparente
                 color: '#2c3e50', // Mismo color para todos
-                weight: isGBA ? 2.5 : 1.5, // Borde más grueso para GBA
+                weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
                 opacity: 0.8
             });
         }
@@ -973,6 +1268,11 @@ function setupResetButton() {
  * Devuelve toda la aplicación a su estado original
  */
 function resetToInitialState() {
+    // Desactivar modo polígono si está activo
+    if (polygonMode) {
+        deactivatePolygonMode();
+    }
+    
     // Limpiar todas las divisiones
     for (let i = 1; i <= currentDivisionCount; i++) {
         const divisionList = document.getElementById(`division-${i}`);
@@ -995,7 +1295,7 @@ function resetToInitialState() {
             fillColor: '#3388ff',
             fillOpacity: 0,
             color: '#2c3e50',
-            weight: isGBA ? 2.5 : 1.5,
+            weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
             opacity: 0.8
         });
     });
@@ -1019,7 +1319,7 @@ function highlightDepartment(deptName) {
     geoJsonLayer.eachLayer(function(layer) {
         if (layer.feature.properties.nam === deptName) {
             layer.setStyle({
-                weight: 3,
+                weight: 2.5,
                 color: '#e74c3c',
                 fillOpacity: 0.3
             });
@@ -1030,3 +1330,4 @@ function highlightDepartment(deptName) {
         }
     });
 }
+[file content end]
