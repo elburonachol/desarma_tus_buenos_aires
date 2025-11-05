@@ -1,3 +1,5 @@
+[file name]: index.html
+[file content begin]
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,6 +22,9 @@
         <!-- Controles principales -->
         <div class="controls">
             <button id="reset-btn" class="reset-button">Reestablecer valores</button>
+            
+            <!-- Nuevo botón para armar polígono de selección -->
+            <button id="polygon-btn" class="polygon-button">Armar polígono de selección</button>
             
             <!-- Nuevo control: Regiones ya existentes -->
             <div class="region-control">
@@ -46,6 +51,12 @@
                     <option value="10">10</option>
                 </select>
             </div>
+        </div>
+        
+        <!-- Información del modo polígono -->
+        <div id="polygon-info" class="polygon-info" style="display: none;">
+            <p><strong>Modo polígono activo:</strong> Haz clic izquierdo para agregar puntos. Haz clic derecho o alcanza 100 puntos para finalizar.</p>
+            <p>Puntos agregados: <span id="point-counter">0</span></p>
         </div>
         
         <!-- 
@@ -107,3 +118,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+[file content end]
