@@ -263,8 +263,9 @@ function finalizePolygon() {
     
     geoJsonLayer.eachLayer(function(layer) {
         if (polygon.getBounds().intersects(layer.getBounds())) {
-            // Verificar intersección más precisa
-            if (polygonsIntersect(polygon, layer)) {
+            // Verificar intersección más precisa usando el centroide
+            const center = layer.getBounds().getCenter();
+            if (polygon.getBounds().contains(center)) {
                 const deptName = layer.feature.properties.nam;
                 selectedDepartments.push(deptName);
             }
@@ -286,25 +287,6 @@ function finalizePolygon() {
     
     // Desactivar modo polígono
     deactivatePolygonMode();
-}
-
-/*
- * VERIFICACIÓN DE INTERSECCIÓN ENTRE POLÍGONOS
- * Función auxiliar para determinar si dos polígonos se intersectan
- */
-function polygonsIntersect(polygon1, polygon2) {
-    // Método simplificado: verificar si algún punto del polígono 2 está dentro del polígono 1
-    const polygon1Bounds = polygon1.getBounds();
-    const polygon2Bounds = polygon2.getBounds();
-    
-    // Si los bounds no se intersectan, los polígonos tampoco
-    if (!polygon1Bounds.intersects(polygon2Bounds)) {
-        return false;
-    }
-    
-    // Verificación más precisa: punto central del departamento
-    const center = polygon2.getBounds().getCenter();
-    return polygon1.getBounds().contains(center);
 }
 
 /*
