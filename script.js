@@ -5,9 +5,9 @@
  * 1. Carga y visualización de mapa con capa base oficial de Argentina (IGN) en escala de grises
  * 2. Representación correcta de la soberanía argentina en Malvinas
  * 3. Carga de departamentos desde PBA.geojson con campos "cde" y "nam"
- * 4. Sistema de divisiones con paleta de colores armónica (12 colores)
+ * 4. Sistema de divisiones con paleta de colores armónica (10 colores)
  * 5. Drag & drop de departamentos entre listado y divisiones
- * 6. Control dinámico del número de divisiones (1-12)
+ * 6. Control dinámico del número de divisiones (1-10)
  * 7. Reset completo del estado
  * 8. Departamentos sin color cuando están en el listado, con color cuando están en divisiones
  * 9. Distribución en tres columnas: mapa | divisiones | listado
@@ -17,7 +17,7 @@
  * 13. Integración con datos externos de superficie y población
  * 14. Nombres de divisiones editables por el usuario
  * 15. Carga de regiones existentes (secciones electorales y regiones sanitarias)
- * 16. Selección por polígono de múltiples departamentos con arrastre grupal
+ * 16. Selección por polígono de múltiples departamentos
  */
 
 // Variables globales para el estado de la aplicación
@@ -35,9 +35,12 @@ let polygonMode = false;    // Indica si estamos en modo de dibujo de polígono
 let polygonPoints = [];     // Almacena los puntos del polígono en construcción
 let polygonLayer = null;    // Capa del polígono actual
 let polylineLayer = null;   // Capa de la línea actual
-let selectedDepartments = []; // Departamentos seleccionados por el polígono (persistentes hasta que se deseleccionen)
+let selectedDepartments = []; // Departamentos seleccionados por el polígono
+let selectedDepartmentsSet = new Set(); // Para manejar departamentos seleccionados
+let pointMarkers = []; // Para los marcadores de puntos
 
-// Paleta de colores armónica y bien diferenciable para las divisiones (12 colores)
+// Paleta de colores armónica y bien diferenciable para las divisiones
+// Colores seleccionados para ser distinguibles pero no demasiado chillones
 const divisionColors = [
     '#1f77b4', // Azul
     '#ff7f0e', // Naranja
@@ -48,9 +51,7 @@ const divisionColors = [
     '#e377c2', // Rosa
     '#7f7f7f', // Gris
     '#bcbd22', // Oliva
-    '#17becf', // Cyan
-    '#9edae5', // Azul claro
-    '#ff9896'  // Rosa claro
+    '#17becf'  // Cyan
 ];
 
 // Códigos de departamentos que pertenecen al Gran Buenos Aires
@@ -80,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
         setupDivisionSelector();
         setupRegionSelector(); // Configurar el selector de regiones existentes
         setupPolygonButton();  // Configurar el botón de polígono
-        setupMapClickDeselect(); // Configurar el clic en el mapa para deseleccionar
         initializeComparisonTable();
         updateRemainingCount();
     }).catch(error => {
@@ -107,78 +107,6 @@ function setupPolygonButton() {
 }
 
 /*
- * CONFIGURACIÓN DEL CLIC EN EL MAPA PARA DESELECCIONAR
- * Agrega un event listener al mapa para deseleccionar departamentos cuando se haga clic en un área sin departamento
- */
-function setupMapClickDeselect() {
-    map.on('click', function(e) {
-        // Verificar si el clic fue en un departamento (usando un timeout para permitir que el evento del departamento se procese primero)
-        setTimeout(() => {
-            // Si no hay ningún departamento seleccionado por polígono, no hacemos nada
-            if (selectedDepartments.length === 0) return;
-            
-            // Deseleccionar todos los departamentos
-            clearSelection();
-        }, 10);
-    });
-}
-
-/*
- * LIMPIAR SELECCIÓN
- * Quita el resaltado de los departamentos seleccionados y limpia la variable
- */
-function clearSelection() {
-    // Quitar el resaltado de los departamentos seleccionados
-    geoJsonLayer.eachLayer(function(layer) {
-        const deptName = layer.feature.properties.nam;
-        if (selectedDepartments.includes(deptName)) {
-            // Restaurar el estilo normal
-            updateDepartmentStyle(layer);
-        }
-    });
-    
-    // Limpiar la lista de departamentos seleccionados
-    selectedDepartments = [];
-}
-
-/*
- * ACTUALIZAR ESTILO DE DEPARTAMENTO
- * Aplica el estilo correspondiente a un departamento según su estado actual
- */
-function updateDepartmentStyle(layer) {
-    const deptName = layer.feature.properties.nam;
-    const isGBA = gbaCodes.includes(layer.feature.properties.cde);
-    let foundGroup = null;
-
-    // Buscar en qué división está este departamento
-    Object.keys(departmentGroups).forEach(groupId => {
-        if (departmentGroups[groupId].departments.includes(deptName)) {
-            foundGroup = groupId;
-        }
-    });
-
-    if (foundGroup) {
-        // Si está en una división: color de relleno opaco
-        layer.setStyle({
-            fillColor: departmentGroups[foundGroup].color,
-            fillOpacity: 0.8,
-            color: 'white',
-            weight: 1.5, // Borde reducido
-            opacity: 1
-        });
-    } else {
-        // Si no está en división: transparente (solo borde)
-        layer.setStyle({
-            fillColor: '#3388ff',
-            fillOpacity: 0,  // Transparente
-            color: '#2c3e50', // Mismo color para todos
-            weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
-            opacity: 0.8
-        });
-    }
-}
-
-/*
  * ACTIVACIÓN DEL MODO POLÍGONO
  * Prepara el mapa y la interfaz para el dibujo de polígonos
  */
@@ -186,11 +114,11 @@ function activatePolygonMode() {
     polygonMode = true;
     polygonPoints = [];
     selectedDepartments = [];
+    selectedDepartmentsSet.clear();
     
     // Actualizar interfaz
     document.getElementById('polygon-btn').classList.add('active');
     document.getElementById('polygon-info').style.display = 'block';
-    updatePointCounter();
     
     // Cambiar cursor del mapa
     map.getContainer().style.cursor = 'crosshair';
@@ -226,6 +154,10 @@ function deactivatePolygonMode() {
         polylineLayer = null;
     }
     
+    // Limpiar marcadores de puntos
+    pointMarkers.forEach(marker => map.removeLayer(marker));
+    pointMarkers = [];
+    
     // Remover eventos del mapa
     map.off('click', handleMapClick);
     map.off('contextmenu', handleMapRightClick);
@@ -242,7 +174,17 @@ function handleMapClick(e) {
     
     // Agregar punto a la lista
     polygonPoints.push(e.latlng);
-    updatePointCounter();
+    
+    // Agregar marcador visible
+    const marker = L.circleMarker(e.latlng, {
+        radius: 6,
+        fillColor: '#e74c3c',
+        color: '#c0392b',
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.8
+    }).addTo(map);
+    pointMarkers.push(marker);
     
     // Dibujar/actualizar el polígono
     drawPolygon();
@@ -267,14 +209,6 @@ function handleMapRightClick(e) {
     
     e.originalEvent.preventDefault(); // Prevenir menú contextual
     finalizePolygon();
-}
-
-/*
- * ACTUALIZACIÓN DEL CONTADOR DE PUNTOS
- * Muestra cuántos puntos se han agregado al polígono
- */
-function updatePointCounter() {
-    document.getElementById('point-counter').textContent = polygonPoints.length;
 }
 
 /*
@@ -332,6 +266,7 @@ function finalizePolygon() {
     
     // Identificar departamentos que intersectan con el polígono
     selectedDepartments = [];
+    selectedDepartmentsSet.clear();
     
     geoJsonLayer.eachLayer(function(layer) {
         if (polygon.getBounds().intersects(layer.getBounds())) {
@@ -340,19 +275,23 @@ function finalizePolygon() {
             if (polygon.getBounds().contains(center)) {
                 const deptName = layer.feature.properties.nam;
                 selectedDepartments.push(deptName);
+                selectedDepartmentsSet.add(deptName);
             }
         }
     });
     
     // Mostrar resultados
     if (selectedDepartments.length > 0) {
-        // Resaltar departamentos seleccionados (persistentemente)
+        // Resaltar departamentos seleccionados
         highlightSelectedDepartments();
         
-        // Mover departamentos seleccionados al listado principal si no están ya
+        // Mover departamentos seleccionados al principio del listado
         moveSelectedToMainList();
         
-        alert(`Se seleccionaron ${selectedDepartments.length} departamentos. Ahora puede arrastrar cualquiera de ellos para mover todo el grupo.`);
+        // Marcar departamentos seleccionados en las divisiones
+        markSelectedInDivisions();
+        
+        alert(`Se seleccionaron ${selectedDepartments.length} departamentos`);
     } else {
         alert('No se encontraron departamentos dentro del polígono');
     }
@@ -362,13 +301,33 @@ function finalizePolygon() {
 }
 
 /*
+ * NUEVA FUNCIÓN PARA MARCAR SELECCIONADOS EN DIVISIONES
+ */
+function markSelectedInDivisions() {
+    for (let i = 1; i <= currentDivisionCount; i++) {
+        const divisionList = document.getElementById(`division-${i}`);
+        if (divisionList) {
+            const items = divisionList.querySelectorAll('.department-item');
+            items.forEach(item => {
+                const deptName = item.getAttribute('data-dept-name');
+                if (selectedDepartmentsSet.has(deptName)) {
+                    item.classList.add('selected');
+                    // Mover al principio de la división
+                    divisionList.insertBefore(item, divisionList.firstChild);
+                }
+            });
+        }
+    }
+}
+
+/*
  * RESALTADO DE DEPARTAMENTOS SELECCIONADOS
- * Aplica un estilo especial a los departamentos seleccionados por el polígono (persistente)
+ * Aplica un estilo especial a los departamentos seleccionados por el polígono
  */
 function highlightSelectedDepartments() {
     geoJsonLayer.eachLayer(function(layer) {
         const deptName = layer.feature.properties.nam;
-        if (selectedDepartments.includes(deptName)) {
+        if (selectedDepartmentsSet.has(deptName)) {
             layer.setStyle({
                 fillColor: '#f39c12',
                 fillOpacity: 0.7,
@@ -386,35 +345,42 @@ function highlightSelectedDepartments() {
 function moveSelectedToMainList() {
     const listContainer = document.getElementById('all-departments-list');
     
+    // Primero, quitamos la selección anterior
+    const previouslySelected = document.querySelectorAll('.department-item.selected');
+    previouslySelected.forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Para cada departamento seleccionado
     selectedDepartments.forEach(deptName => {
         // Verificar si el departamento ya está en el listado
         const existingItems = listContainer.querySelectorAll('.department-item');
-        let alreadyInList = false;
+        let existingItem = null;
         
         existingItems.forEach(item => {
             if (item.getAttribute('data-dept-name') === deptName) {
-                alreadyInList = true;
+                existingItem = item;
             }
         });
         
-        // Si no está en el listado, agregarlo
-        if (!alreadyInList) {
-            // Recuperar el departamento de allDepartments para obtener su código
+        if (existingItem) {
+            // Si ya está, lo movemos al principio y lo marcamos
+            listContainer.insertBefore(existingItem, listContainer.firstChild);
+            existingItem.classList.add('selected');
+        } else {
+            // Si no está, lo creamos y lo agregamos al principio
             const dept = allDepartments.find(d => d.properties.nam === deptName);
             const isGBA = dept && gbaCodes.includes(dept.properties.cde);
             
             const item = document.createElement('div');
-            item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
+            item.className = `department-item ${isGBA ? 'gba-department-bold' : ''} selected`;
             item.textContent = deptName;
             item.setAttribute('data-dept-name', deptName);
             item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
             
-            listContainer.appendChild(item);
+            listContainer.insertBefore(item, listContainer.firstChild);
         }
     });
-    
-    // Ordenar el listado
-    sortMainList();
     
     // Actualizar contador
     updateRemainingCount();
@@ -610,54 +576,68 @@ function loadGeoJSON() {
                 style: function(feature) {
                     // Verificar si es un departamento del GBA
                     const isGBA = gbaCodes.includes(feature.properties.cde);
+                    const isSelected = selectedDepartmentsSet.has(feature.properties.nam);
                     
-                    // Estilo por defecto: transparente (sin relleno) con borde visible
-                    // GBA tiene bordes más gruesos pero mismo color que los demás
-                    // Cambio: bordes menos gruesos (reducido de 1.5/2.5 a 1/2)
-                    return {
-                        fillColor: '#3388ff',
-                        fillOpacity: 0,  // Transparente - sin relleno
-                        color: '#2c3e50', // Mismo color para todos los bordes
-                        weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
-                        opacity: 0.8
-                    };
+                    if (isSelected) {
+                        // Estilo para departamentos seleccionados
+                        return {
+                            fillColor: '#f39c12',
+                            fillOpacity: 0.7,
+                            color: '#e67e22',
+                            weight: 3,
+                            opacity: 1
+                        };
+                    } else {
+                        // Estilo normal con bordes más finos para no GBA
+                        return {
+                            fillColor: '#3388ff',
+                            fillOpacity: 0,  // Transparente - sin relleno
+                            color: '#2c3e50', // Mismo color para todos los bordes
+                            weight: isGBA ? 1.5 : 0.8, // Bordes más finos para no GBA
+                            opacity: 0.8
+                        };
+                    }
                 },
                 onEachFeature: function(feature, layer) {
-                    // Tooltip con el nombre del departamento y código
+                    // Tooltip solo con el nombre
                     const nombre = feature.properties.nam || 'Sin nombre';
-                    const codigo = feature.properties.cde || 'N/A';
-                    const isGBA = gbaCodes.includes(codigo);
                     
-                    layer.bindTooltip(`<strong>${nombre}</strong><br>Código: ${codigo}`, {
+                    layer.bindTooltip(`<strong>${nombre}</strong>`, {
                         permanent: false,
                         direction: 'auto'
                     });
                     
-                    // Click para resaltar individualmente y deseleccionar grupo si es necesario
-                    layer.on('click', function(e) {
-                        // Si hay departamentos seleccionados por polígono, deseleccionarlos al hacer clic en un departamento no seleccionado
-                        if (selectedDepartments.length > 0 && !selectedDepartments.includes(nombre)) {
-                            clearSelection();
-                        }
-                        highlightDepartment(nombre);
+                    // Click para resaltar
+                    layer.on('click', function() {
+                        highlightDepartment(feature.properties.nam);
                     });
 
-                    // Efectos hover para mejor UX
+                    // Efectos hover - no aplicar si está seleccionado
                     layer.on('mouseover', function() {
-                        layer.setStyle({
-                            weight: 2,
-                            color: '#e74c3c',
-                            fillOpacity: 0.1
-                        });
+                        const deptName = feature.properties.nam;
+                        if (!selectedDepartmentsSet.has(deptName)) {
+                            layer.setStyle({
+                                weight: 2,
+                                color: '#e74c3c',
+                                fillOpacity: 0.1
+                            });
+                        }
                     });
 
                     layer.on('mouseout', function() {
-                        // Volver al estilo original según si está en división o no
                         const deptName = feature.properties.nam;
                         const isGBA = gbaCodes.includes(feature.properties.cde);
                         const inDivision = isDepartmentInDivision(deptName);
                         
-                        if (inDivision) {
+                        if (selectedDepartmentsSet.has(deptName)) {
+                            // Mantener estilo de selección
+                            layer.setStyle({
+                                fillColor: '#f39c12',
+                                fillOpacity: 0.7,
+                                color: '#e67e22',
+                                weight: 3
+                            });
+                        } else if (inDivision) {
                             const groupId = getDepartmentGroupId(deptName);
                             layer.setStyle({
                                 fillColor: departmentGroups[groupId].color,
@@ -670,7 +650,7 @@ function loadGeoJSON() {
                                 fillColor: '#3388ff',
                                 fillOpacity: 0,
                                 color: '#2c3e50',
-                                weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
+                                weight: isGBA ? 1.5 : 0.8,
                                 opacity: 0.8
                             });
                         }
@@ -1010,15 +990,6 @@ function processDivisionReduction(newCount, previousGroups) {
  */
 function setupDivisionSelector() {
     const selector = document.getElementById('division-count');
-    // Aumentar a 12 divisiones
-    selector.innerHTML = '';
-    for (let i = 1; i <= 12; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i;
-        if (i === 3) option.selected = true;
-        selector.appendChild(option);
-    }
     selector.value = currentDivisionCount;
     
     selector.addEventListener('change', function() {
@@ -1110,44 +1081,13 @@ function initializeDragAndDrop() {
 /*
  * MANEJO DE MOVIMIENTO DE DEPARTAMENTOS
  * Procesa los eventos de drag & drop entre listas
- * Si el departamento arrastrado está seleccionado, mueve todos los seleccionados
+ * Si se mueve un departamento, se deselecciona la región existente
  */
 function handleDepartmentMove(evt) {
     const departmentName = evt.item.getAttribute('data-dept-name');
     const toElement = evt.to;
     const fromElement = evt.from;
 
-    // Determinar si estamos moviendo un departamento seleccionado
-    const movingSelected = selectedDepartments.length > 0 && selectedDepartments.includes(departmentName);
-
-    // Si estamos moviendo un departamento seleccionado, mover todos los seleccionados
-    if (movingSelected) {
-        moveSelectedDepartments(toElement.id);
-    } else {
-        // Comportamiento normal para un solo departamento
-        handleSingleDepartmentMove(departmentName, toElement, fromElement);
-    }
-
-    // Si estamos en modo región existente, deseleccionar
-    if (currentRegionType) {
-        document.getElementById('existing-regions').value = '';
-        currentRegionType = null;
-    }
-
-    // Actualizar estado y mapa
-    updateDepartmentGroups();
-    updateMapColors();
-    
-    // Actualizar tabla comparativa y contador
-    updateComparisonTable();
-    updateRemainingCount();
-}
-
-/*
- * MANEJO DE MOVIMIENTO DE UN SOLO DEPARTAMENTO
- * Procesa el movimiento de un departamento individual
- */
-function handleSingleDepartmentMove(departmentName, toElement, fromElement) {
     // Si el destino es el listado principal
     if (toElement.id === 'all-departments-list') {
         // Eliminar de todas las divisiones y ordenar listado
@@ -1165,53 +1105,20 @@ function handleSingleDepartmentMove(departmentName, toElement, fromElement) {
         // Eliminar de otras divisiones
         removeDepartmentFromAllDivisions(departmentName, toElement.id);
     }
-}
 
-/*
- * MOVIMIENTO DE DEPARTAMENTOS SELECCIONADOS
- * Mueve todos los departamentos seleccionados a la división de destino
- */
-function moveSelectedDepartments(toDivisionId) {
-    // Obtener el ID de la división de destino
-    const divisionId = toDivisionId.replace('division-', '');
+    // Si estamos en modo región existente, deseleccionar
+    if (currentRegionType) {
+        document.getElementById('existing-regions').value = '';
+        currentRegionType = null;
+    }
+
+    // Actualizar estado y mapa
+    updateDepartmentGroups();
+    updateMapColors();
     
-    // Para cada departamento seleccionado
-    selectedDepartments.forEach(deptName => {
-        // Remover de donde esté (listado o divisiones)
-        removeDepartmentFromMainList(deptName);
-        removeDepartmentFromAllDivisions(deptName, toDivisionId);
-        
-        // Agregar a la división de destino
-        const divisionList = document.getElementById(toDivisionId);
-        if (divisionList) {
-            // Verificar si el departamento ya está en la división de destino
-            const existingItems = divisionList.querySelectorAll('.department-item');
-            let alreadyInDivision = false;
-            
-            existingItems.forEach(item => {
-                if (item.getAttribute('data-dept-name') === deptName) {
-                    alreadyInDivision = true;
-                }
-            });
-            
-            // Si no está, agregarlo
-            if (!alreadyInDivision) {
-                const dept = allDepartments.find(d => d.properties.nam === deptName);
-                const isGBA = dept && gbaCodes.includes(dept.properties.cde);
-                
-                const item = document.createElement('div');
-                item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
-                item.textContent = deptName;
-                item.setAttribute('data-dept-name', deptName);
-                item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
-                
-                divisionList.appendChild(item);
-            }
-        }
-    });
-    
-    // Limpiar la selección después de mover
-    clearSelection();
+    // Actualizar tabla comparativa y contador
+    updateComparisonTable();
+    updateRemainingCount();
 }
 
 /*
@@ -1303,7 +1210,36 @@ function updateMapColors() {
     if (!geoJsonLayer) return;
 
     geoJsonLayer.eachLayer(function(layer) {
-        updateDepartmentStyle(layer);
+        const deptName = layer.feature.properties.nam;
+        const isGBA = gbaCodes.includes(layer.feature.properties.cde);
+        let foundGroup = null;
+
+        // Buscar en qué división está este departamento
+        Object.keys(departmentGroups).forEach(groupId => {
+            if (departmentGroups[groupId].departments.includes(deptName)) {
+                foundGroup = groupId;
+            }
+        });
+
+        if (foundGroup) {
+            // Si está en una división: color de relleno opaco
+            layer.setStyle({
+                fillColor: departmentGroups[foundGroup].color,
+                fillOpacity: 0.8,
+                color: 'white',
+                weight: 1.5, // Borde reducido
+                opacity: 1
+            });
+        } else {
+            // Si no está en división: transparente (solo borde)
+            layer.setStyle({
+                fillColor: '#3388ff',
+                fillOpacity: 0,  // Transparente
+                color: '#2c3e50', // Mismo color para todos
+                weight: isGBA ? 1.5 : 0.8, // Borde más grueso para GBA (reducido)
+                opacity: 0.8
+            });
+        }
     });
 }
 
@@ -1371,7 +1307,14 @@ function resetToInitialState() {
     }
     
     // Limpiar selección
-    clearSelection();
+    selectedDepartments = [];
+    selectedDepartmentsSet.clear();
+    
+    // Limpiar selección visual
+    const selectedItems = document.querySelectorAll('.department-item.selected');
+    selectedItems.forEach(item => {
+        item.classList.remove('selected');
+    });
     
     // Limpiar todas las divisiones
     for (let i = 1; i <= currentDivisionCount; i++) {
@@ -1395,7 +1338,7 @@ function resetToInitialState() {
             fillColor: '#3388ff',
             fillOpacity: 0,
             color: '#2c3e50',
-            weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
+            weight: isGBA ? 1.5 : 0.8, // Borde más grueso para GBA (reducido)
             opacity: 0.8
         });
     });
@@ -1425,7 +1368,7 @@ function highlightDepartment(deptName) {
             });
             
             setTimeout(() => {
-                updateDepartmentStyle(layer);
+                updateMapColors();
             }, 2000);
         }
     });
