@@ -1,3 +1,5 @@
+[file name]: styles.css
+[file content begin]
 /* 
  * ESTILOS PARA EL MAPA INTERACTIVO DE DIVISIÓN PROVINCIAL
  * 
@@ -332,6 +334,18 @@ h3 {
     color: #2c3e50;
 }
 
+/* Estilo para departamentos seleccionados */
+.department-item.selected {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.department-item.selected:hover {
+    background: #ffeaa7;
+    border-color: #fdcb6e;
+}
+
 /* Estado de arrastre */
 .dragging {
     opacity: 0.5;
@@ -513,10 +527,4 @@ h3 {
         font-size: 12px;
     }
 }
-
-/* Estilo para departamentos seleccionados en el listado */
-.department-item.selected-department {
-    background-color: #fff3cd !important;
-    border-color: #ffeaa7 !important;
-    box-shadow: 0 0 0 2px #f39c12;
-}
+[file content end]
