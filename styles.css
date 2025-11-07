@@ -334,18 +334,6 @@ h3 {
     color: #2c3e50;
 }
 
-/* Estilo para departamentos seleccionados */
-.department-item.selected {
-    background: #fff3cd;
-    border-color: #ffeaa7;
-    color: #856404;
-}
-
-.department-item.selected:hover {
-    background: #ffeaa7;
-    border-color: #fdcb6e;
-}
-
 /* Estado de arrastre */
 .dragging {
     opacity: 0.5;
