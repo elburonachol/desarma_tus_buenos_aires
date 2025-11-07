@@ -21,10 +21,10 @@
         <div class="controls">
             <button id="reset-btn" class="reset-button">Reestablecer valores</button>
             
-            <!-- Nuevo botón para armar polígono de selección -->
+            <!-- Botón para armar polígono de selección -->
             <button id="polygon-btn" class="polygon-button">Armar polígono de selección</button>
             
-            <!-- Nuevo control: Regiones ya existentes -->
+            <!-- Control: Regiones ya existentes -->
             <div class="region-control">
                 <label for="existing-regions">Regiones ya existentes:</label>
                 <select id="existing-regions">
@@ -53,16 +53,10 @@
         
         <!-- Información del modo polígono -->
         <div id="polygon-info" class="polygon-info" style="display: none;">
-            <p><strong>Modo polígono activo:</strong> Haz clic izquierdo para agregar puntos. Haz clic derecho o alcanza 100 puntos para finalizar.</p>
-            <p>Puntos agregados: <span id="point-counter">0</span></p>
+            <p><strong>Modo polígono activo:</strong> Haz clic izquierdo para agregar puntos. Haz clic derecho para finalizar.</p>
         </div>
         
-        <!-- 
-        DISTRIBUCIÓN EN TRES COLUMNAS:
-        - Mapa a la izquierda (aproximadamente 60% del ancho)
-        - Divisiones en el centro (aproximadamente 20% del ancho) 
-        - Listado a la derecha (aproximadamente 20% del ancho)
-        -->
+        <!-- Distribución en tres columnas -->
         <div class="main-content">
             <!-- Columna 1: Mapa -->
             <div id="map-container">
@@ -86,13 +80,7 @@
             </div>
         </div>
         
-        <!-- 
-        TABLA COMPARATIVA:
-        - Se ubica debajo de las tres columnas principales
-        - Muestra estadísticas comparativas entre divisiones
-        - Se actualiza automáticamente cuando cambian las divisiones
-        - Usa los nombres editables de las divisiones
-        -->
+        <!-- Tabla comparativa -->
         <div class="comparison-section">
             <h3>Comparación entre Divisiones</h3>
             <div class="table-container">
@@ -111,7 +99,7 @@
         </div>
     </div>
 
-    <!-- Leaflet JS (cargado una única vez) -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
 </body>
