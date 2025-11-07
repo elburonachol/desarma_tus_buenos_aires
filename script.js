@@ -37,8 +37,7 @@ let polygonMode = false;    // Indica si estamos en modo de dibujo de polígono
 let polygonPoints = [];     // Almacena los puntos del polígono en construcción
 let polygonLayer = null;    // Capa del polígono actual
 let polylineLayer = null;   // Capa de la línea actual
-let selectedDepartments = []; // Departamentos seleccionados por el polígono
-let isSelectionActive = false; // Indica si hay una selección activa
+let selectedDepartments = []; // Departamentos seleccionados por el polígono (persistentes hasta que se deseleccionen)
 
 // Paleta de colores armónica y bien diferenciable para las divisiones (12 colores)
 const divisionColors = [
@@ -52,8 +51,8 @@ const divisionColors = [
     '#7f7f7f', // Gris
     '#bcbd22', // Oliva
     '#17becf', // Cyan
-    '#aec7e8', // Azul claro
-    '#ffbb78'  // Naranja claro
+    '#9edae5', // Azul claro
+    '#ff9896'  // Rosa claro
 ];
 
 // Códigos de departamentos que pertenecen al Gran Buenos Aires
@@ -83,6 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupDivisionSelector();
         setupRegionSelector(); // Configurar el selector de regiones existentes
         setupPolygonButton();  // Configurar el botón de polígono
+        setupMapClickDeselect(); // Configurar el clic en el mapa para deseleccionar
         initializeComparisonTable();
         updateRemainingCount();
     }).catch(error => {
@@ -109,17 +109,85 @@ function setupPolygonButton() {
 }
 
 /*
+ * CONFIGURACIÓN DEL CLIC EN EL MAPA PARA DESELECCIONAR
+ * Agrega un event listener al mapa para deseleccionar departamentos cuando se haga clic en un área sin departamento
+ */
+function setupMapClickDeselect() {
+    map.on('click', function(e) {
+        // Verificar si el clic fue en un departamento (usando un timeout para permitir que el evento del departamento se procese primero)
+        setTimeout(() => {
+            // Si no hay ningún departamento seleccionado por polígono, no hacemos nada
+            if (selectedDepartments.length === 0) return;
+            
+            // Deseleccionar todos los departamentos
+            clearSelection();
+        }, 10);
+    });
+}
+
+/*
+ * LIMPIAR SELECCIÓN
+ * Quita el resaltado de los departamentos seleccionados y limpia la variable
+ */
+function clearSelection() {
+    // Quitar el resaltado de los departamentos seleccionados
+    geoJsonLayer.eachLayer(function(layer) {
+        const deptName = layer.feature.properties.nam;
+        if (selectedDepartments.includes(deptName)) {
+            // Restaurar el estilo normal
+            updateDepartmentStyle(layer);
+        }
+    });
+    
+    // Limpiar la lista de departamentos seleccionados
+    selectedDepartments = [];
+}
+
+/*
+ * ACTUALIZAR ESTILO DE DEPARTAMENTO
+ * Aplica el estilo correspondiente a un departamento según su estado actual
+ */
+function updateDepartmentStyle(layer) {
+    const deptName = layer.feature.properties.nam;
+    const isGBA = gbaCodes.includes(layer.feature.properties.cde);
+    let foundGroup = null;
+
+    // Buscar en qué división está este departamento
+    Object.keys(departmentGroups).forEach(groupId => {
+        if (departmentGroups[groupId].departments.includes(deptName)) {
+            foundGroup = groupId;
+        }
+    });
+
+    if (foundGroup) {
+        // Si está en una división: color de relleno opaco
+        layer.setStyle({
+            fillColor: departmentGroups[foundGroup].color,
+            fillOpacity: 0.8,
+            color: 'white',
+            weight: 1.5, // Borde reducido
+            opacity: 1
+        });
+    } else {
+        // Si no está en división: transparente (solo borde)
+        layer.setStyle({
+            fillColor: '#3388ff',
+            fillOpacity: 0,  // Transparente
+            color: '#2c3e50', // Mismo color para todos
+            weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
+            opacity: 0.8
+        });
+    }
+}
+
+/*
  * ACTIVACIÓN DEL MODO POLÍGONO
  * Prepara el mapa y la interfaz para el dibujo de polígonos
  */
 function activatePolygonMode() {
-    // Si hay una selección activa, limpiarla
-    if (isSelectionActive) {
-        clearSelection();
-    }
-    
     polygonMode = true;
     polygonPoints = [];
+    selectedDepartments = [];
     
     // Actualizar interfaz
     document.getElementById('polygon-btn').classList.add('active');
@@ -280,10 +348,13 @@ function finalizePolygon() {
     
     // Mostrar resultados
     if (selectedDepartments.length > 0) {
-        // Activar selección
-        activateSelection();
+        // Resaltar departamentos seleccionados (persistentemente)
+        highlightSelectedDepartments();
         
-        alert(`Se seleccionaron ${selectedDepartments.length} departamentos. Ahora puedes arrastrar cualquier departamento seleccionado para mover todos a una división.`);
+        // Mover departamentos seleccionados al listado principal si no están ya
+        moveSelectedToMainList();
+        
+        alert(`Se seleccionaron ${selectedDepartments.length} departamentos. Ahora puede arrastrar cualquiera de ellos para mover todo el grupo.`);
     } else {
         alert('No se encontraron departamentos dentro del polígono');
     }
@@ -293,47 +364,8 @@ function finalizePolygon() {
 }
 
 /*
- * ACTIVACIÓN DE LA SELECCIÓN
- * Resalta los departamentos seleccionados y configura eventos
- */
-function activateSelection() {
-    isSelectionActive = true;
-    
-    // Resaltar departamentos seleccionados
-    highlightSelectedDepartments();
-    
-    // Mover departamentos seleccionados al listado principal si no están ya
-    moveSelectedToMainList();
-    
-    // Configurar evento de click en el mapa para limpiar selección
-    map.once('click', clearSelection);
-    
-    // Configurar eventos de drag & drop especiales para los elementos seleccionados
-    setupGroupDragAndDrop();
-}
-
-/*
- * LIMPIAR SELECCIÓN
- * Restaura el estilo normal de los departamentos seleccionados
- */
-function clearSelection() {
-    if (!isSelectionActive) return;
-    
-    isSelectionActive = false;
-    selectedDepartments = [];
-    
-    // Restaurar estilos del mapa
-    updateMapColors();
-    
-    // Remover eventos de drag & drop especiales
-    // (Se restaurará el drag & drop normal en la próxima interacción)
-    
-    console.log('Selección limpiada');
-}
-
-/*
  * RESALTADO DE DEPARTAMENTOS SELECCIONADOS
- * Aplica un estilo especial a los departamentos seleccionados por el polígono
+ * Aplica un estilo especial a los departamentos seleccionados por el polígono (persistente)
  */
 function highlightSelectedDepartments() {
     geoJsonLayer.eachLayer(function(layer) {
@@ -364,8 +396,6 @@ function moveSelectedToMainList() {
         existingItems.forEach(item => {
             if (item.getAttribute('data-dept-name') === deptName) {
                 alreadyInList = true;
-                // Marcar como seleccionado
-                item.classList.add('selected');
             }
         });
         
@@ -376,7 +406,7 @@ function moveSelectedToMainList() {
             const isGBA = dept && gbaCodes.includes(dept.properties.cde);
             
             const item = document.createElement('div');
-            item.className = `department-item ${isGBA ? 'gba-department-bold' : ''} selected`;
+            item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
             item.textContent = deptName;
             item.setAttribute('data-dept-name', deptName);
             item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
@@ -390,99 +420,6 @@ function moveSelectedToMainList() {
     
     // Actualizar contador
     updateRemainingCount();
-}
-
-/*
- * CONFIGURACIÓN DE DRAG & DROP GRUPAL
- * Prepara los elementos para que al arrastrar uno se arrastren todos los seleccionados
- */
-function setupGroupDragAndDrop() {
-    // Para cada departamento seleccionado, configurar un manejador de inicio de arrastre
-    const allItems = document.querySelectorAll('.department-item.selected');
-    
-    allItems.forEach(item => {
-        item.addEventListener('mousedown', handleGroupDragStart);
-        item.addEventListener('touchstart', handleGroupDragStart);
-    });
-}
-
-/*
- * MANEJO DE INICIO DE ARRASTRE GRUPAL
- * Prepara el arrastre de todos los departamentos seleccionados
- */
-function handleGroupDragStart(e) {
-    if (!isSelectionActive) return;
-    
-    e.preventDefault();
-    
-    // Crear un elemento temporal para el arrastre
-    const dragImage = document.createElement('div');
-    dragImage.textContent = `Mover ${selectedDepartments.length} departamentos`;
-    dragImage.style.background = '#f39c12';
-    dragImage.style.color = 'white';
-    dragImage.style.padding = '10px';
-    dragImage.style.borderRadius = '5px';
-    dragImage.style.position = 'absolute';
-    dragImage.style.top = '-1000px'; // Fuera de pantalla
-    
-    document.body.appendChild(dragImage);
-    
-    // Configurar el arrastre
-    e.dataTransfer.setDragImage(dragImage, 0, 0);
-    
-    // Al soltar el mouse, mover todos los departamentos seleccionados
-    const handleDrop = function(targetList) {
-        if (!targetList) return;
-        
-        // Mover todos los departamentos seleccionados a la lista objetivo
-        selectedDepartments.forEach(deptName => {
-            // Buscar el elemento en cualquier lista
-            const item = document.querySelector(`.department-item[data-dept-name="${deptName}"]`);
-            if (item && !targetList.contains(item)) {
-                // Clonar el elemento y agregarlo a la lista objetivo
-                const clone = item.cloneNode(true);
-                targetList.appendChild(clone);
-                
-                // Remover el original de donde esté
-                item.remove();
-            }
-        });
-        
-        // Limpiar selección
-        clearSelection();
-        
-        // Actualizar estado
-        updateDepartmentGroups();
-        updateMapColors();
-        updateComparisonTable();
-        updateRemainingCount();
-        
-        // Remover el elemento temporal
-        document.body.removeChild(dragImage);
-    };
-    
-    // Para simular el drop, usaremos un enfoque diferente ya que el drag and drop nativo es limitado
-    // En su lugar, usaremos eventos de mouse para detectar sobre qué lista estamos
-    let currentTargetList = null;
-    
-    const handleMouseMove = function(e) {
-        const elements = document.elementsFromPoint(e.clientX, e.clientY);
-        const list = elements.find(el => el.classList.contains('group-list'));
-        if (list) {
-            currentTargetList = list;
-        }
-    };
-    
-    const handleMouseUp = function() {
-        if (currentTargetList) {
-            handleDrop(currentTargetList);
-        }
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
 }
 
 /*
@@ -698,9 +635,13 @@ function loadGeoJSON() {
                         direction: 'auto'
                     });
                     
-                    // Click para resaltar
-                    layer.on('click', function() {
-                        highlightDepartment(feature.properties.nam);
+                    // Click para resaltar individualmente y deseleccionar grupo si es necesario
+                    layer.on('click', function(e) {
+                        // Si hay departamentos seleccionados por polígono, deseleccionarlos al hacer clic en un departamento no seleccionado
+                        if (selectedDepartments.length > 0 && !selectedDepartments.includes(nombre)) {
+                            clearSelection();
+                        }
+                        highlightDepartment(nombre);
                     });
 
                     // Efectos hover para mejor UX
@@ -1071,6 +1012,15 @@ function processDivisionReduction(newCount, previousGroups) {
  */
 function setupDivisionSelector() {
     const selector = document.getElementById('division-count');
+    // Aumentar a 12 divisiones
+    selector.innerHTML = '';
+    for (let i = 1; i <= 12; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        if (i === 3) option.selected = true;
+        selector.appendChild(option);
+    }
     selector.value = currentDivisionCount;
     
     selector.addEventListener('change', function() {
@@ -1087,7 +1037,7 @@ function setupDivisionSelector() {
 }
 
 /*
- * POBLADO DEL LISTADO OF DEPARTAMENTOS
+ * POBLADO DEL LISTADO DE DEPARTAMENTOS
  * Llena la lista principal con todos los departamentos ordenados
  * Aplica texto en negrita a los departamentos del Gran Buenos Aires (sin franja roja)
  */
@@ -1162,13 +1112,44 @@ function initializeDragAndDrop() {
 /*
  * MANEJO DE MOVIMIENTO DE DEPARTAMENTOS
  * Procesa los eventos de drag & drop entre listas
- * Si se mueve un departamento, se deselecciona la región existente
+ * Si el departamento arrastrado está seleccionado, mueve todos los seleccionados
  */
 function handleDepartmentMove(evt) {
     const departmentName = evt.item.getAttribute('data-dept-name');
     const toElement = evt.to;
     const fromElement = evt.from;
 
+    // Determinar si estamos moviendo un departamento seleccionado
+    const movingSelected = selectedDepartments.length > 0 && selectedDepartments.includes(departmentName);
+
+    // Si estamos moviendo un departamento seleccionado, mover todos los seleccionados
+    if (movingSelected) {
+        moveSelectedDepartments(toElement.id);
+    } else {
+        // Comportamiento normal para un solo departamento
+        handleSingleDepartmentMove(departmentName, toElement, fromElement);
+    }
+
+    // Si estamos en modo región existente, deseleccionar
+    if (currentRegionType) {
+        document.getElementById('existing-regions').value = '';
+        currentRegionType = null;
+    }
+
+    // Actualizar estado y mapa
+    updateDepartmentGroups();
+    updateMapColors();
+    
+    // Actualizar tabla comparativa y contador
+    updateComparisonTable();
+    updateRemainingCount();
+}
+
+/*
+ * MANEJO DE MOVIMIENTO DE UN SOLO DEPARTAMENTO
+ * Procesa el movimiento de un departamento individual
+ */
+function handleSingleDepartmentMove(departmentName, toElement, fromElement) {
     // Si el destino es el listado principal
     if (toElement.id === 'all-departments-list') {
         // Eliminar de todas las divisiones y ordenar listado
@@ -1186,20 +1167,53 @@ function handleDepartmentMove(evt) {
         // Eliminar de otras divisiones
         removeDepartmentFromAllDivisions(departmentName, toElement.id);
     }
+}
 
-    // Si estamos en modo región existente, deseleccionar
-    if (currentRegionType) {
-        document.getElementById('existing-regions').value = '';
-        currentRegionType = null;
-    }
-
-    // Actualizar estado y mapa
-    updateDepartmentGroups();
-    updateMapColors();
+/*
+ * MOVIMIENTO DE DEPARTAMENTOS SELECCIONADOS
+ * Mueve todos los departamentos seleccionados a la división de destino
+ */
+function moveSelectedDepartments(toDivisionId) {
+    // Obtener el ID de la división de destino
+    const divisionId = toDivisionId.replace('division-', '');
     
-    // Actualizar tabla comparativa y contador
-    updateComparisonTable();
-    updateRemainingCount();
+    // Para cada departamento seleccionado
+    selectedDepartments.forEach(deptName => {
+        // Remover de donde esté (listado o divisiones)
+        removeDepartmentFromMainList(deptName);
+        removeDepartmentFromAllDivisions(deptName, toDivisionId);
+        
+        // Agregar a la división de destino
+        const divisionList = document.getElementById(toDivisionId);
+        if (divisionList) {
+            // Verificar si el departamento ya está en la división de destino
+            const existingItems = divisionList.querySelectorAll('.department-item');
+            let alreadyInDivision = false;
+            
+            existingItems.forEach(item => {
+                if (item.getAttribute('data-dept-name') === deptName) {
+                    alreadyInDivision = true;
+                }
+            });
+            
+            // Si no está, agregarlo
+            if (!alreadyInDivision) {
+                const dept = allDepartments.find(d => d.properties.nam === deptName);
+                const isGBA = dept && gbaCodes.includes(dept.properties.cde);
+                
+                const item = document.createElement('div');
+                item.className = `department-item ${isGBA ? 'gba-department-bold' : ''}`;
+                item.textContent = deptName;
+                item.setAttribute('data-dept-name', deptName);
+                item.setAttribute('data-dept-code', dept ? dept.properties.cde : '');
+                
+                divisionList.appendChild(item);
+            }
+        }
+    });
+    
+    // Limpiar la selección después de mover
+    clearSelection();
 }
 
 /*
@@ -1291,36 +1305,7 @@ function updateMapColors() {
     if (!geoJsonLayer) return;
 
     geoJsonLayer.eachLayer(function(layer) {
-        const deptName = layer.feature.properties.nam;
-        const isGBA = gbaCodes.includes(layer.feature.properties.cde);
-        let foundGroup = null;
-
-        // Buscar en qué división está este departamento
-        Object.keys(departmentGroups).forEach(groupId => {
-            if (departmentGroups[groupId].departments.includes(deptName)) {
-                foundGroup = groupId;
-            }
-        });
-
-        if (foundGroup) {
-            // Si está en una división: color de relleno opaco
-            layer.setStyle({
-                fillColor: departmentGroups[foundGroup].color,
-                fillOpacity: 0.8,
-                color: 'white',
-                weight: 1.5, // Borde reducido
-                opacity: 1
-            });
-        } else {
-            // Si no está en división: transparente (solo borde)
-            layer.setStyle({
-                fillColor: '#3388ff',
-                fillOpacity: 0,  // Transparente
-                color: '#2c3e50', // Mismo color para todos
-                weight: isGBA ? 2 : 1, // Borde más grueso para GBA (reducido)
-                opacity: 0.8
-            });
-        }
+        updateDepartmentStyle(layer);
     });
 }
 
@@ -1387,10 +1372,8 @@ function resetToInitialState() {
         deactivatePolygonMode();
     }
     
-    // Limpiar selección si está activa
-    if (isSelectionActive) {
-        clearSelection();
-    }
+    // Limpiar selección
+    clearSelection();
     
     // Limpiar todas las divisiones
     for (let i = 1; i <= currentDivisionCount; i++) {
@@ -1444,7 +1427,7 @@ function highlightDepartment(deptName) {
             });
             
             setTimeout(() => {
-                updateMapColors();
+                updateDepartmentStyle(layer);
             }, 2000);
         }
     });
