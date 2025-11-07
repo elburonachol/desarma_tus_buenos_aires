@@ -1430,4 +1430,3 @@ function highlightDepartment(deptName) {
         }
     });
 }
-[file content end]
