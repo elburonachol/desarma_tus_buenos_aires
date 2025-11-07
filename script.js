@@ -1,5 +1,3 @@
-[file name]: script.js
-[file content begin]
 /*
  * MAPA INTERACTIVO - DIVISIÓN DE LA PROVINCIA DE BUENOS AIRES
  * 
