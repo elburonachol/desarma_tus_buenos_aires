@@ -1,13 +1,3 @@
-[file name]: styles.css
-[file content begin]
-/* 
- * ESTILOS PARA EL MAPA INTERACTIVO DE DIVISIÓN PROVINCIAL
- * 
- * Propósito: Estilos para interfaz de división de la Provincia de Buenos Aires
- * Distribución: Tres columnas - Mapa | Divisiones | Listado + Tabla comparativa
- * Características: Diseño responsive, colores distintivos, interfaz intuitiva
- */
-
 * {
     margin: 0;
     padding: 0;
@@ -42,13 +32,7 @@ h3 {
     font-weight: 600;
 }
 
-/* 
- * CONTROLES PRINCIPALES:
- * - Botón de reset
- * - Botón de polígono
- * - Selector de regiones existentes
- * - Selector de número de divisiones
- */
+/* Controles principales */
 .controls {
     text-align: center;
     margin-bottom: 30px;
@@ -86,7 +70,6 @@ h3 {
     transform: translateY(0);
 }
 
-/* Nuevo estilo para el botón de polígono */
 .polygon-button {
     background: #3498db;
     color: white;
@@ -111,7 +94,6 @@ h3 {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
 }
 
-/* Información del modo polígono */
 .polygon-info {
     background: #e3f2fd;
     border-left: 4px solid #3498db;
@@ -126,12 +108,6 @@ h3 {
     color: #2c3e50;
 }
 
-#point-counter {
-    font-weight: bold;
-    color: #e74c3c;
-}
-
-/* Nuevo estilo para el control de regiones existentes */
 .region-control {
     display: flex;
     align-items: center;
@@ -188,9 +164,7 @@ h3 {
     border-color: #3498db;
 }
 
-/* 
- * DISTRIBUCIÓN EN TRES COLUMNAS PRINCIPALES
- */
+/* Distribución en tres columnas principales */
 .main-content {
     display: flex;
     gap: 25px;
@@ -198,7 +172,6 @@ h3 {
     height: 70vh;
 }
 
-/* Columna 1: Mapa */
 #map-container {
     flex: 3;
     background: white;
@@ -214,7 +187,6 @@ h3 {
     border-radius: 10px;
 }
 
-/* Columna 2: Divisiones */
 .divisions-column {
     flex: 1;
     background: white;
@@ -277,7 +249,6 @@ h3 {
     background: white;
 }
 
-/* Columna 3: Listado de departamentos */
 .list-column {
     flex: 1;
     background: white;
@@ -303,9 +274,7 @@ h3 {
     background: white;
 }
 
-/* 
- * ELEMENTOS DE LISTA (DEPARTAMENTOS)
- */
+/* Elementos de lista (departamentos) */
 .department-item {
     padding: 10px 12px;
     margin: 5px 0;
@@ -328,10 +297,17 @@ h3 {
     cursor: grabbing;
 }
 
-/* Cambio: Solo negrita para GBA, sin franja roja */
+/* Solo negrita para GBA */
 .department-item.gba-department-bold {
     font-weight: 700;
     color: #2c3e50;
+}
+
+/* Departamento seleccionado */
+.department-item.selected {
+    background: #fff3cd;
+    border-color: #ffc107;
+    order: -1;
 }
 
 /* Estado de arrastre */
@@ -340,9 +316,7 @@ h3 {
     transform: rotate(5deg);
 }
 
-/* 
- * TABLA COMPARATIVA
- */
+/* Tabla comparativa */
 .comparison-section {
     background: white;
     border-radius: 10px;
@@ -398,12 +372,7 @@ h3 {
     background: #e3f2fd;
 }
 
-/* 
- * DISEÑO RESPONSIVE:
- * - En tablets: tres columnas se apilan en dos filas
- * - En móviles: una columna
- * - Controles se adaptan
- */
+/* Diseño responsive */
 @media (max-width: 1200px) {
     .main-content {
         flex-wrap: wrap;
@@ -515,4 +484,3 @@ h3 {
         font-size: 12px;
     }
 }
-[file content end]
