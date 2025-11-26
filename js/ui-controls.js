@@ -156,6 +156,8 @@ function initializeDivisionBoxes(newCount) {
                 item.setAttribute('data-dept-name', deptName);
                 divisionList.appendChild(item);
             });
+            // Ordenar alfabéticamente los departamentos en la división
+            sortDivisionList(i);
         }
     }
 
@@ -164,6 +166,30 @@ function initializeDivisionBoxes(newCount) {
     
     // Actualizar todo el estado de la aplicación
     notifyStateChange();
+}
+
+/**
+ * ORDENA LOS DEPARTAMENTOS EN UNA DIVISIÓN ALFABÉTICAMENTE
+ * @param {number} divisionId - ID de la división a ordenar
+ */
+function sortDivisionList(divisionId) {
+    const divisionList = document.getElementById(`division-${divisionId}`);
+    if (!divisionList) return;
+    
+    const items = Array.from(divisionList.querySelectorAll('.department-item'));
+    
+    // Ordenar por nombre del departamento
+    items.sort((a, b) => {
+        const nameA = a.getAttribute('data-dept-name').toUpperCase();
+        const nameB = b.getAttribute('data-dept-name').toUpperCase();
+        return nameA.localeCompare(nameB);
+    });
+    
+    // Reconstruir lista ordenada
+    divisionList.innerHTML = '';
+    items.forEach(item => {
+        divisionList.appendChild(item);
+    });
 }
 
 /**
@@ -226,6 +252,8 @@ function initializeDragAndDrop() {
                 ghostClass: 'dragging',
                 onEnd: function(evt) {
                     handleDepartmentMove(evt);
+                    // Ordenar la división después del movimiento
+                    sortDivisionList(index + 1);
                 }
             });
         }
@@ -442,6 +470,9 @@ function populateDepartmentsList(features) {
         item.setAttribute('data-dept-code', codigo);
         listContainer.appendChild(item);
     });
+    
+    // Ordenar alfabéticamente después de poblar
+    sortMainList();
 }
 
 /**
@@ -460,7 +491,7 @@ function updateRemainingCount() {
 
 /**
  * CARGA REGIONES EXISTENTES EN LAS DIVISIONES
- * @param {string} tipoRegion - Tipo de región ('secciones_electorales' o 'regiones_sanitarias')
+ * @param {string} tipoRegion - Tipo de región ('secciones_electorales', 'regiones_sanitarias', 'regiones_educativas', 'deptos_judiciales')
  */
 function loadExistingRegions(tipoRegion) {
     if (!regionesExistentes) {
@@ -469,7 +500,7 @@ function loadExistingRegions(tipoRegion) {
     }
 
     // Obtener las regiones según el tipo seleccionado
-    const regiones = regionesExistentes[tipoRegion];
+    let regiones = regionesExistentes[tipoRegion];
     if (!regiones) {
         console.error(`Tipo de región no válido: ${tipoRegion}`);
         return;
@@ -477,6 +508,11 @@ function loadExistingRegions(tipoRegion) {
 
     // Guardar el tipo de región actual
     currentRegionType = tipoRegion;
+
+    // Si son regiones educativas, aplicar agrupamientos especiales
+    if (tipoRegion === 'regiones_educativas') {
+        regiones = agruparRegionesEducativas(regiones);
+    }
 
     // Obtener los nombres de las regiones y ordenarlos
     const nombresRegiones = Object.keys(regiones).sort();
@@ -520,11 +556,69 @@ function loadExistingRegions(tipoRegion) {
                 item.setAttribute('data-dept-code', codigoCde);
                 divisionList.appendChild(item);
             });
+            
+            // Ordenar alfabéticamente los departamentos en la división
+            sortDivisionList(groupId);
         }
     });
 
     // Actualizar estado completo de la aplicación
     notifyStateChange();
+}
+
+/**
+ * AGRUPA LAS REGIONES EDUCATIVAS SEGÚN LAS ESPECIFICACIONES SOLICITADAS
+ * @param {Object} regionesEducativas - Objeto con las regiones educativas originales
+ * @returns {Object} - Objeto con las regiones educativas agrupadas
+ */
+function agruparRegionesEducativas(regionesEducativas) {
+    const regionesAgrupadas = {};
+    
+    // Definir los agrupamientos solicitados
+    const agrupamientos = {
+        'Regiones educativas 12 y 13': ['12', '13'],
+        'Regiones educativas 11 y 6': ['11', '6'],
+        'Regiones educativas 7, 8 y 9': ['7', '8', '9'],
+        'Regiones educativas 2 y 5': ['2', '5'],
+        'Regiones educativas 1 y 4': ['1', '4'],
+        'Regiones educativas 20 y 19': ['20', '19'],
+        'Regiones educativas 14 y 15': ['14', '15'],
+        'Regiones educativas 24 y 25': ['24', '25'],
+        'Regiones educativas 17 y 18': ['17', '18']
+    };
+
+    // Aplicar los agrupamientos
+    Object.keys(agrupamientos).forEach(nombreAgrupado => {
+        const regionesIncluidas = agrupamientos[nombreAgrupado];
+        regionesAgrupadas[nombreAgrupado] = [];
+        
+        regionesIncluidas.forEach(regionId => {
+            if (regionesEducativas[regionId]) {
+                regionesAgrupadas[nombreAgrupado] = regionesAgrupadas[nombreAgrupado].concat(regionesEducativas[regionId]);
+            }
+        });
+        
+        // Ordenar alfabéticamente los departamentos dentro del grupo
+        regionesAgrupadas[nombreAgrupado].sort((a, b) => {
+            return a.municipio_nombre.localeCompare(b.municipio_nombre);
+        });
+    });
+
+    // Incluir las regiones educativas que no están en ningún agrupamiento
+    Object.keys(regionesEducativas).forEach(regionId => {
+        let estaIncluida = false;
+        Object.values(agrupamientos).forEach(regionesIncluidas => {
+            if (regionesIncluidas.includes(regionId)) {
+                estaIncluida = true;
+            }
+        });
+        
+        if (!estaIncluida) {
+            regionesAgrupadas[`Región educativa ${regionId}`] = regionesEducativas[regionId];
+        }
+    });
+
+    return regionesAgrupadas;
 }
 
 // =============================================
