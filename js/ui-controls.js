@@ -512,6 +512,8 @@ function loadExistingRegions(tipoRegion) {
     // Si son regiones educativas, aplicar agrupamientos especiales
     if (tipoRegion === 'regiones_educativas') {
         regiones = agruparRegionesEducativas(regiones);
+    } else if (tipoRegion === 'deptos_judiciales') {
+        regiones = agruparDeptosJudiciales(regiones);
     }
 
     // Obtener los nombres de las regiones y ordenarlos
@@ -619,6 +621,57 @@ function agruparRegionesEducativas(regionesEducativas) {
     });
 
     return regionesAgrupadas;
+}
+
+/**
+ * AGRUPA LOS DEPARTAMENTOS JUDICIALES SEGÚN LAS ESPECIFICACIONES SOLICITADAS
+ * @param {Object} deptosJudiciales - Objeto con los departamentos judiciales originales
+ * @returns {Object} - Objeto con los departamentos judiciales agrupados
+ */
+function agruparDeptosJudiciales(deptosJudiciales) {
+    const deptosAgrupados = {};
+    
+    // Definir los agrupamientos solicitados
+    const agrupamientos = {
+        'Avellaneda - Lanús con Quilmes': ['Avellaneda - Lanús', 'Quilmes'],
+        'San Isidro con San Martín': ['San Isidro', 'General San Martín'],
+        'Pergamino con San Nicolás': ['Pergamino', 'San Nicolás'],
+        'Necochea con Mar del Plata': ['Necochea', 'Mar del Plata'],
+        'Moreno - Gral. Rodríguez con Morón': ['Moreno - General Rodríguez', 'Morón']
+    };
+
+    // Aplicar los agrupamientos
+    Object.keys(agrupamientos).forEach(nombreAgrupado => {
+        const deptosIncluidos = agrupamientos[nombreAgrupado];
+        deptosAgrupados[nombreAgrupado] = [];
+        
+        deptosIncluidos.forEach(deptoNombre => {
+            if (deptosJudiciales[deptoNombre]) {
+                deptosAgrupados[nombreAgrupado] = deptosAgrupados[nombreAgrupado].concat(deptosJudiciales[deptoNombre]);
+            }
+        });
+        
+        // Ordenar alfabéticamente los departamentos dentro del grupo
+        deptosAgrupados[nombreAgrupado].sort((a, b) => {
+            return a.municipio_nombre.localeCompare(b.municipio_nombre);
+        });
+    });
+
+    // Incluir los departamentos judiciales que no están en ningún agrupamiento
+    Object.keys(deptosJudiciales).forEach(deptoNombre => {
+        let estaIncluido = false;
+        Object.values(agrupamientos).forEach(deptosIncluidos => {
+            if (deptosIncluidos.includes(deptoNombre)) {
+                estaIncluido = true;
+            }
+        });
+        
+        if (!estaIncluido) {
+            deptosAgrupados[deptoNombre] = deptosJudiciales[deptoNombre];
+        }
+    });
+
+    return deptosAgrupados;
 }
 
 // =============================================
