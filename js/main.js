@@ -103,6 +103,9 @@ function initializeUI() {
     setupRegionSelector();
     setupPolygonButton();
     
+    // Sistema de visualización de regionalizaciones (NUEVO)
+    initializeRegionalizaciones();
+    
     // Sistema de visualización de datos
     initializeComparisonTable();
     updateRemainingCount();
