@@ -916,6 +916,8 @@ function resetToInitialState() {
     document.getElementById('division-count').value = 3;
     document.getElementById('existing-regions').value = '';
     currentRegionType = null;
+    // Limpiar regionalizaciones visibles
+    clearRegionalizaciones();;
     
     // Reinicializar con 3 divisiones
     initializeDivisionBoxes(3);
