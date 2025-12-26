@@ -126,6 +126,50 @@ function obtenerCodigoCdePorNombre(nombreDepartamento) {
     return departamento ? departamento.properties.cde : null;
 }
 
+// =============================================
+// FUNCIONES AUXILIARES PARA GESTIÓN DE DATOS
+// =============================================
+
+/**
+ * OBTIENE UN DEPARTAMENTO COMPLETO POR SU CÓDIGO CDE
+ * @param {string} cde - Código CDE del departamento
+ * @returns {Object|null} - Departamento encontrado o null
+ */
+function getDepartmentByCode(cde) {
+    return allDepartments.find(dept => dept.properties.cde === cde);
+}
+
+/**
+ * OBTIENE EL NOMBRE DE UN DEPARTAMENTO POR SU CÓDIGO CDE
+ * @param {string} cde - Código CDE del departamento
+ * @returns {string|null} - Nombre del departamento o null
+ */
+function getDepartmentNameByCode(cde) {
+    const dept = getDepartmentByCode(cde);
+    return dept ? dept.properties.nam : null;
+}
+
+/**
+ * VERIFICA SI UN DEPARTAMENTO PERTENECE AL GBA POR SU CÓDIGO CDE
+ * @param {string} cde - Código CDE del departamento
+ * @returns {boolean} - True si pertenece al GBA
+ */
+function isGBADepartmentByCode(cde) {
+    return gbaCodes.includes(cde);
+}
+
+/**
+ * FORMATEA NÚMEROS CON SEPARADORES DE MILES PARA MEJOR LEGIBILIDAD
+ * @param {number|string} numero - Número a formatear
+ * @returns {string} - Número formateado con separadores de miles
+ */
+function formatearNumero(numero) {
+    if (numero === 0 || numero === '0') return '0';
+    if (!numero) return '-';
+    
+    return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
 /**
  * CALCULA EL TOTAL DE UNA VARIABLE PARA TODOS LOS DEPARTAMENTOS DE UNA DIVISIÓN
  * @param {number} grupoId - ID de la división (1, 2, 3, ...)
@@ -169,48 +213,4 @@ function calcularDensidadDivision(grupoId) {
         return (poblacion / superficie).toFixed(1);
     }
     return '0.0';
-}
-
-/**
- * FORMATEA NÚMEROS CON SEPARADORES DE MILES PARA MEJOR LEGIBILIDAD
- * @param {number|string} numero - Número a formatear
- * @returns {string} - Número formateado con separadores de miles
- */
-function formatearNumero(numero) {
-    if (numero === 0 || numero === '0') return '0';
-    if (!numero) return '-';
-    
-    return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}
-
-// =============================================
-// FUNCIONES AUXILIARES PARA GESTIÓN DE DATOS
-// =============================================
-
-/**
- * OBTIENE UN DEPARTAMENTO COMPLETO POR SU CÓDIGO CDE
- * @param {string} cde - Código CDE del departamento
- * @returns {Object|null} - Departamento encontrado o null
- */
-function getDepartmentByCode(cde) {
-    return allDepartments.find(dept => dept.properties.cde === cde);
-}
-
-/**
- * OBTIENE EL NOMBRE DE UN DEPARTAMENTO POR SU CÓDIGO CDE
- * @param {string} cde - Código CDE del departamento
- * @returns {string|null} - Nombre del departamento o null
- */
-function getDepartmentNameByCode(cde) {
-    const dept = getDepartmentByCode(cde);
-    return dept ? dept.properties.nam : null;
-}
-
-/**
- * VERIFICA SI UN DEPARTAMENTO PERTENECE AL GBA POR SU CÓDIGO CDE
- * @param {string} cde - Código CDE del departamento
- * @returns {boolean} - True si pertenece al GBA
- */
-function isGBADepartmentByCode(cde) {
-    return gbaCodes.includes(cde);
 }
