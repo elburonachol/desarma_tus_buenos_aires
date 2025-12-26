@@ -1,28 +1,54 @@
-/* =============================================
-   ESTILOS GENERALES MODIFICADOS
-   ============================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* Título principal */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f7fa;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 h1 {
     text-align: center;
     margin-bottom: 25px;
     color: #2c3e50;
-    font-size: 2rem; /* Un poco más grande */
-    font-weight: 700;
-    font-style: italic; /* Para darle un toque distintivo */
+    font-size: 1.8rem;
+    font-weight: 600;
 }
 
-/* =============================================
-   CONTROLES PRINCIPALES MODIFICADOS
-   ============================================= */
+h3 {
+    color: #34495e;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
 
+/* Controles principales */
 .controls {
-    /* Mantener los estilos existentes pero agregar espacio para el nuevo botón */
+    text-align: center;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
     flex-wrap: wrap;
+    padding: 18px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 
-.regionalizaciones-toggle {
-    background: #95a5a6;
+.reset-button {
+    background: #e74c3c;
     color: white;
     border: none;
     padding: 12px 25px;
@@ -32,22 +58,322 @@ h1 {
     font-weight: 600;
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin: 5px;
 }
 
-.regionalizaciones-toggle:hover {
-    background: #7f8c8d;
+.reset-button:hover {
+    background: #c0392b;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-.regionalizaciones-toggle.active {
+.reset-button:active {
+    transform: translateY(0);
+}
+
+.polygon-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.polygon-button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.polygon-button.active {
     background: #2c3e50;
-    box-shadow: 0 0 0 3px rgba(149, 165, 166, 0.3);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.polygon-info {
+    background: #e3f2fd;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.polygon-info p {
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.region-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.region-control label {
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.region-control select {
+    padding: 10px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.3s ease;
+    min-width: 200px;
+}
+
+.region-control select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.division-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.division-control label {
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.division-control select {
+    padding: 10px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.3s ease;
+    min-width: 80px;
+}
+
+.division-control select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Distribución en tres columnas principales */
+.main-content {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 30px;
+    height: 70vh;
+}
+
+#map-container {
+    flex: 3;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+.divisions-column {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.group-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.group-box:hover {
+    transform: translateY(-2px);
+}
+
+.group-box h3 {
+    margin-bottom: 12px;
+    color: #2c3e50;
+    font-size: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.editable-division-name {
+    cursor: text;
+    padding: 2px 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.editable-division-name:hover {
+    background-color: #e9ecef;
+}
+
+.editable-division-name:focus {
+    outline: 2px solid #3498db;
+    background-color: white;
+}
+
+.group-list {
+    min-height: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px dashed #dee2e6;
+    border-radius: 5px;
+    padding: 10px;
+    background: white;
+}
+
+.list-column {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.count-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: normal;
+    margin-left: 8px;
+}
+
+.departments-list {
+    height: calc(100% - 60px);
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background: white;
+}
+
+/* Elementos de lista (departamentos) */
+.department-item {
+    padding: 10px 12px;
+    margin: 5px 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    cursor: move;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    color: #495057;
+}
+
+.department-item:hover {
+    background: #e3f2fd;
+    border-color: #3498db;
+    transform: translateX(3px);
+}
+
+.department-item:active {
+    cursor: grabbing;
+}
+
+/* Solo negrita para GBA */
+.department-item.gba-department-bold {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* Departamento seleccionado */
+.department-item.selected {
+    background: #fff3cd;
+    border-color: #ffc107;
+    order: -1;
+}
+
+/* Estado de arrastre */
+.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg);
+}
+
+/* Tabla comparativa */
+.comparison-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+#comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+#comparison-table th {
+    background: #34495e;
+    color: white;
+    padding: 12px 15px;
+    text-align: center;
+    font-weight: 600;
+    border-right: 1px solid #2c3e50;
+}
+
+#comparison-table th:first-child {
+    text-align: left;
+    background: #2c3e50;
+}
+
+#comparison-table td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
+    text-align: center;
+}
+
+#comparison-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+    background: #f8f9fa;
+}
+
+#comparison-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+#comparison-table tr:hover {
+    background: #e3f2fd;
 }
 
 /* =============================================
-   CONTROLES DE REGIONALIZACIONES (ahora colapsable)
+   CONTROLES DE REGIONALIZACIONES
    ============================================= */
 
 .regionalizaciones-controls {
@@ -56,7 +382,6 @@ h1 {
     padding: 20px;
     margin: 20px 0;
     box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    border-left: 5px solid #2c3e50; /* Línea lateral para destacar */
 }
 
 .regionalizaciones-controls h3 {
@@ -82,35 +407,31 @@ h1 {
     font-size: 14px;
     color: #495057;
     cursor: pointer;
-    padding: 8px 10px;
+    padding: 5px;
     border-radius: 4px;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
+    transition: background-color 0.2s ease;
 }
 
 .regionalizaciones-controls .checkboxes label:hover {
     background-color: #f8f9fa;
-    border-color: #dee2e6;
 }
 
 .regionalizaciones-controls .checkboxes input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     cursor: pointer;
-    accent-color: #3498db; /* Color uniforme para los checkboxes */
 }
 
 .regionalizaciones-controls .opacity-control {
-    margin-bottom: 10px;
-    padding: 15px;
+    margin-bottom: 20px;
+    padding: 10px;
     background: #f8f9fa;
     border-radius: 6px;
-    border: 1px solid #dee2e6;
 }
 
 .regionalizaciones-controls .opacity-control label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-weight: 600;
     color: #495057;
     font-size: 14px;
@@ -119,36 +440,53 @@ h1 {
 .regionalizaciones-controls .opacity-control input[type="range"] {
     width: 100%;
     max-width: 300px;
-    height: 8px;
-    border-radius: 4px;
-    background: linear-gradient(to right, #e74c3c, #3498db, #2ecc71, #9b59b6); /* Degradado con los colores de las regionalizaciones */
+    height: 6px;
+    border-radius: 3px;
+    background: #dee2e6;
     outline: none;
     -webkit-appearance: none;
 }
 
 .regionalizaciones-controls .opacity-control input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: #2c3e50;
+    background: #3498db;
     cursor: pointer;
-    border: 3px solid white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .regionalizaciones-controls .opacity-control input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: #2c3e50;
+    background: #3498db;
     cursor: pointer;
-    border: 3px solid white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.regionalizaciones-controls .modo-coincidentes {
+    padding: 10px;
+    background: #e3f2fd;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+}
+
+.regionalizaciones-controls .modo-coincidentes label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 /* =============================================
-   LEYENDA FLOTANTE MEJORADA
+   LEYENDA FLOTANTE
    ============================================= */
 
 .regionalizaciones-legend {
@@ -159,14 +497,13 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     z-index: 1000;
-    min-width: 240px;
+    min-width: 220px;
     overflow: hidden;
     transition: all 0.3s ease;
-    border: 1px solid #dee2e6;
 }
 
 .regionalizaciones-legend.minimized {
-    width: 240px;
+    width: 220px;
 }
 
 .regionalizaciones-legend.minimized .legend-content {
@@ -174,7 +511,7 @@ h1 {
 }
 
 .legend-header {
-    background: #2c3e50;
+    background: #34495e;
     color: white;
     padding: 12px 15px;
     cursor: pointer;
@@ -187,7 +524,7 @@ h1 {
 }
 
 .legend-header:hover {
-    background: #34495e;
+    background: #2c3e50;
 }
 
 .toggle-icon {
@@ -205,9 +542,9 @@ h1 {
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    font-size: 13px;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 12px;
 }
 
 .legend-item:last-child {
@@ -215,71 +552,25 @@ h1 {
 }
 
 .legend-line {
-    flex: 0 0 50px;
+    flex: 0 0 40px;
     height: 0;
-    border-top-width: 3px; /* Coincide con el weight de los estilos */
+    border-top-width: 2px;
     border-top-style: solid;
     opacity: 0.7;
 }
 
 .legend-label {
-    color: #2c3e50;
+    color: #495057;
     font-weight: 500;
 }
 
 /* =============================================
-   ESTILOS PARA MEJORAR VISUALIZACIÓN DE LÍMITES
+   ESTILOS PARA SUPERPOSICIÓN DE LÍMITES
    ============================================= */
 
-/* Asegurar que los límites de las regionalizaciones se vean por encima de los departamentos */
-.leaflet-overlay-pane {
-    z-index: 600; /* Por encima del pane de departamentos */
-}
-
-.leaflet-pane.leaflet-overlay-pane path {
-    mix-blend-mode: multiply; /* Mezcla de colores para superposiciones */
-}
-
-/* Estilo para los departamentos del GBA - más destacado */
-.gba-department {
-    border-width: 2.5px !important; /* Más grueso para GBA */
-    border-color: #2c3e50 !important; /* Color oscuro */
-}
-
-/* Estilo para departamentos normales (no GBA) */
-.normal-department {
-    border-width: 1px !important;
-    border-color: #7f8c8d !important; /* Gris más claro */
-}
-
-/* =============================================
-   ESTILOS PARA DRAG & DROP CON COMPRESIÓN/EXPANSIÓN
-   ============================================= */
-
-/* Clase para cajas comprimidas */
-.group-box.compressed {
-    max-height: 60px;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
-
-/* Clase para cajas expandidas */
-.group-box.expanded {
-    max-height: 400px;
-    transition: max-height 0.3s ease;
-}
-
-/* Listado de departamentos comprimido */
-.departments-list.compressed {
-    max-height: 100px;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
-
-/* Listado de departamentos expandido */
-.departments-list.expanded {
-    max-height: 500px;
-    transition: max-height 0.3s ease;
+/* Estos estilos se aplican automáticamente por Leaflet según el dashArray */
+.leaflet-overlay-pane path {
+    mix-blend-mode: multiply;
 }
 
 /* =============================================
@@ -287,17 +578,63 @@ h1 {
    ============================================= */
 
 @media (max-width: 1200px) {
-    .controls {
-        justify-content: flex-start;
+    .main-content {
+        flex-wrap: wrap;
+        height: auto;
     }
     
-    .regionalizaciones-toggle {
-        width: 100%;
-        margin-top: 10px;
+    #map-container {
+        flex: 100%;
+        height: 50vh;
+        order: 1;
+    }
+    
+    .divisions-column {
+        flex: 1;
+        min-width: 300px;
+        order: 2;
+    }
+    
+    .list-column {
+        flex: 1;
+        min-width: 300px;
+        order: 3;
     }
 }
 
 @media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .region-control,
+    .division-control {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .region-control select {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .divisions-column,
+    .list-column {
+        max-width: none;
+        min-width: auto;
+    }
+    
     .regionalizaciones-controls .checkboxes {
         grid-template-columns: 1fr;
     }
@@ -315,11 +652,41 @@ h1 {
     }
     
     h1 {
-        font-size: 1.6rem;
+        font-size: 1.5rem;
+    }
+    
+    .comparison-section {
+        padding: 20px;
+    }
+    
+    .count-info {
+        display: block;
+        margin-top: 5px;
+        font-size: 13px;
     }
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .divisions-column,
+    .list-column {
+        padding: 15px;
+    }
+    
+    .department-item {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    
+    .reset-button,
+    .polygon-button {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+    
     .regionalizaciones-legend {
         bottom: 10px;
         left: 10px;
@@ -327,18 +694,20 @@ h1 {
         max-width: none;
     }
     
-    h1 {
-        font-size: 1.4rem;
-    }
-    
-    .controls {
+    .comparison-section {
         padding: 15px;
     }
     
-    .reset-button, 
-    .polygon-button, 
-    .regionalizaciones-toggle {
-        padding: 10px 15px;
-        font-size: 13px;
+    #comparison-table {
+        font-size: 12px;
+    }
+    
+    #comparison-table th,
+    #comparison-table td {
+        padding: 8px 10px;
+    }
+    
+    .count-info {
+        font-size: 12px;
     }
 }
