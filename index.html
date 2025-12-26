@@ -162,12 +162,18 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Scripts de la aplicación (mantener el orden actual) -->
+    <!-- Scripts de la aplicación (nuevo orden) -->
     <script src="js/main.js"></script>
     <script src="js/map-core.js"></script>
-    <script src="js/data-manager.js"></script>
-    <script src="js/ui-controls.js"></script>
-    <!-- NUEVO: Módulo de Regionalizaciones (agregar esta línea) -->
+    <script src="js/data-manager.js"></script> <!-- Ahora incluye funciones de cálculo -->
+    
+    <!-- Módulos de interfaz de usuario (divididos) -->
+    <script src="js/ui-controls-core.js"></script>       <!-- Controles principales -->
+    <script src="js/divisions-manager.js"></script>      <!-- Gestión de divisiones -->
+    <script src="js/regions-loader.js"></script>         <!-- Carga de regiones existentes -->
+    <script src="js/comparison-table.js"></script>       <!-- Tabla comparativa -->
+    
+    <!-- Módulo de regionalizaciones -->
     <script src="js/regionalizaciones.js"></script>
 </body>
 </html>
