@@ -3,19 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>(des)arma tus Buenos Aires</title>
+    <title>Mapa Interactivo - División de la Provincia de Buenos Aires</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
+    <!-- CSS Modularizado (cargar en orden correcto) -->
+    <link rel="stylesheet" href="css/base.css">          <!-- Estilos base y reset -->
+    <link rel="stylesheet" href="css/layout.css">        <!-- Estructura de página -->
+    <link rel="stylesheet" href="css/components.css">    <!-- Componentes reutilizables -->
+    <link rel="stylesheet" href="css/modules.css">       <!-- Módulos específicos (regionalizaciones) -->
+    
     <!-- SortableJS para drag & drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>(des)arma tus Buenos Aires</h1>
+        <h1>Mapa Interactivo - División de la Provincia de Buenos Aires</h1>
         
         <!-- Controles principales -->
         <div class="controls">
@@ -56,15 +60,10 @@
                     <option value="15">15</option>
                 </select>
             </div>
-
-            <!-- Botón para desplegar controles de regionalizaciones -->
-            <button id="toggle-regionalizaciones" class="regionalizaciones-toggle">
-                Límites de Regionalizaciones Existentes
-            </button>
         </div>
-
-        <!-- Controles de Regionalizaciones (inicialmente oculto) -->
-        <div id="regionalizaciones-controls" class="regionalizaciones-controls" style="display: none;">
+        
+        <!-- Controles de Regionalizaciones -->
+        <div class="regionalizaciones-controls">
             <h3>Límites de Regionalizaciones Existentes</h3>
             
             <div class="checkboxes">
@@ -91,6 +90,13 @@
                     Opacidad de límites: <span id="opacity-value">70</span>%
                 </label>
                 <input type="range" id="regionalizaciones-opacity" min="10" max="90" value="70">
+            </div>
+            
+            <div class="modo-coincidentes">
+                <label>
+                    <input type="checkbox" id="solo-coincidentes">
+                    Mostrar sólo límites coincidentes (requiere al menos 2 seleccionadas)
+                </label>
             </div>
         </div>
 
@@ -155,11 +161,13 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Scripts de la aplicación (mantener el orden actual) -->
     <script src="js/main.js"></script>
     <script src="js/map-core.js"></script>
     <script src="js/data-manager.js"></script>
     <script src="js/ui-controls.js"></script>
-    <!-- Módulo de Regionalizaciones -->
+    <!-- NUEVO: Módulo de Regionalizaciones (agregar esta línea) -->
     <script src="js/regionalizaciones.js"></script>
 </body>
 </html>
