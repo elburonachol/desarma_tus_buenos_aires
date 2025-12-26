@@ -1,0 +1,111 @@
+/* Distribución en tres columnas principales */
+.main-content {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 30px;
+    height: 70vh;
+}
+
+#map-container {
+    flex: 3;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+}
+
+.divisions-column {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+.list-column {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    overflow-y: auto;
+    min-width: 300px;
+}
+
+/* Tabla comparativa */
+.comparison-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+/* Responsive para layout */
+@media (max-width: 1200px) {
+    .main-content {
+        flex-wrap: wrap;
+        height: auto;
+    }
+    
+    #map-container {
+        flex: 100%;
+        height: 50vh;
+        order: 1;
+    }
+    
+    .divisions-column {
+        flex: 1;
+        min-width: 300px;
+        order: 2;
+    }
+    
+    .list-column {
+        flex: 1;
+        min-width: 300px;
+        order: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .divisions-column,
+    .list-column {
+        max-width: none;
+        min-width: auto;
+    }
+    
+    .comparison-section {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .divisions-column,
+    .list-column {
+        padding: 15px;
+    }
+    
+    .comparison-section {
+        padding: 15px;
+    }
+}
