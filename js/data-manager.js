@@ -2,7 +2,7 @@
  * MÓDULO DE GESTIÓN DE DATOS - data-manager.js
  * 
  * Responsabilidades:
- * - Carga de datos externos (GeoJSON, datos_partidos.json, regiones_existentes.json)
+ * - Carga de datos externos (GeoJSON, datos_partidos.json, regiones_administrativas.json)
  * - Cálculos matemáticos y estadísticos
  * - Búsquedas y filtros en los datos
  * - Procesamiento de información para la tabla comparativa
@@ -13,11 +13,11 @@
 // =============================================
 
 /**
- * CARGA DEL ARCHIVO GEOJSON DESDE PBA.geojson
+ * CARGA DEL ARCHIVO GEOJSON DESDE geometrias/deptos_pba.geojson
  * Carga todos los departamentos y los prepara para su uso en la aplicación
  */
 function loadGeoJSON() {
-    return fetch('PBA.geojson')
+    return fetch('geometrias/deptos_pba.geojson')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Error al cargar el archivo GeoJSON');
@@ -64,11 +64,11 @@ function loadGeoJSON() {
 }
 
 /**
- * CARGA DE DATOS DE PARTIDOS DESDE datos/datos_partidos.json
+ * CARGA DE DATOS DE PARTIDOS DESDE tablas_de_atributos/datos_partidos.json
  * Incluye superficie, población y otras variables para cálculos
  */
 function loadPartidosData() {
-    return fetch('datos/datos_partidos.json')
+    return fetch('tablas_de_atributos/datos_partidos.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Error HTTP: ${response.status}`);
@@ -89,11 +89,11 @@ function loadPartidosData() {
 }
 
 /**
- * CARGA DE REGIONES EXISTENTES DESDE regiones/regiones_existentes.json
- * Incluye secciones electorales y regiones sanitarias predefinidas
+ * CARGA DE REGIONES ADMINISTRATIVAS DESDE tablas_de_atributos/regiones_administrativas.json
+ * Incluye secciones electorales, regiones sanitarias, regiones educativas y departamentos judiciales
  */
 function loadRegionesExistentes() {
-    return fetch('regiones/regiones_existentes.json')
+    return fetch('tablas_de_atributos/regiones_administrativas.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Error HTTP: ${response.status}`);
@@ -102,11 +102,11 @@ function loadRegionesExistentes() {
         })
         .then(data => {
             regionesExistentes = data;
-            console.log('✅ Regiones existentes cargadas:', regionesExistentes);
+            console.log('✅ Regiones administrativas cargadas:', regionesExistentes);
             return regionesExistentes;
         })
         .catch(error => {
-            console.error('❌ Error cargando regiones existentes:', error);
+            console.error('❌ Error cargando regiones administrativas:', error);
             // No bloqueamos la aplicación si falla la carga de estos datos
             return null;
         });
@@ -125,10 +125,6 @@ function obtenerCodigoCdePorNombre(nombreDepartamento) {
     const departamento = allDepartments.find(dept => dept.properties.nam === nombreDepartamento);
     return departamento ? departamento.properties.cde : null;
 }
-
-// =============================================
-// FUNCIONES AUXILIARES PARA GESTIÓN DE DATOS
-// =============================================
 
 /**
  * OBTIENE UN DEPARTAMENTO COMPLETO POR SU CÓDIGO CDE
@@ -157,6 +153,10 @@ function getDepartmentNameByCode(cde) {
 function isGBADepartmentByCode(cde) {
     return gbaCodes.includes(cde);
 }
+
+// =============================================
+// FUNCIONES AUXILIARES PARA GESTIÓN DE DATOS
+// =============================================
 
 /**
  * FORMATEA NÚMEROS CON SEPARADORES DE MILES PARA MEJOR LEGIBILIDAD
