@@ -23,7 +23,7 @@ let currentDivisionCount = 3; // Número actual de divisiones visibles
 
 // Datos externos cargados
 let partidosData = null;    // Datos de superficie/población desde datos_partidos.json
-let regionesExistentes = null; // Regiones predefinidas desde regiones_existentes.json
+let regionesExistentes = null; // Regiones predefinidas desde regiones_administrativas.json
 
 // Estado de regiones existentes
 let currentRegionType = null; // 'secciones_electorales' o 'regiones_sanitarias'
@@ -97,14 +97,16 @@ function initializeUI() {
     // Sistema de divisiones y drag & drop
     initializeDivisionBoxes(currentDivisionCount);
     
-    // Controles principales
+    // Controles principales (ahora en ui-controls-core.js)
     setupResetButton();
     setupDivisionSelector(); 
     setupRegionSelector();
     setupPolygonButton();
     
-    // Sistema de visualización de regionalizaciones (NUEVO)
-    initializeRegionalizaciones();
+    // Sistema de visualización de regionalizaciones
+    if (typeof initializeRegionalizaciones === 'function') {
+        initializeRegionalizaciones();
+    }
     
     // Sistema de visualización de datos
     initializeComparisonTable();
@@ -122,10 +124,18 @@ function initializeUI() {
  * Se llama cuando cambia el estado de las divisiones
  */
 function notifyStateChange() {
-    updateDepartmentGroups();   // Actualiza la estructura de datos
-    updateMapColors();          // Actualiza colores en el mapa
-    updateComparisonTable();    // Actualiza tabla comparativa
-    updateRemainingCount();     // Actualiza contadores
+    if (typeof updateDepartmentGroups === 'function') {
+        updateDepartmentGroups();   // Actualiza la estructura de datos
+    }
+    if (typeof updateMapColors === 'function') {
+        updateMapColors();          // Actualiza colores en el mapa
+    }
+    if (typeof updateComparisonTable === 'function') {
+        updateComparisonTable();    // Actualiza tabla comparativa
+    }
+    if (typeof updateRemainingCount === 'function') {
+        updateRemainingCount();     // Actualiza contadores
+    }
 }
 
 /**
@@ -141,7 +151,9 @@ function clearAllSelections() {
         item.classList.remove('selected');
     });
     
-    updateMapColors();
+    if (typeof updateMapColors === 'function') {
+        updateMapColors();
+    }
 }
 
 // =============================================
@@ -178,7 +190,7 @@ function isGBADepartment(departmentName) {
 }
 
 // =============================================
-// INICIALIZACIÓN DE MÓDULOS EXTERNOS
+// DECLARACIONES DE FUNCIONES IMPLEMENTADAS EN OTROS MÓDULOS
 // =============================================
 
 // Estas funciones se implementan en otros archivos pero se declaran aquí
@@ -201,35 +213,35 @@ function loadRegionesExistentes() {
 }
 
 function initializeDivisionBoxes(count) {
-    // Implementado en ui-controls.js
+    // Implementado en divisions-manager.js
 }
 
 function setupResetButton() {
-    // Implementado en ui-controls.js
+    // Implementado en ui-controls-core.js
 }
 
 function setupDivisionSelector() {
-    // Implementado en ui-controls.js
+    // Implementado en ui-controls-core.js
 }
 
 function setupRegionSelector() {
-    // Implementado en ui-controls.js
+    // Implementado en ui-controls-core.js
 }
 
 function setupPolygonButton() {
-    // Implementado en ui-controls.js
+    // Implementado en ui-controls-core.js
 }
 
 function initializeComparisonTable() {
-    // Implementado en ui-controls.js
+    // Implementado en comparison-table.js
 }
 
 function updateRemainingCount() {
-    // Implementado en ui-controls.js
+    // Implementado en divisions-manager.js
 }
 
 function updateDepartmentGroups() {
-    // Implementado en ui-controls.js
+    // Implementado en divisions-manager.js
 }
 
 function updateMapColors() {
@@ -237,5 +249,9 @@ function updateMapColors() {
 }
 
 function updateComparisonTable() {
-    // Implementado en ui-controls.js
+    // Implementado en comparison-table.js
+}
+
+function initializeRegionalizaciones() {
+    // Implementado en regionalizaciones.js
 }
