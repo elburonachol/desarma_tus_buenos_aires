@@ -4,7 +4,7 @@
     margin-bottom: 30px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 25px;
     flex-wrap: wrap;
     padding: 18px;
@@ -130,55 +130,60 @@
     border-color: #3498db;
 }
 
-/* Acordeón de regionalizaciones */
-.regionalizaciones-accordion {
-    background: white;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+/* Panel colapsable de regionalizaciones */
+.regionalizaciones-collapsible {
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
     overflow: hidden;
 }
 
-.accordion-header {
-    width: 100%;
-    padding: 18px 20px;
-    background: #34495e;
-    color: white;
-    border: none;
-    text-align: left;
-    font-size: 16px;
-    font-weight: 600;
+.collapsible-header {
+    background: #f8f9fa;
+    padding: 12px 15px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: background 0.3s ease;
+    font-weight: 600;
+    color: #2c3e50;
+    transition: background-color 0.2s ease;
 }
 
-.accordion-header:hover {
-    background: #2c3e50;
+.collapsible-header:hover {
+    background: #e9ecef;
 }
 
-.accordion-icon {
-    font-size: 18px;
+.toggle-icon {
+    font-size: 16px;
     font-weight: bold;
+    transition: transform 0.3s ease;
 }
 
-.accordion-content {
-    padding: 20px;
+.collapsible-content {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e1e8ed;
+}
+
+.regionalizaciones-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .checkboxes-and-opacity {
     display: flex;
     flex-wrap: wrap;
+    gap: 20px;
     align-items: center;
-    gap: 30px;
 }
 
 .checkboxes {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     flex: 1;
 }
 
@@ -209,7 +214,6 @@
     padding: 10px;
     background: #f8f9fa;
     border-radius: 6px;
-    min-width: 200px;
 }
 
 .opacity-control label {
@@ -222,6 +226,7 @@
 
 .opacity-control input[type="range"] {
     width: 100%;
+    max-width: 200px;
     height: 6px;
     border-radius: 3px;
     background: #dee2e6;
@@ -262,7 +267,7 @@
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .group-box:hover {
@@ -301,6 +306,31 @@
     border-radius: 5px;
     padding: 10px;
     background: white;
+    transition: all 0.3s ease;
+}
+
+/* Efectos de compresión y expansión para drag-and-drop */
+.group-box.compressed .group-list {
+    max-height: 50px;
+    min-height: 50px;
+    overflow: hidden;
+}
+
+.group-box.expanded .group-list {
+    max-height: 400px;
+    min-height: 150px;
+}
+
+/* Para el listado de departamentos */
+.list-column.compressed .departments-list {
+    max-height: 50px;
+    min-height: 50px;
+    overflow: hidden;
+}
+
+.list-column.expanded .departments-list {
+    max-height: 400px;
+    min-height: 150px;
 }
 
 /* Listas de departamentos */
@@ -317,6 +347,7 @@
     border: 1px solid #e9ecef;
     border-radius: 5px;
     background: white;
+    transition: all 0.3s ease;
 }
 
 /* Elementos de lista (departamentos) */
@@ -353,6 +384,12 @@
     background: #fff3cd;
     border-color: #ffc107;
     order: -1;
+}
+
+/* Elemento arrastrado */
+.dragging-item {
+    opacity: 0.5;
+    transform: rotate(5deg);
 }
 
 /* Tabla comparativa */
@@ -419,12 +456,19 @@
     .checkboxes-and-opacity {
         flex-direction: column;
         align-items: flex-start;
-        gap: 20px;
+    }
+    
+    .checkboxes {
+        grid-template-columns: 1fr;
+        width: 100%;
     }
     
     .opacity-control {
         width: 100%;
-        min-width: auto;
+    }
+    
+    .opacity-control input[type="range"] {
+        max-width: 100%;
     }
     
     .count-info {
