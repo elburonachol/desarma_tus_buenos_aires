@@ -1,0 +1,76 @@
+[file name]: buttons-controls.css
+[file content begin]
+/* =============================================
+   ESTILOS DE BOTONES Y POLÍGONO
+   ============================================= */
+
+.reset-button {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.reset-button:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.reset-button:active {
+    transform: translateY(0);
+}
+
+.polygon-button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.polygon-button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.polygon-button.active {
+    background: #2c3e50;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.polygon-info {
+    background: #e3f2fd;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.polygon-info p {
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+/* Responsive para botones */
+@media (max-width: 480px) {
+    .reset-button,
+    .polygon-button {
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+}
+[file content end]

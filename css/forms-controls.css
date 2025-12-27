@@ -1,0 +1,76 @@
+[file name]: form-controls.css
+[file content begin]
+/* =============================================
+   CONTROLES DE FORMULARIO Y SELECTORES
+   ============================================= */
+
+.region-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.region-control label {
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.region-control select {
+    padding: 10px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.3s ease;
+    min-width: 200px;
+}
+
+.region-control select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.division-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.division-control label {
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.division-control select {
+    padding: 10px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.3s ease;
+    min-width: 80px;
+}
+
+.division-control select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Responsive para controles de formulario */
+@media (max-width: 768px) {
+    .region-control,
+    .division-control {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .region-control select {
+        min-width: auto;
+        width: 100%;
+    }
+}
+[file content end]

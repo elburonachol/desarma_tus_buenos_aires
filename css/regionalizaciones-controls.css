@@ -1,0 +1,152 @@
+[file name]: regionalizaciones-controls.css
+[file content begin]
+/* =============================================
+   CONTROLES DE REGIONALIZACIONES (PANEL COLAPSABLE)
+   ============================================= */
+
+/* Panel colapsable de regionalizaciones */
+.regionalizaciones-collapsible {
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.collapsible-header {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #2c3e50;
+    transition: background-color 0.2s ease;
+}
+
+.collapsible-header:hover {
+    background: #e9ecef;
+}
+
+.toggle-icon {
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.collapsible-content {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e1e8ed;
+}
+
+.regionalizaciones-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.checkboxes-and-opacity {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.checkboxes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    flex: 1;
+}
+
+.checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #495057;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.checkboxes label:hover {
+    background-color: #f8f9fa;
+}
+
+.checkboxes input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.opacity-control {
+    flex: 0 0 auto;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.opacity-control label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+.opacity-control input[type="range"] {
+    width: 100%;
+    max-width: 200px;
+    height: 6px;
+    border-radius: 3px;
+    background: #dee2e6;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.opacity-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3498db;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.opacity-control input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3498db;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Responsive para controles de regionalizaciones */
+@media (max-width: 768px) {
+    .checkboxes-and-opacity {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .checkboxes {
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+    
+    .opacity-control {
+        width: 100%;
+    }
+    
+    .opacity-control input[type="range"] {
+        max-width: 100%;
+    }
+}
+[file content end]
