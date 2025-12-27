@@ -60,46 +60,49 @@
                     <option value="15">15</option>
                 </select>
             </div>
-        </div>
-        
-        <!-- Controles de Regionalizaciones (ahora plegable) -->
-        <div class="regionalizaciones-accordion">
-            <button id="toggle-regionalizaciones" class="accordion-header">
-                <span>Límites de Regionalizaciones Existentes</span>
-                <span class="accordion-icon">+</span>
-            </button>
-            <div class="accordion-content" style="display: none;">
-                <div class="checkboxes-and-opacity">
-                    <div class="checkboxes">
-                        <label>
-                            <input type="checkbox" id="toggle-sanitarias">
-                            Regiones Sanitarias
-                        </label>
-                        <label>
-                            <input type="checkbox" id="toggle-electorales">
-                            Secciones Electorales
-                        </label>
-                        <label>
-                            <input type="checkbox" id="toggle-judiciales">
-                            Departamentos Judiciales
-                        </label>
-                        <label>
-                            <input type="checkbox" id="toggle-educativas">
-                            Regiones Educativas
-                        </label>
-                    </div>
-                    <div class="opacity-control">
-                        <label for="regionalizaciones-opacity">
-                            Opacidad: <span id="opacity-value">70</span>%
-                        </label>
-                        <input type="range" id="regionalizaciones-opacity" min="10" max="90" value="70">
+            
+            <!-- Controles de Regionalizaciones (Colapsable) -->
+            <div class="regionalizaciones-collapsible">
+                <div class="collapsible-header" id="regionalizaciones-toggle">
+                    <span>Límites de Regionalizaciones Existentes</span>
+                    <span class="toggle-icon">+</span>
+                </div>
+                <div class="collapsible-content" id="regionalizaciones-content" style="display: none;">
+                    <div class="regionalizaciones-inner">
+                        <div class="checkboxes-and-opacity">
+                            <div class="checkboxes">
+                                <label>
+                                    <input type="checkbox" id="toggle-sanitarias">
+                                    Regiones Sanitarias
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="toggle-electorales">
+                                    Secciones Electorales
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="toggle-judiciales">
+                                    Departamentos Judiciales
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="toggle-educativas">
+                                    Regiones Educativas
+                                </label>
+                            </div>
+                            
+                            <div class="opacity-control">
+                                <label for="regionalizaciones-opacity">
+                                    Opacidad: <span id="opacity-value">70</span>%
+                                </label>
+                                <input type="range" id="regionalizaciones-opacity" min="10" max="90" value="70">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Leyenda Flotante -->
-        <div id="regionalizaciones-legend" class="regionalizaciones-legend" style="display: none;">
+        <div id="regionalizaciones-legend" class="regionalizaciones-legend">
             <div class="legend-header">
                 <span>Leyenda de Regionalizaciones</span>
                 <span class="toggle-icon">−</span>
