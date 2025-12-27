@@ -69,20 +69,33 @@ function getDepartmentStyle(feature) {
         return {
             fillColor: departmentGroups[groupId].color,
             fillOpacity: 0.8,
-            color: 'white',
-            weight: 1.5,
+            color: 'white',  // Borde blanco para que se destaque sobre las regionalizaciones
+            weight: 2,       // Borde más grueso para departamentos asignados
             opacity: 1
         };
     }
     
     // Departamento en listado (sin asignar)
-    return {
-        fillColor: '#3388ff',
-        fillOpacity: 0,  // Transparente
-        color: '#2c3e50',
-        weight: isGBA ? 1.5 : 0.8, // GBA con borde más grueso
-        opacity: 0.8
-    };
+    // Estilo para departamentos no asignados: más tenue
+    if (isGBA) {
+        // Departamento del GBA sin asignar: borde más grueso y color azul
+        return {
+            fillColor: '#3388ff',
+            fillOpacity: 0.1,  // Muy transparente
+            color: '#2c3e50',  // Color oscuro para el borde
+            weight: 2,         // Borde más grueso para GBA
+            opacity: 0.9
+        };
+    } else {
+        // Departamento no GBA sin asignar: borde más delgado
+        return {
+            fillColor: '#3388ff',
+            fillOpacity: 0.05, // Casi transparente
+            color: '#2c3e50',
+            weight: 1,         // Borde delgado
+            opacity: 0.7
+        };
+    }
 }
 
 /**
@@ -108,9 +121,9 @@ function setupDepartmentInteractions(feature, layer) {
     layer.on('mouseover', function() {
         if (!selectedDepartmentsSet.has(nombre)) {
             layer.setStyle({
-                weight: 2,
+                weight: 3,
                 color: '#e74c3c',
-                fillOpacity: 0.1
+                fillOpacity: 0.2
             });
         }
     });
@@ -149,9 +162,9 @@ function highlightDepartment(deptName) {
         if (layer.feature.properties.nam === deptName) {
             // Resaltado temporal
             layer.setStyle({
-                weight: 2.5,
+                weight: 3,
                 color: '#e74c3c',
-                fillOpacity: 0.3
+                fillOpacity: 0.4
             });
             
             // Vuelve al estilo original después de 2 segundos
@@ -413,9 +426,9 @@ function getDepartmentGroupId(departmentName) {
 // Estas funciones se llaman desde este módulo pero se implementan en otros
 
 function moveSelectedToMainList() {
-    // Implementado en ui-controls.js
+    // Implementado en ui-controls-core.js
 }
 
 function markSelectedInDivisions() {
-    // Implementado en ui-controls.js  
+    // Implementado en ui-controls-core.js  
 }
