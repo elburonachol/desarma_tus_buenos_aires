@@ -1,0 +1,125 @@
+/* =============================================
+   LEYENDA FLOTANTE DE REGIONALIZACIONES
+   ============================================= */
+
+.regionalizaciones-legend {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    min-width: 220px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.regionalizaciones-legend.minimized {
+    width: 220px;
+}
+
+.regionalizaciones-legend.minimized .legend-content {
+    display: none;
+}
+
+.legend-header {
+    background: #34495e;
+    color: white;
+    padding: 12px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 13px;
+    user-select: none;
+}
+
+.legend-header:hover {
+    background: #2c3e50;
+}
+
+.toggle-icon {
+    font-size: 16px;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+.legend-content {
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+
+.legend-line {
+    flex: 0 0 40px;
+    height: 0;
+    border-top-width: 2px;
+    border-top-style: solid;
+    opacity: 0.7;
+}
+
+.legend-label {
+    color: #495057;
+    font-weight: 500;
+}
+
+/* Estilos para las capas de regionalizaciones en el mapa */
+.regionalizacion-layer {
+    /* Estilos generales para todas las capas de regionalizaciones */
+    mix-blend-mode: multiply;
+}
+
+/* Estilos específicos para cada tipo de regionalización (opcional) */
+.sanitarias-layer {
+    /* Estilos específicos para regiones sanitarias */
+}
+
+.electorales-layer {
+    /* Estilos específicos para secciones electorales */
+}
+
+.judiciales-layer {
+    /* Estilos específicos para departamentos judiciales */
+}
+
+.educativas-layer {
+    /* Estilos específicos para regiones educativas */
+}
+
+/* Responsive para leyenda */
+@media (max-width: 768px) {
+    .regionalizaciones-legend {
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        min-width: auto;
+        max-width: 300px;
+    }
+    
+    .regionalizaciones-legend.minimized {
+        width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .regionalizaciones-legend {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+}
