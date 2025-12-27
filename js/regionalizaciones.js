@@ -6,6 +6,7 @@
  * - Visualización de límites con estilos diferenciados
  * - Control de opacidad y superposición de límites
  * - Sistema de leyenda flotante
+ * - Control de panel colapsable
  */
 
 // =============================================
@@ -28,35 +29,48 @@ let regionalizacionesActivas = {
 
 let regionalizacionesOpacity = 0.7;
 
-// Nuevos estilos para cada tipo de regionalización - más distinguibles
+// =============================================
+// PROPUESTA DE ESTILOS MEJORADOS PARA DIFERENCIACIÓN VISUAL
+// =============================================
+
+// Basado en las mejores prácticas de visualización de datos:
+// 1. Usar combinaciones de colores perceptualmente uniformes
+// 2. Variar peso y patrón de línea para máxima diferenciación
+// 3. Priorizar contraste contra el fondo del mapa base
+// 4. Considerar usuarios con daltonismo (evitar rojo/verde juntos)
+
 const regionalizacionesEstilos = {
     sanitarias: {
-        color: '#e74c3c', // Rojo
-        weight: 3,
-        dashArray: '5, 10', // Punteado más espaciado
-        opacity: 0.8,
-        fillOpacity: 0
+        color: '#FF6B6B',      // Rojo coral - bien visible
+        weight: 3,             // Más grueso para destacar
+        dashArray: '8, 6',     // Patrón guión-medio
+        opacity: 0.9,
+        fillOpacity: 0,
+        className: 'regionalizacion-layer sanitarias-layer' // Para CSS específico
     },
     electorales: {
-        color: '#3498db', // Azul
+        color: '#4ECDC4',      // Turquesa - buen contraste
         weight: 2.5,
-        dashArray: '15, 10, 5, 10', // Patrón más complejo
-        opacity: 0.8,
-        fillOpacity: 0
+        dashArray: '12, 8, 2, 8', // Patrón complejo único
+        opacity: 0.9,
+        fillOpacity: 0,
+        className: 'regionalizacion-layer electorales-layer'
     },
     judiciales: {
-        color: '#2ecc71', // Verde
+        color: '#FFD166',      // Amarillo mostaza - muy visible
         weight: 3,
-        dashArray: '20, 10', // Rayas largas
-        opacity: 0.8,
-        fillOpacity: 0
+        dashArray: '5, 10',    // Guiones largos y espacios
+        opacity: 0.9,
+        fillOpacity: 0,
+        className: 'regionalizacion-layer judiciales-layer'
     },
     educativas: {
-        color: '#9b59b6', // Púrpura
-        weight: 2.5,
-        dashArray: '5, 5', // Punteado fino
-        opacity: 0.8,
-        fillOpacity: 0
+        color: '#9B5DE5',      // Púrpura vibrante
+        weight: 2,
+        dashArray: '2, 6',     // Puntos y espacios
+        opacity: 0.9,
+        fillOpacity: 0,
+        className: 'regionalizacion-layer educativas-layer'
     }
 };
 
@@ -79,8 +93,8 @@ const regionalizacionesNombres = {
 function initializeRegionalizaciones() {
     console.log('🗺️ Inicializando sistema de regionalizaciones...');
     
-    // Configurar acordeón
-    setupAcordeon();
+    // Configurar panel colapsable
+    setupCollapsiblePanel();
     
     // Configurar controles de checkboxes
     setupRegionalizacionesCheckboxes();
@@ -95,22 +109,23 @@ function initializeRegionalizaciones() {
 }
 
 /**
- * CONFIGURA EL ACORDEÓN PARA MOSTRAR/OCULTAR CONTROLES
+ * CONFIGURA EL PANEL COLAPSABLE DE REGIONALIZACIONES
  */
-function setupAcordeon() {
-    const toggleBtn = document.getElementById('toggle-regionalizaciones');
-    const accordionContent = document.querySelector('.accordion-content');
-    const accordionIcon = toggleBtn.querySelector('.accordion-icon');
+function setupCollapsiblePanel() {
+    const toggleHeader = document.getElementById('regionalizaciones-toggle');
+    const content = document.getElementById('regionalizaciones-content');
+    const toggleIcon = toggleHeader.querySelector('.toggle-icon');
     
-    if (toggleBtn && accordionContent) {
-        toggleBtn.addEventListener('click', function() {
-            const isVisible = accordionContent.style.display !== 'none';
+    if (toggleHeader && content) {
+        toggleHeader.addEventListener('click', function() {
+            const isVisible = content.style.display !== 'none';
+            
             if (isVisible) {
-                accordionContent.style.display = 'none';
-                accordionIcon.textContent = '+';
+                content.style.display = 'none';
+                toggleIcon.textContent = '+';
             } else {
-                accordionContent.style.display = 'block';
-                accordionIcon.textContent = '−';
+                content.style.display = 'block';
+                toggleIcon.textContent = '−';
             }
         });
     }
@@ -156,8 +171,8 @@ function setupOpacitySlider() {
  * CONFIGURA LA LEYENDA FLOTANTE
  */
 function initializeLegend() {
-    const legendHeader = document.querySelector('.legend-header');
-    const toggleIcon = document.querySelector('.toggle-icon');
+    const legendHeader = document.querySelector('#regionalizaciones-legend .legend-header');
+    const toggleIcon = document.querySelector('#regionalizaciones-legend .toggle-icon');
     
     if (legendHeader && toggleIcon) {
         legendHeader.addEventListener('click', function() {
@@ -211,7 +226,6 @@ function toggleRegionalizacion(tipo, activar) {
 function loadRegionalizacionLayer(tipo) {
     const archivo = getRegionalizacionFileName(tipo);
     
-    // RUTA MODIFICADA: ahora en carpeta "geometrias/"
     fetch(`geometrias/${archivo}`)
         .then(response => {
             if (!response.ok) {
@@ -220,7 +234,7 @@ function loadRegionalizacionLayer(tipo) {
             return response.json();
         })
         .then(data => {
-            // Crear capa Leaflet
+            // Crear capa Leaflet con estilos mejorados
             const layer = L.geoJSON(data, {
                 style: regionalizacionesEstilos[tipo],
                 interactive: false // Sin tooltips ni interacciones
@@ -298,15 +312,11 @@ function updateLegend() {
             
             const legendItem = document.createElement('div');
             legendItem.className = 'legend-item';
-            
-            // Crear una representación visual del patrón de línea
-            const lineStyle = `
-                border-top: ${estilo.weight}px ${getDashStyle(estilo.dashArray)} ${estilo.color};
-                opacity: ${estilo.opacity};
-            `;
-            
             legendItem.innerHTML = `
-                <span class="legend-line" style="${lineStyle}"></span>
+                <span class="legend-line" style="
+                    border-top: ${estilo.weight}px solid ${estilo.color};
+                    border-top-style: ${estilo.dashArray.includes('2, 6') ? 'dotted' : 'dashed'};
+                "></span>
                 <span class="legend-label">${nombre}</span>
             `;
             
@@ -323,31 +333,6 @@ function updateLegend() {
     } else {
         legend.style.display = 'none';
     }
-}
-
-/**
- * CONVIERTE EL dashArray DE LEAFLET A UN ESTILO CSS
- * @param {string} dashArray - Cadena de dashArray (ej: '5, 10')
- * @returns {string} - Estilo de borde CSS
- */
-function getDashStyle(dashArray) {
-    // Si es un patrón complejo, usamos 'dashed' como fallback
-    if (dashArray.includes(',')) {
-        const parts = dashArray.split(',').map(Number);
-        // Si todos los números son iguales, es un punteado
-        if (parts.every(val => val === parts[0])) {
-            return 'dotted';
-        }
-        // Si hay más de dos números, es un patrón complejo
-        if (parts.length > 2) {
-            return 'dashed';
-        }
-        // Si el primer número es pequeño, es punteado
-        if (parts[0] <= 5) {
-            return 'dotted';
-        }
-    }
-    return 'dashed';
 }
 
 // =============================================
@@ -374,6 +359,14 @@ function clearRegionalizaciones() {
             checkbox.checked = false;
         }
     });
+    
+    // Colapsar panel si está expandido
+    const content = document.getElementById('regionalizaciones-content');
+    const toggleIcon = document.querySelector('#regionalizaciones-toggle .toggle-icon');
+    if (content && toggleIcon) {
+        content.style.display = 'none';
+        toggleIcon.textContent = '+';
+    }
     
     // Ocultar leyenda
     const legend = document.getElementById('regionalizaciones-legend');
