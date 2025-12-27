@@ -3,7 +3,7 @@
  * 
  * Responsabilidades:
  * - Creación y gestión de las cajas de división
- * - Sistema de drag & drop
+ * - Sistema de drag & drop con redimensionamiento dinámico
  * - Ordenación de listas
  * - Actualización de grupos de departamentos
  */
@@ -240,12 +240,13 @@ function updateDepartmentGroups() {
 }
 
 // =============================================
-// SISTEMA DE DRAG & DROP
+// SISTEMA DE DRAG & DROP CON REDIMENSIONAMIENTO DINÁMICO
 // =============================================
 
 /**
  * INICIALIZA EL SISTEMA DE DRAG & DROP CON SORTABLEJS
  * Configura todas las listas (principal y divisiones) para arrastrar elementos
+ * con redimensionamiento dinámico
  */
 function initializeDragAndDrop() {
     const allDepartmentsList = document.getElementById('all-departments-list');
@@ -263,6 +264,23 @@ function initializeDragAndDrop() {
         sort: true,        // Permitir reordenamiento interno
         animation: 150,    // Duración de animaciones
         ghostClass: 'dragging', // Clase CSS durante arrastre
+        dragClass: 'dragging-item', // Clase para el elemento que se está arrastrando
+        // Cuando se empieza a arrastrar
+        onChoose: function(evt) {
+            // Comprimir todas las listas
+            compressAllLists();
+        },
+        // Cuando se mueve sobre otro contenedor
+        onMove: function(evt) {
+            // Expandir el contenedor sobre el que se está moviendo
+            const toContainer = evt.to;
+            expandContainer(toContainer);
+        },
+        // Cuando se suelta el elemento
+        onUnchoose: function(evt) {
+            // Restaurar todos los contenedores a su tamaño original
+            restoreAllLists();
+        },
         onAdd: function(evt) {
             // Reordenar automáticamente después de agregar elemento
             setTimeout(() => {
@@ -271,6 +289,8 @@ function initializeDragAndDrop() {
         },
         onEnd: function(evt) {
             handleDepartmentMove(evt);
+            // Asegurar que se restauren los tamaños
+            restoreAllLists();
         }
     });
 
@@ -285,14 +305,94 @@ function initializeDragAndDrop() {
                 },
                 animation: 150,
                 ghostClass: 'dragging',
+                dragClass: 'dragging-item',
+                // Cuando se empieza a arrastrar
+                onChoose: function(evt) {
+                    // Comprimir todas las listas
+                    compressAllLists();
+                },
+                // Cuando se mueve sobre otro contenedor
+                onMove: function(evt) {
+                    // Expandir el contenedor sobre el que se está moviendo
+                    const toContainer = evt.to;
+                    expandContainer(toContainer);
+                },
+                // Cuando se suelta el elemento
+                onUnchoose: function(evt) {
+                    // Restaurar todos los contenedores a su tamaño original
+                    restoreAllLists();
+                },
                 onEnd: function(evt) {
                     handleDepartmentMove(evt);
                     // Ordenar la división después del movimiento
                     sortDivisionList(index + 1);
+                    // Asegurar que se restauren los tamaños
+                    restoreAllLists();
                 }
             });
         }
     });
+}
+
+/**
+ * COMPRIME TODAS LAS LISTAS (divisiones y listado principal)
+ * Se llama cuando comienza el arrastre de un elemento
+ */
+function compressAllLists() {
+    // Comprimir todas las cajas de división
+    for (let i = 1; i <= currentDivisionCount; i++) {
+        const divisionList = document.getElementById(`division-${i}`);
+        if (divisionList) {
+            divisionList.parentElement.classList.add('compressed');
+        }
+    }
+    
+    // Comprimir listado principal
+    const allDepartmentsList = document.getElementById('all-departments-list');
+    if (allDepartmentsList) {
+        allDepartmentsList.parentElement.classList.add('compressed');
+    }
+}
+
+/**
+ * EXPANDE UN CONTENEDOR ESPECÍFICO
+ * Se llama cuando se arrastra un elemento sobre un contenedor
+ * @param {HTMLElement} container - El contenedor a expandir
+ */
+function expandContainer(container) {
+    // Primero, restaurar todos los contenedores a su tamaño comprimido
+    compressAllLists();
+    
+    // Luego expandir el contenedor objetivo
+    if (container.id === 'all-departments-list') {
+        // Es el listado principal
+        container.parentElement.classList.remove('compressed');
+        container.parentElement.classList.add('expanded');
+    } else if (container.id.startsWith('division-')) {
+        // Es una división
+        container.parentElement.classList.remove('compressed');
+        container.parentElement.classList.add('expanded');
+    }
+}
+
+/**
+ * RESTAURA TODAS LAS LISTAS A SU TAMAÑO ORIGINAL
+ * Se llama cuando se suelta el elemento arrastrado
+ */
+function restoreAllLists() {
+    // Restaurar todas las cajas de división
+    for (let i = 1; i <= currentDivisionCount; i++) {
+        const divisionList = document.getElementById(`division-${i}`);
+        if (divisionList) {
+            divisionList.parentElement.classList.remove('compressed', 'expanded');
+        }
+    }
+    
+    // Restaurar listado principal
+    const allDepartmentsList = document.getElementById('all-departments-list');
+    if (allDepartmentsList) {
+        allDepartmentsList.parentElement.classList.remove('compressed', 'expanded');
+    }
 }
 
 /**
