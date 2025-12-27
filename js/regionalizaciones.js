@@ -6,6 +6,7 @@
  * - Visualización de límites con estilos diferenciados
  * - Control de opacidad y superposición de límites
  * - Sistema de leyenda flotante
+ * - Modo "sólo límites coincidentes"
  */
 
 // =============================================
@@ -27,34 +28,35 @@ let regionalizacionesActivas = {
 };
 
 let regionalizacionesOpacity = 0.7;
+let soloCoincidentesMode = false;
 
-// Estilos mejorados para cada tipo de regionalización
+// Estilos para cada tipo de regionalización
 const regionalizacionesEstilos = {
     sanitarias: {
-        color: '#e74c3c', // Rojo
-        weight: 3, // Un poco más grueso
-        dashArray: '10, 10', // Línea punteada
+        color: '#e74c3c',
+        weight: 2.5,
+        dashArray: '5, 5',
         opacity: 0.7,
         fillOpacity: 0
     },
     electorales: {
-        color: '#3498db', // Azul
-        weight: 3,
-        dashArray: '20, 10, 5, 10', // Patrón más complejo
+        color: '#3498db',
+        weight: 2,
+        dashArray: '10, 5',
         opacity: 0.7,
         fillOpacity: 0
     },
     judiciales: {
-        color: '#2ecc71', // Verde
-        weight: 3,
-        dashArray: '5, 15', // Puntos y rayas más separados
+        color: '#2ecc71',
+        weight: 2.5,
+        dashArray: '15, 5, 5, 5',
         opacity: 0.7,
         fillOpacity: 0
     },
     educativas: {
-        color: '#9b59b6', // Púrpura
-        weight: 3,
-        dashArray: '30, 10, 5, 10, 5, 10', // Patrón más distintivo
+        color: '#9b59b6',
+        weight: 2,
+        dashArray: '8, 8',
         opacity: 0.7,
         fillOpacity: 0
     }
@@ -79,39 +81,19 @@ const regionalizacionesNombres = {
 function initializeRegionalizaciones() {
     console.log('🗺️ Inicializando sistema de regionalizaciones...');
     
-    // Configurar el botón toggle para mostrar/ocultar controles
-    setupRegionalizacionesToggle();
-    
     // Configurar controles de checkboxes
     setupRegionalizacionesCheckboxes();
     
     // Configurar slider de opacidad
     setupOpacitySlider();
     
+    // Configurar modo "sólo coincidentes"
+    setupSoloCoincidentes();
+    
     // Inicializar leyenda flotante
     initializeLegend();
     
     console.log('✅ Sistema de regionalizaciones inicializado');
-}
-
-/**
- * CONFIGURA EL BOTÓN TOGGLE PARA MOSTRAR/OCULTAR CONTROLES
- */
-function setupRegionalizacionesToggle() {
-    const toggleBtn = document.getElementById('toggle-regionalizaciones');
-    const controlsContainer = document.getElementById('regionalizaciones-controls');
-    
-    if (toggleBtn && controlsContainer) {
-        toggleBtn.addEventListener('click', function() {
-            if (controlsContainer.style.display === 'none') {
-                controlsContainer.style.display = 'block';
-                toggleBtn.classList.add('active');
-            } else {
-                controlsContainer.style.display = 'none';
-                toggleBtn.classList.remove('active');
-            }
-        });
-    }
 }
 
 /**
@@ -146,6 +128,19 @@ function setupOpacitySlider() {
             regionalizacionesOpacity = this.value / 100;
             valueDisplay.textContent = this.value;
             updateRegionalizacionesOpacity();
+        });
+    }
+}
+
+/**
+ * CONFIGURA EL MODO "SÓLO LÍMITES COINCIDENTES"
+ */
+function setupSoloCoincidentes() {
+    const checkbox = document.getElementById('solo-coincidentes');
+    if (checkbox) {
+        checkbox.addEventListener('change', function() {
+            soloCoincidentesMode = this.checked;
+            updateRegionalizacionesStyles();
         });
     }
 }
@@ -198,8 +193,11 @@ function toggleRegionalizacion(tipo, activar) {
         }
     }
     
-    // Actualizar leyenda
+    // Actualizar leyenda y estilos
     updateLegend();
+    if (soloCoincidentesMode) {
+        updateRegionalizacionesStyles();
+    }
 }
 
 /**
@@ -209,7 +207,7 @@ function toggleRegionalizacion(tipo, activar) {
 function loadRegionalizacionLayer(tipo) {
     const archivo = getRegionalizacionFileName(tipo);
     
-    fetch(`regiones/${archivo}`)
+    fetch(`geometrias/${archivo}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Error al cargar ${archivo}`);
@@ -273,6 +271,54 @@ function updateRegionalizacionesOpacity() {
     });
 }
 
+/**
+ * ACTUALIZA LOS ESTILOS PARA EL MODO "SÓLO COINCIDENTES"
+ * (Implementación básica - puede mejorarse para coincidencias exactas)
+ */
+function updateRegionalizacionesStyles() {
+    if (soloCoincidentesMode) {
+        // Contar cuántas regionalizaciones están activas
+        const activas = Object.values(regionalizacionesActivas).filter(v => v).length;
+        
+        if (activas >= 2) {
+            // En modo coincidentes, mostrar todas las activas
+            Object.keys(regionalizacionesLayers).forEach(tipo => {
+                const layer = regionalizacionesLayers[tipo];
+                if (layer) {
+                    if (regionalizacionesActivas[tipo]) {
+                        map.addLayer(layer);
+                        layer.setStyle({ opacity: regionalizacionesOpacity });
+                    } else {
+                        map.removeLayer(layer);
+                    }
+                }
+            });
+        } else {
+            // Si hay menos de 2 activas, desactivar el modo
+            const checkbox = document.getElementById('solo-coincidentes');
+            if (checkbox) {
+                checkbox.checked = false;
+                soloCoincidentesMode = false;
+                alert('El modo "Sólo límites coincidentes" requiere al menos 2 regionalizaciones activas.');
+            }
+        }
+    } else {
+        // Modo normal: mostrar/ocultar según checkboxes
+        Object.keys(regionalizacionesLayers).forEach(tipo => {
+            const layer = regionalizacionesLayers[tipo];
+            if (layer) {
+                if (regionalizacionesActivas[tipo]) {
+                    map.addLayer(layer);
+                } else {
+                    map.removeLayer(layer);
+                }
+            }
+        });
+    }
+    
+    updateLegend();
+}
+
 // =============================================
 // LEYENDA FLOTANTE
 // =============================================
@@ -295,15 +341,14 @@ function updateLegend() {
             
             const legendItem = document.createElement('div');
             legendItem.className = 'legend-item';
-            
-            // Crear una línea de ejemplo con el patrón correspondiente
-            const lineStyle = `
-                border-top: ${estilo.weight}px ${getDashStyle(estilo.dashArray)} ${estilo.color};
-                opacity: ${estilo.opacity};
-            `;
-            
             legendItem.innerHTML = `
-                <span class="legend-line" style="${lineStyle}"></span>
+                <span class="legend-line" style="
+                    border-top: ${estilo.weight}px dashed ${estilo.color};
+                    border-top-style: ${estilo.dashArray === '5, 5' ? 'dashed' : 
+                                      estilo.dashArray === '10, 5' ? 'dotted' :
+                                      estilo.dashArray === '15, 5, 5, 5' ? 'double' : 'dashed'};
+                    opacity: ${estilo.opacity};
+                "></span>
                 <span class="legend-label">${nombre}</span>
             `;
             
@@ -320,19 +365,6 @@ function updateLegend() {
     } else {
         legend.style.display = 'none';
     }
-}
-
-/**
- * CONVIERTE EL DASHARRAY EN UN ESTILO CSS LEGIBLE
- */
-function getDashStyle(dashArray) {
-    // Para simplificar, usamos 'dashed' para patrones simples
-    // Podríamos mejorar esto para generar patrones más exactos
-    if (dashArray === '10, 10') return 'dashed';
-    if (dashArray === '20, 10, 5, 10') return 'dotted';
-    if (dashArray === '5, 15') return 'dashed';
-    if (dashArray === '30, 10, 5, 10, 5, 10') return 'dotted';
-    return 'dashed';
 }
 
 // =============================================
@@ -359,6 +391,13 @@ function clearRegionalizaciones() {
             checkbox.checked = false;
         }
     });
+    
+    // Desactivar modo coincidentes
+    const coincidentesCheckbox = document.getElementById('solo-coincidentes');
+    if (coincidentesCheckbox) {
+        coincidentesCheckbox.checked = false;
+        soloCoincidentesMode = false;
+    }
     
     // Ocultar leyenda
     const legend = document.getElementById('regionalizaciones-legend');
