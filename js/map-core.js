@@ -325,7 +325,7 @@ function drawPolyline() {
 
 /**
  * FINALIZACIÓN DEL POLÍGONO
- * Identifica departamentos dentro del polígono y los selecciona
+ * Identifica departamentos cuyo centroide está dentro del polígono y los selecciona
  */
 function finalizePolygon() {
     if (polygonPoints.length < 3) {
@@ -335,19 +335,19 @@ function finalizePolygon() {
     
     console.log(`🔷 Finalizando polígono con ${polygonPoints.length} puntos...`);
     
-    // Crear polígono Leaflet para cálculos espaciales
-    const polygon = L.polygon(polygonPoints);
+    // Crear polígono Leaflet para el filtro de bounding box (optimización)
+    const leafletPolygon = L.polygon(polygonPoints);
     
-    // Identificar departamentos que intersectan con el polígono
+    // Identificar departamentos cuyo centroide está dentro del polígono dibujado
     selectedDepartments = [];
     selectedDepartmentsSet.clear();
     
     geoJsonLayer.eachLayer(function(layer) {
-        // Verificación por bounding box primero (más rápida)
-        if (polygon.getBounds().intersects(layer.getBounds())) {
-            // Verificación más precisa usando el centroide
+        // Verificación por bounding box primero (filtro rápido)
+        if (leafletPolygon.getBounds().intersects(layer.getBounds())) {
+            // Verificación precisa: ray casting sobre el centroide del departamento
             const center = layer.getBounds().getCenter();
-            if (polygon.getBounds().contains(center)) {
+            if (isPointInPolygon(center, polygonPoints)) {
                 const deptName = layer.feature.properties.nam;
                 selectedDepartments.push(deptName);
                 selectedDepartmentsSet.add(deptName);
@@ -371,6 +371,31 @@ function finalizePolygon() {
     
     // Volver al modo normal
     deactivatePolygonMode();
+}
+
+/**
+ * VERIFICA SI UN PUNTO ESTÁ DENTRO DE UN POLÍGONO - Algoritmo Ray Casting
+ * Lanza un rayo horizontal desde el punto y cuenta las intersecciones
+ * con los lados del polígono. Número impar = dentro, par = fuera.
+ * @param {L.LatLng} point - Punto a verificar
+ * @param {Array<L.LatLng>} polygon - Array de vértices del polígono
+ * @returns {boolean} - True si el punto está dentro del polígono
+ */
+function isPointInPolygon(point, polygon) {
+    const x = point.lat;
+    const y = point.lng;
+    let inside = false;
+    
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].lat, yi = polygon[i].lng;
+        const xj = polygon[j].lat, yj = polygon[j].lng;
+        
+        const intersect = ((yi > y) !== (yj > y)) &&
+            (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    
+    return inside;
 }
 
 /**
@@ -417,18 +442,4 @@ function getDepartmentGroupId(departmentName) {
         }
     }
     return null;
-}
-
-// =============================================
-// FUNCIONES PENDIENTES (implementadas en otros módulos)
-// =============================================
-
-// Estas funciones se llaman desde este módulo pero se implementan en otros
-
-function moveSelectedToMainList() {
-    // Implementado en ui-controls-core.js
-}
-
-function markSelectedInDivisions() {
-    // Implementado en ui-controls-core.js  
 }
