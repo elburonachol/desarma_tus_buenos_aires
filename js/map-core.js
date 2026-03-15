@@ -10,6 +10,14 @@
  */
 
 // =============================================
+// VARIABLES DEL MÓDULO
+// =============================================
+
+// Referencia a la capa que tiene el tooltip actualmente abierto
+// Garantiza que nunca haya más de un tooltip visible a la vez
+let currentTooltipLayer = null;
+
+// =============================================
 // CONFIGURACIÓN DEL MAPA LEAFLET
 // =============================================
 
@@ -31,6 +39,14 @@ function initializeMap() {
         maxZoom: 18,
         crossOrigin: true // Importante para evitar problemas CORS
     }).addTo(map);
+    
+    // Cerrar tooltip activo cuando el cursor sale del área del mapa
+    map.on('mouseout', function() {
+        if (currentTooltipLayer) {
+            currentTooltipLayer.closeTooltip();
+            currentTooltipLayer = null;
+        }
+    });
     
     console.log('✅ Mapa inicializado correctamente');
 }
@@ -105,7 +121,7 @@ function getDepartmentStyle(feature) {
 function setupDepartmentInteractions(feature, layer) {
     const nombre = feature.properties.nam || 'Sin nombre';
     
-    // Tooltip con nombre del departamento
+    // Tooltip con nombre del departamento - controlado manualmente para evitar acumulación
     layer.bindTooltip(`<strong>${nombre}</strong>`, {
         permanent: false,
         direction: 'auto',
@@ -117,8 +133,15 @@ function setupDepartmentInteractions(feature, layer) {
         highlightDepartment(nombre);
     });
     
-    // Efectos hover - resaltado temporal
-    layer.on('mouseover', function() {
+    // Efectos hover: abre tooltip y aplica estilo de resaltado
+    layer.on('mouseover', function(e) {
+        // Cerrar tooltip de la capa anterior si quedó abierto
+        if (currentTooltipLayer && currentTooltipLayer !== layer) {
+            currentTooltipLayer.closeTooltip();
+        }
+        layer.openTooltip(e.latlng);
+        currentTooltipLayer = layer;
+        
         if (!selectedDepartmentsSet.has(nombre)) {
             layer.setStyle({
                 weight: 3,
@@ -128,7 +151,11 @@ function setupDepartmentInteractions(feature, layer) {
         }
     });
     
+    // Al salir del departamento: cierra tooltip y restaura estilo original
     layer.on('mouseout', function() {
+        layer.closeTooltip();
+        currentTooltipLayer = null;
+        
         // Vuelve al estilo original según su estado
         const originalStyle = getDepartmentStyle(feature);
         layer.setStyle(originalStyle);
@@ -191,6 +218,12 @@ function activatePolygonMode() {
     polygonPoints = [];
     selectedDepartments = [];
     selectedDepartmentsSet.clear();
+    
+    // Limpiar selección visual previa en la interfaz y el mapa
+    document.querySelectorAll('.department-item.selected').forEach(item => {
+        item.classList.remove('selected');
+    });
+    updateMapColors(); // Reflejar la deselección en el mapa
     
     // Feedback visual en la interfaz
     document.getElementById('polygon-btn').classList.add('active');
