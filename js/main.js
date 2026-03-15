@@ -78,11 +78,20 @@ document.addEventListener('DOMContentLoaded', function() {
     ]).then(() => {
         console.log('✅ Todos los datos cargados correctamente');
         
+        // Ocultar loader antes de mostrar la interfaz
+        const loader = document.getElementById('app-loader');
+        if (loader) loader.style.display = 'none';
+        
         // 3. Inicializamos la interfaz de usuario
         initializeUI();
         
     }).catch(error => {
         console.error('❌ Error en la inicialización:', error);
+        
+        // Ocultar loader aunque haya error
+        const loader = document.getElementById('app-loader');
+        if (loader) loader.style.display = 'none';
+        
         alert('Error al cargar los datos. Verifica la consola para más detalles.');
     });
 });
@@ -187,71 +196,4 @@ function getDepartmentCode(departmentName) {
 function isGBADepartment(departmentName) {
     const code = getDepartmentCode(departmentName);
     return code ? gbaCodes.includes(code) : false;
-}
-
-// =============================================
-// DECLARACIONES DE FUNCIONES IMPLEMENTADAS EN OTROS MÓDULOS
-// =============================================
-
-// Estas funciones se implementan en otros archivos pero se declaran aquí
-// para que estén disponibles globalmente
-
-function initializeMap() {
-    // Implementado en map-core.js
-}
-
-function loadGeoJSON() {
-    // Implementado en data-manager.js  
-}
-
-function loadPartidosData() {
-    // Implementado en data-manager.js
-}
-
-function loadRegionesExistentes() {
-    // Implementado en data-manager.js
-}
-
-function initializeDivisionBoxes(count) {
-    // Implementado en divisions-manager.js
-}
-
-function setupResetButton() {
-    // Implementado en ui-controls-core.js
-}
-
-function setupDivisionSelector() {
-    // Implementado en ui-controls-core.js
-}
-
-function setupRegionSelector() {
-    // Implementado en ui-controls-core.js
-}
-
-function setupPolygonButton() {
-    // Implementado en ui-controls-core.js
-}
-
-function initializeComparisonTable() {
-    // Implementado en comparison-table.js
-}
-
-function updateRemainingCount() {
-    // Implementado en divisions-manager.js
-}
-
-function updateDepartmentGroups() {
-    // Implementado en divisions-manager.js
-}
-
-function updateMapColors() {
-    // Implementado en map-core.js
-}
-
-function updateComparisonTable() {
-    // Implementado en comparison-table.js
-}
-
-function initializeRegionalizaciones() {
-    // Implementado en regionalizaciones.js
 }
