@@ -66,20 +66,29 @@ function loadGeoJSON() {
 /**
  * CARGA DEL ARCHIVO GEOJSON DE COMUNAS DESDE geometrias/comunas_caba_c_datos.geojson
  * Carga las 15 comunas de CABA para su uso en la aplicación
+ * Nota: Este archivo tiene la misma estructura de datos que deptos_pba.geojson
  */
 function loadComunasCABA() {
     return fetch('geometrias/comunas_caba_c_datos.geojson')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Error al cargar el archivo de comunas');
+                throw new Error(`Error al cargar comunas: HTTP ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
             console.log(`✅ Comunas CABA cargadas: ${data.features.length} comunas`);
-
+            console.log('📍 Comunas cargadas:', data.features.map(f => f.properties.nam));
+            
             // Guardar todas las comunas
             comunasCABA = data.features;
+            
+            // Ordenar alfabéticamente como los departamentos
+            comunasCABA.sort((a, b) => {
+                const nameA = (a.properties.nam || '').toUpperCase();
+                const nameB = (b.properties.nam || '').toUpperCase();
+                return nameA.localeCompare(nameB);
+            });
 
             return comunasCABA;
         })
