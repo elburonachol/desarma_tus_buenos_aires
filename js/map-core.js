@@ -4,6 +4,7 @@
  * Este archivo maneja TODO lo relacionado con el mapa:
  * - Configuración de Leaflet y capas base
  * - Visualización de departamentos GeoJSON
+ * - Visualización de comunas de CABA
  * - Herramienta de selección por polígono
  * - Estilos y colores del mapa
  * - Interacciones geográficas
@@ -115,6 +116,51 @@ function getDepartmentStyle(feature) {
 }
 
 /**
+ * ESTILO DINÁMICO DE COMUNAS DE CABA
+ * Define cómo se ven las comunas según su estado:
+ * - En listado: transparentes con borde
+ * - En división: coloreadas según su grupo
+ * - Seleccionadas: resaltadas en naranja
+ */
+function getComunaStyle(feature) {
+    const comunaName = feature.properties.nam;
+    const isSelected = selectedDepartmentsSet.has(comunaName);
+    const inDivision = isDepartmentInDivision(comunaName);
+    
+    // Comuna seleccionada por polígono
+    if (isSelected) {
+        return {
+            fillColor: '#f39c12',
+            fillOpacity: 0.7,
+            color: '#e67e22',
+            weight: 3,
+            opacity: 1
+        };
+    }
+    
+    // Comuna asignada a una división
+    if (inDivision) {
+        const groupId = getDepartmentGroupId(comunaName);
+        return {
+            fillColor: departmentGroups[groupId].color,
+            fillOpacity: 0.8,
+            color: 'white',
+            weight: 2,
+            opacity: 1
+        };
+    }
+    
+    // Comuna en listado (sin asignar): transparente con borde
+    return {
+        fillColor: '#e74c3c',
+        fillOpacity: 0.05,
+        color: '#c0392b',
+        weight: 1,
+        opacity: 0.7
+    };
+}
+
+/**
  * CONFIGURACIÓN DE INTERACCIONES POR DEPARTAMENTO
  * Define tooltips y comportamientos al hacer hover/click
  */
@@ -163,8 +209,54 @@ function setupDepartmentInteractions(feature, layer) {
 }
 
 /**
+ * CONFIGURACIÓN DE INTERACCIONES POR COMUNA
+ * Similar a departamentos pero con estilos específicos
+ */
+function setupComunaInteractions(feature, layer) {
+    const nombre = feature.properties.nam || 'Sin nombre';
+    
+    // Tooltip con nombre de la comuna
+    layer.bindTooltip(`<strong>${nombre}</strong>`, {
+        permanent: false,
+        direction: 'auto',
+        className: 'map-tooltip'
+    });
+    
+    // Click para resaltar temporalmente
+    layer.on('click', function() {
+        highlightDepartment(nombre);
+    });
+    
+    // Efectos hover
+    layer.on('mouseover', function(e) {
+        if (currentTooltipLayer && currentTooltipLayer !== layer) {
+            currentTooltipLayer.closeTooltip();
+        }
+        layer.openTooltip(e.latlng);
+        currentTooltipLayer = layer;
+        
+        if (!selectedDepartmentsSet.has(nombre)) {
+            layer.setStyle({
+                weight: 3,
+                color: '#e74c3c',
+                fillOpacity: 0.2
+            });
+        }
+    });
+    
+    // Al salir
+    layer.on('mouseout', function() {
+        layer.closeTooltip();
+        currentTooltipLayer = null;
+        
+        const originalStyle = getComunaStyle(feature);
+        layer.setStyle(originalStyle);
+    });
+}
+
+/**
  * ACTUALIZACIÓN MASIVA DE COLORES DEL MAPA
- * Se ejecuta cuando cambian las asignaciones de departamentos
+ * Se ejecuta cuando cambian las asignaciones de departamentos y comunas
  * para reflejar los cambios visualmente
  */
 function updateMapColors() {
@@ -178,11 +270,20 @@ function updateMapColors() {
         const newStyle = getDepartmentStyle(feature);
         layer.setStyle(newStyle);
     });
+    
+    // Actualizar comunas si están visibles
+    if (comunasVisible && comunasLayer) {
+        comunasLayer.eachLayer(function(layer) {
+            const feature = layer.feature;
+            const newStyle = getComunaStyle(feature);
+            layer.setStyle(newStyle);
+        });
+    }
 }
 
 /**
- * RESALTADO TEMPORAL DE DEPARTAMENTO
- * Útil para mostrar cuál departamento se clickeó
+ * RESALTADO TEMPORAL DE DEPARTAMENTO O COMUNA
+ * Útil para mostrar cuál departamento/comuna se clickeó
  */
 function highlightDepartment(deptName) {
     geoJsonLayer.eachLayer(function(layer) {
@@ -201,6 +302,55 @@ function highlightDepartment(deptName) {
             }, 2000);
         }
     });
+    
+    // Buscar en comunas si están visibles
+    if (comunasVisible && comunasLayer) {
+        comunasLayer.eachLayer(function(layer) {
+            if (layer.feature.properties.nam === deptName) {
+                layer.setStyle({
+                    weight: 3,
+                    color: '#e74c3c',
+                    fillOpacity: 0.4
+                });
+                
+                setTimeout(() => {
+                    const originalStyle = getComunaStyle(layer.feature);
+                    layer.setStyle(originalStyle);
+                }, 2000);
+            }
+        });
+    }
+}
+
+/**
+ * CARGA Y MUESTRA LAS COMUNAS DE CABA EN EL MAPA
+ */
+function loadComunasLayer() {
+    if (!comunasCABA || comunasCABA.length === 0) {
+        console.warn('⚠️ No hay datos de comunas cargados');
+        return;
+    }
+    
+    if (comunasLayer) {
+        map.removeLayer(comunasLayer);
+    }
+    
+    comunasLayer = L.geoJSON(comunasCABA, {
+        style: getComunaStyle,
+        onEachFeature: setupComunaInteractions
+    }).addTo(map);
+    
+    console.log('✅ Comunas de CABA cargadas en el mapa');
+}
+
+/**
+ * OCULTA LAS COMUNAS DE CABA DEL MAPA
+ */
+function removeComunasLayer() {
+    if (comunasLayer) {
+        map.removeLayer(comunasLayer);
+        comunasLayer = null;
+    }
 }
 
 // =============================================
@@ -358,7 +508,7 @@ function drawPolyline() {
 
 /**
  * FINALIZACIÓN DEL POLÍGONO
- * Identifica departamentos cuyo centroide está dentro del polígono y los selecciona
+ * Identifica departamentos y comunas cuyo centroide está dentro del polígono y los selecciona
  */
 function finalizePolygon() {
     if (polygonPoints.length < 3) {
@@ -371,7 +521,7 @@ function finalizePolygon() {
     // Crear polígono Leaflet para el filtro de bounding box (optimización)
     const leafletPolygon = L.polygon(polygonPoints);
     
-    // Identificar departamentos cuyo centroide está dentro del polígono dibujado
+    // Identificar departamentos y comunas cuyo centroide está dentro del polígono dibujado
     selectedDepartments = [];
     selectedDepartmentsSet.clear();
     
@@ -388,18 +538,32 @@ function finalizePolygon() {
         }
     });
     
+    // Buscar también en comunas si están visibles
+    if (comunasVisible && comunasLayer) {
+        comunasLayer.eachLayer(function(layer) {
+            if (leafletPolygon.getBounds().intersects(layer.getBounds())) {
+                const center = layer.getBounds().getCenter();
+                if (isPointInPolygon(center, polygonPoints)) {
+                    const comunaName = layer.feature.properties.nam;
+                    selectedDepartments.push(comunaName);
+                    selectedDepartmentsSet.add(comunaName);
+                }
+            }
+        });
+    }
+    
     // Mostrar resultados y actualizar interfaz
     if (selectedDepartments.length > 0) {
-        console.log(`✅ Seleccionados ${selectedDepartments.length} departamentos`);
+        console.log(`✅ Seleccionados ${selectedDepartments.length} elementos (departamentos y/o comunas)`);
         
         highlightSelectedDepartments();
         moveSelectedToMainList();
         markSelectedInDivisions();
         
-        alert(`Se seleccionaron ${selectedDepartments.length} departamentos`);
+        alert(`Se seleccionaron ${selectedDepartments.length} elementos`);
     } else {
-        console.log('⚠️ No se encontraron departamentos dentro del polígono');
-        alert('No se encontraron departamentos dentro del polígono');
+        console.log('⚠️ No se encontraron elementos dentro del polígono');
+        alert('No se encontraron elementos dentro del polígono');
     }
     
     // Volver al modo normal
@@ -432,8 +596,8 @@ function isPointInPolygon(point, polygon) {
 }
 
 /**
- * RESALTADO VISUAL DE DEPARTAMENTOS SELECCIONADOS
- * Aplica estilo especial a los departamentos dentro del polígono
+ * RESALTADO VISUAL DE DEPARTAMENTOS Y COMUNAS SELECCIONADOS
+ * Aplica estilo especial a los elementos dentro del polígono
  */
 function highlightSelectedDepartments() {
     geoJsonLayer.eachLayer(function(layer) {
@@ -447,6 +611,21 @@ function highlightSelectedDepartments() {
             });
         }
     });
+    
+    // Resaltar comunas seleccionadas si están visibles
+    if (comunasVisible && comunasLayer) {
+        comunasLayer.eachLayer(function(layer) {
+            const comunaName = layer.feature.properties.nam;
+            if (selectedDepartmentsSet.has(comunaName)) {
+                layer.setStyle({
+                    fillColor: '#f39c12',
+                    fillOpacity: 0.7,
+                    color: '#e67e22',
+                    weight: 3
+                });
+            }
+        });
+    }
 }
 
 // =============================================
@@ -454,7 +633,7 @@ function highlightSelectedDepartments() {
 // =============================================
 
 /**
- * Verifica si un departamento está en alguna división
+ * Verifica si un departamento o comuna está en alguna división
  */
 function isDepartmentInDivision(departmentName) {
     for (let groupId in departmentGroups) {
@@ -466,7 +645,7 @@ function isDepartmentInDivision(departmentName) {
 }
 
 /**
- * Obtiene el ID de grupo de un departamento
+ * Obtiene el ID de grupo de un departamento o comuna
  */
 function getDepartmentGroupId(departmentName) {
     for (let groupId in departmentGroups) {
