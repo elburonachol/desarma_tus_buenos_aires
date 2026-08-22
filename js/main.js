@@ -17,6 +17,11 @@ let map;                    // Instancia principal del mapa Leaflet
 let geoJsonLayer;           // Capa GeoJSON con todos los departamentos
 let allDepartments = [];    // Array con TODOS los departamentos (para reset)
 
+// Datos de comunas de CABA
+let comunasCABA = [];       // Array con todas las comunas
+let comunasVisible = false; // ¿Las comunas están visibles?
+let comunasLayer = null;    // Capa GeoJSON de comunas
+
 // Estado de las divisiones y agrupamientos
 let departmentGroups = {};  // {1: {color: '#ff0000', departments: [], name: 'División 1'}, ...}
 let currentDivisionCount = 3; // Número actual de divisiones visibles
@@ -74,7 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
     Promise.all([
         loadGeoJSON(),          // Datos geográficos de departamentos
         loadPartidosData(),     // Datos de superficie y población
-        loadRegionesExistentes() // Regiones predefinidas
+        loadRegionesExistentes(), // Regiones predefinidas
+        loadComunasCABA()
     ]).then(() => {
         console.log('✅ Todos los datos cargados correctamente');
         
