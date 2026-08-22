@@ -64,6 +64,33 @@ function loadGeoJSON() {
 }
 
 /**
+ * CARGA DEL ARCHIVO GEOJSON DE COMUNAS DESDE geometrias/comunas_CABA.geojson
+ * Carga las 15 comunas de CABA para su uso en la aplicación
+ */
+function loadComunasCABA() {
+    return fetch('geometrias/comunas_CABA.geojson')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar el archivo de comunas');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(`✅ Comunas CABA cargadas: ${data.features.length} comunas`);
+
+            // Guardar todas las comunas
+            comunasCABA = data.features;
+
+            return comunasCABA;
+        })
+        .catch(error => {
+            console.error('❌ Error cargando comunas CABA:', error);
+            // No bloqueamos la aplicación si falla la carga de comunas
+            return null;
+        });
+}
+
+/**
  * CARGA DE DATOS DE PARTIDOS DESDE tablas_de_atributos/datos_partidos.json
  * Incluye superficie, población y otras variables para cálculos
  */
