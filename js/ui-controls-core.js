@@ -207,6 +207,113 @@ function markSelectedInDivisions() {
     }
 }
 
+/**
+ * CONFIGURA EL CHECKBOX DE COMUNAS DE CABA
+ * Muestra/oculta las 15 comunas de CABA en el mapa y el listado
+ */
+function setupComunasButton() {
+    const checkbox = document.getElementById('toggle-comunas');
+    
+    if (checkbox) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                showComunas();
+            } else {
+                hideComunas();
+            }
+        });
+    }
+}
+
+/**
+ * MUESTRA LAS COMUNAS DE CABA
+ */
+function showComunas() {
+    console.log('👁️ Mostrando comunas de CABA...');
+    
+    comunasVisible = true;
+    loadComunasLayer();
+    
+    // Agregar comunas al listado principal
+    if (comunasCABA && comunasCABA.length > 0) {
+        comunasCABA.forEach(feature => {
+            const nombre = feature.properties.nam;
+            const codigo = feature.properties.cde || 'COMUNA';
+            
+            // Verificar que no esté ya en el listado
+            const listContainer = document.getElementById('all-departments-list');
+            const existingItem = listContainer.querySelector(`[data-dept-name="${nombre}"]`);
+            
+            if (!existingItem) {
+                const item = document.createElement('div');
+                item.className = 'department-item';
+                item.textContent = nombre;
+                item.setAttribute('data-dept-name', nombre);
+                item.setAttribute('data-dept-code', codigo);
+                listContainer.appendChild(item);
+            }
+        });
+        
+        // Ordenar el listado
+        sortMainList();
+    }
+    
+    // Actualizar contador
+    updateRemainingCount();
+    
+    console.log(`✅ ${comunasCABA.length} comunas agregadas`);
+}
+
+/**
+ * OCULTA LAS COMUNAS DE CABA
+ */
+function hideComunas() {
+    console.log('👁️ Ocultando comunas de CABA...');
+    
+    comunasVisible = false;
+    removeComunasLayer();
+    
+    // Remover comunas del listado principal y devolverlas si estaban en divisiones
+    if (comunasCABA && comunasCABA.length > 0) {
+        comunasCABA.forEach(feature => {
+            const nombre = feature.properties.nam;
+            
+            // Remover de divisiones
+            for (let i = 1; i <= currentDivisionCount; i++) {
+                const divisionList = document.getElementById(`division-${i}`);
+                if (divisionList) {
+                    const items = divisionList.querySelectorAll('.department-item');
+                    items.forEach(item => {
+                        if (item.getAttribute('data-dept-name') === nombre) {
+                            item.remove();
+                        }
+                    });
+                }
+            }
+            
+            // Remover del listado principal
+            const listContainer = document.getElementById('all-departments-list');
+            const items = listContainer.querySelectorAll('.department-item');
+            items.forEach(item => {
+                if (item.getAttribute('data-dept-name') === nombre) {
+                    item.remove();
+                }
+            });
+            
+            // Limpiar de seleccionados
+            selectedDepartmentsSet.delete(nombre);
+            selectedDepartments = selectedDepartments.filter(d => d !== nombre);
+        });
+    }
+    
+    // Actualizar todo
+    updateDepartmentGroups();
+    updateMapColors();
+    updateRemainingCount();
+    
+    console.log('✅ Comunas ocultadas');
+}
+
 // =============================================
 // RESET Y ESTADO INICIAL
 // =============================================
