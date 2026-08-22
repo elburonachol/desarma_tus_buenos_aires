@@ -109,6 +109,14 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeUI() {
     console.log('🎛️ Inicializando interfaz de usuario...');
     
+    // Verificar que los datos críticos estén cargados
+    if (!allDepartments || allDepartments.length === 0) {
+        console.error('❌ No hay departamentos cargados');
+        return;
+    }
+    
+    console.log(`📊 Datos disponibles: ${allDepartments.length} departamentos, ${comunasCABA.length} comunas`);
+    
     // Sistema de divisiones y drag & drop
     initializeDivisionBoxes(currentDivisionCount);
     
@@ -117,12 +125,18 @@ function initializeUI() {
     setupDivisionSelector(); 
     setupRegionSelector();
     setupPolygonButton();
+    setupComunasButton();
     
     // Sistema de visualización de regionalizaciones
     if (typeof initializeRegionalizaciones === 'function') {
         initializeRegionalizaciones();
     }
     
+    // Sistema de visualización de datos
+    initializeComparisonTable();
+    updateRemainingCount();
+    
+    console.log('✅ Interfaz de usuario inicializada');
     // Sistema de visualización de datos
     initializeComparisonTable();
     updateRemainingCount();
