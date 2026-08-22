@@ -64,11 +64,11 @@ function loadGeoJSON() {
 }
 
 /**
- * CARGA DEL ARCHIVO GEOJSON DE COMUNAS DESDE geometrias/comunas_CABA.geojson
+ * CARGA DEL ARCHIVO GEOJSON DE COMUNAS DESDE geometrias/comunas_caba_c_datos.geojson
  * Carga las 15 comunas de CABA para su uso en la aplicación
  */
 function loadComunasCABA() {
-    return fetch('geometrias/comunas_CABA.geojson')
+    return fetch('geometrias/comunas_caba_c_datos.geojson')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Error al cargar el archivo de comunas');
