@@ -42,7 +42,7 @@ let regionalizacionesOpacity = 0.7;
 const regionalizacionesEstilos = {
     sanitarias: {
         color: '#FF6B6B',      // Rojo coral - bien visible
-        weight: 3,             // Más grueso para destacar
+        weight: 4,             // Aumentado de 3 a 4 para mejor visibilidad
         dashArray: '8, 6',     // Patrón guión-medio
         opacity: 0.9,
         fillOpacity: 0,
@@ -50,7 +50,7 @@ const regionalizacionesEstilos = {
     },
     electorales: {
         color: '#4ECDC4',      // Turquesa - buen contraste
-        weight: 2.5,
+        weight: 4,             // Aumentado de 2.5 a 4
         dashArray: '12, 8, 2, 8', // Patrón complejo único
         opacity: 0.9,
         fillOpacity: 0,
@@ -58,7 +58,7 @@ const regionalizacionesEstilos = {
     },
     judiciales: {
         color: '#FFD166',      // Amarillo mostaza - muy visible
-        weight: 3,
+        weight: 4,             // Aumentado de 3 a 4
         dashArray: '5, 10',    // Guiones largos y espacios
         opacity: 0.9,
         fillOpacity: 0,
@@ -66,7 +66,7 @@ const regionalizacionesEstilos = {
     },
     educativas: {
         color: '#9B5DE5',      // Púrpura vibrante
-        weight: 2,
+        weight: 3,             // Aumentado de 2 a 3
         dashArray: '2, 6',     // Puntos y espacios
         opacity: 0.9,
         fillOpacity: 0,
