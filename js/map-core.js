@@ -117,10 +117,8 @@ function getDepartmentStyle(feature) {
 
 /**
  * ESTILO DINÁMICO DE COMUNAS DE CABA
- * Define cómo se ven las comunas según su estado:
- * - En listado: transparentes con borde
- * - En división: coloreadas según su grupo
- * - Seleccionadas: resaltadas en naranja
+ * Las comunas se tratan con bordes como los departamentos GBA
+ * (ya que pertenecen al Gran Buenos Aires)
  */
 function getComunaStyle(feature) {
     const comunaName = feature.properties.nam;
@@ -150,13 +148,13 @@ function getComunaStyle(feature) {
         };
     }
     
-    // Comuna en listado (sin asignar): transparente con borde
+    // Comuna en listado (sin asignar): mismo estilo que GBA (borde más grueso)
     return {
-        fillColor: '#e74c3c',
-        fillOpacity: 0.05,
-        color: '#c0392b',
-        weight: 1,
-        opacity: 0.7
+        fillColor: '#3388ff',
+        fillOpacity: 0.1,
+        color: '#2c3e50',
+        weight: 2,     // Mismo peso que GBA (no 1)
+        opacity: 0.9
     };
 }
 
