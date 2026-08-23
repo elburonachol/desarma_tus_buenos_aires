@@ -228,15 +228,44 @@ function isGBADepartmentByCode(cde) {
 // =============================================
 
 /**
- * FORMATEA NÚMEROS CON SEPARADORES DE MILES PARA MEJOR LEGIBILIDAD
+ * FORMATEA NÚMEROS CON SEPARADOR DE MILES Y OPCIONALMENTE DECIMALES
  * @param {number|string} numero - Número a formatear
- * @returns {string} - Número formateado con separadores de miles
+ * @param {number} [decimales] - Cantidad de decimales a mostrar (opcional). 
+ *                                Si no se indica, se redondea a entero (sin decimales).
+ *                                Si se indica 0 o más, se usa coma como separador decimal.
+ * @returns {string} - Número formateado
  */
-function formatearNumero(numero) {
+function formatearNumero(numero, decimales) {
     if (numero === 0 || numero === '0') return '0';
-    if (!numero) return '-';
+    if (!numero && numero !== 0) return '-';
     
-    return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    let num = parseFloat(numero);
+    if (isNaN(num)) return '-';
+    
+    let parteEntera, parteDecimal;
+    
+    if (decimales !== undefined && decimales >= 0) {
+        // Redondear a la cantidad de decimales especificada
+        let factor = Math.pow(10, decimales);
+        num = Math.round(num * factor) / factor;
+        let partes = num.toFixed(decimales).split('.');
+        parteEntera = partes[0];
+        parteDecimal = partes[1] || '';
+    } else {
+        // Sin decimales: redondear a entero
+        num = Math.round(num);
+        parteEntera = num.toString();
+        parteDecimal = '';
+    }
+    
+    // Agregar separador de miles (punto) en la parte entera
+    parteEntera = parteEntera.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    if (parteDecimal) {
+        return parteEntera + ',' + parteDecimal; // coma como separador decimal
+    } else {
+        return parteEntera;
+    }
 }
 
 /**
