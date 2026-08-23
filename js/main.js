@@ -78,12 +78,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1. Primero inicializamos el mapa (módulo map-core.js)
     initializeMap();
     
-    // 2. Cargamos todos los datos necesarios en paralelo
+
     Promise.all([
         loadGeoJSON(),          // Datos geográficos de departamentos
-        loadPartidosData(),     // Datos de superficie y población
+        loadPartidosData(),     // Datos de superficie y población de PBA
         loadRegionesExistentes(), // Regiones predefinidas
-        loadComunasCABA()
+        loadComunasCABA(),      // Geometrías de comunas de CABA
+        loadDatosComuna()       // Datos de superficie y población de CABA
     ]).then(() => {
         console.log('✅ Todos los datos cargados correctamente');
         
