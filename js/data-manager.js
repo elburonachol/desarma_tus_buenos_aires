@@ -148,6 +148,32 @@ function loadRegionesExistentes() {
         });
 }
 
+/**
+ * CARGA DE DATOS DE COMUNAS DESDE tablas_de_atributos/datos_comunas.json
+ * Incluye superficie y población de las comunas de CABA para cálculos
+ */
+let datosComuna = null;
+
+function loadDatosComuna() {
+    return fetch('tablas_de_atributos/datos_comunas.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            datosComuna = data;
+            console.log('✅ Datos de comunas cargados:', datosComuna);
+            return datosComuna;
+        })
+        .catch(error => {
+            console.error('❌ Error cargando datos de comunas:', error);
+            // No bloqueamos la aplicación si falla la carga de estos datos
+            return null;
+        });
+}
+
 // =============================================
 // CÁLCULOS Y PROCESAMIENTO DE DATOS
 // =============================================
@@ -207,7 +233,7 @@ function formatearNumero(numero) {
 }
 
 /**
- * CALCULA EL TOTAL DE UNA VARIABLE PARA TODOS LOS DEPARTAMENTOS DE UNA DIVISIÓN
+ * CALCULA EL TOTAL DE UNA VARIABLE PARA TODOS LOS DEPARTAMENTOS Y COMUNAS DE UNA DIVISIÓN
  * @param {number} grupoId - ID de la división (1, 2, 3, ...)
  * @param {string} variable - Nombre de la variable a sumar ('superficie', 'poblacion_total', etc.)
  * @returns {number} - Suma total de la variable para la división
@@ -218,21 +244,29 @@ function calcularTotalDivision(grupoId, variable) {
         return 0;
     }
     
-    const partidosEnGrupo = departmentGroups[grupoId].departments;
+    const elementosEnGrupo = departmentGroups[grupoId].departments;
     let total = 0;
-    let partidosConDatos = 0;
+    let elementosConDatos = 0;
     
-    // Sumar la variable para cada departamento en la división
-    partidosEnGrupo.forEach(nombrePartido => {
-        const codigoCde = obtenerCodigoCdePorNombre(nombrePartido);
+    // Sumar la variable para cada elemento (departamento o comuna) en la división
+    elementosEnGrupo.forEach(nombreElemento => {
+        // Primero intentar con datos de departamentos (PBA)
+        const codigoCde = obtenerCodigoCdePorNombre(nombreElemento);
         if (codigoCde && partidosData.datos[codigoCde] && partidosData.datos[codigoCde][variable]) {
             total += partidosData.datos[codigoCde][variable];
-            partidosConDatos++;
+            elementosConDatos++;
+        }
+        // Si no es departamento, intentar con datos de comunas (CABA)
+        else if (datosComuna && datosComuna.datos && datosComuna.datos[nombreElemento]) {
+            if (datosComuna.datos[nombreElemento][variable]) {
+                total += datosComuna.datos[nombreElemento][variable];
+                elementosConDatos++;
+            }
         }
     });
     
-    // Solo retornar total si encontramos datos para al menos un departamento
-    return partidosConDatos > 0 ? total : 0;
+    // Solo retornar total si encontramos datos para al menos un elemento
+    return elementosConDatos > 0 ? total : 0;
 }
 
 /**
