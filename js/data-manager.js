@@ -50,10 +50,7 @@ function loadGeoJSON() {
 
             // Poblar el listado de departamentos en la interfaz
             populateDepartmentsList(allDepartments);
-
-            // Actualizar contador total de departamentos
-            document.getElementById('dept-count').textContent = allDepartments.length;
-
+            
             return allDepartments;
         })
         .catch(error => {
