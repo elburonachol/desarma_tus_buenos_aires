@@ -231,37 +231,69 @@ function setupComunasButton() {
 function showComunas() {
     console.log('👁️ Mostrando comunas de CABA...');
     
+    // Verificaciones previas
+    if (!comunasCABA || comunasCABA.length === 0) {
+        console.error('❌ No hay datos de comunas disponibles');
+        alert('Error: No se cargaron los datos de comunas');
+        return;
+    }
+    
+    console.log(`   - Comunas a mostrar: ${comunasCABA.length}`);
+    
     comunasVisible = true;
+    comunasIncluidas = true;
+    
+    // Cargar la capa en el mapa
+    console.log('   - Cargando capa en el mapa...');
     loadComunasLayer();
     
     // Agregar comunas al listado principal
-    if (comunasCABA && comunasCABA.length > 0) {
-        comunasCABA.forEach(feature => {
-            const nombre = feature.properties.nam;
-            const codigo = feature.properties.cde || 'COMUNA';
-            
-            // Verificar que no esté ya en el listado
-            const listContainer = document.getElementById('all-departments-list');
-            const existingItem = listContainer.querySelector(`[data-dept-name="${nombre}"]`);
-            
-            if (!existingItem) {
-                const item = document.createElement('div');
-                item.className = 'department-item';
-                item.textContent = nombre;
-                item.setAttribute('data-dept-name', nombre);
-                item.setAttribute('data-dept-code', codigo);
-                listContainer.appendChild(item);
-            }
-        });
-        
-        // Ordenar el listado
-        sortMainList();
+    const listContainer = document.getElementById('all-departments-list');
+    if (!listContainer) {
+        console.error('❌ No se encontró el contenedor del listado de departamentos');
+        return;
     }
     
-    // Actualizar contador
-    updateRemainingCount();
+    let comunasAgregadas = 0;
+    let comunasSkipped = 0;
     
-    console.log(`✅ ${comunasCABA.length} comunas agregadas`);
+    comunasCABA.forEach(feature => {
+        const nombre = feature.properties.nam;
+        const codigo = feature.properties.cde || 'COMUNA';
+        
+        console.log(`   Procesando comuna: ${nombre} (CDE: ${codigo})`);
+        
+        // Verificar que no esté ya en el listado
+        const existingItem = listContainer.querySelector(`[data-dept-name="${nombre}"]`);
+        
+        if (!existingItem) {
+            const item = document.createElement('div');
+            item.className = 'department-item';
+            item.textContent = nombre;
+            item.setAttribute('data-dept-name', nombre);
+            item.setAttribute('data-dept-code', codigo);
+            listContainer.appendChild(item);
+            
+            comunasAgregadas++;
+            console.log(`   ✅ Comuna agregada: ${nombre}`);
+        } else {
+            comunasSkipped++;
+            console.log(`   ⏭️  Comuna ya existe en el listado: ${nombre}`);
+        }
+    });
+    
+    // Ordenar el listado
+    console.log('   - Ordenando listado...');
+    sortMainList();
+    
+    // Actualizar contador y título
+    updateRemainingCount();
+    updateDivisionsTitle();
+    
+    console.log(`👁️ Operación completada:`);
+    console.log(`   ✅ Comunas agregadas: ${comunasAgregadas}`);
+    console.log(`   ⏭️  Comunas omitidas (ya existentes): ${comunasSkipped}`);
+    console.log(`   📊 Total en listado ahora: ${listContainer.querySelectorAll('.department-item').length} elementos`);
 }
 
 /**
@@ -270,48 +302,74 @@ function showComunas() {
 function hideComunas() {
     console.log('👁️ Ocultando comunas de CABA...');
     
+    if (!comunasCABA || comunasCABA.length === 0) {
+        console.warn('⚠️ No hay datos de comunas para ocultar');
+        return;
+    }
+    
+    console.log(`   - Comunas a ocultar: ${comunasCABA.length}`);
+    
     comunasVisible = false;
+    comunasIncluidas = false;
+    
+    // Remover capa del mapa
+    console.log('   - Removiendo capa del mapa...');
     removeComunasLayer();
     
-    // Remover comunas del listado principal y devolverlas si estaban en divisiones
-    if (comunasCABA && comunasCABA.length > 0) {
-        comunasCABA.forEach(feature => {
-            const nombre = feature.properties.nam;
-            
-            // Remover de divisiones
-            for (let i = 1; i <= currentDivisionCount; i++) {
-                const divisionList = document.getElementById(`division-${i}`);
-                if (divisionList) {
-                    const items = divisionList.querySelectorAll('.department-item');
-                    items.forEach(item => {
-                        if (item.getAttribute('data-dept-name') === nombre) {
-                            item.remove();
-                        }
-                    });
-                }
+    let comunasRemovidasDivisiones = 0;
+    let comunasRemovidasListado = 0;
+    let comunasDeseleccionadas = 0;
+    
+    // Remover comunas del listado principal y de las divisiones
+    comunasCABA.forEach(feature => {
+        const nombre = feature.properties.nam;
+        
+        console.log(`   Procesando comuna: ${nombre}`);
+        
+        // Remover de divisiones
+        for (let i = 1; i <= currentDivisionCount; i++) {
+            const divisionList = document.getElementById(`division-${i}`);
+            if (divisionList) {
+                const items = divisionList.querySelectorAll('.department-item');
+                items.forEach(item => {
+                    if (item.getAttribute('data-dept-name') === nombre) {
+                        item.remove();
+                        comunasRemovidasDivisiones++;
+                    }
+                });
             }
-            
-            // Remover del listado principal
-            const listContainer = document.getElementById('all-departments-list');
+        }
+        
+        // Remover del listado principal
+        const listContainer = document.getElementById('all-departments-list');
+        if (listContainer) {
             const items = listContainer.querySelectorAll('.department-item');
             items.forEach(item => {
                 if (item.getAttribute('data-dept-name') === nombre) {
                     item.remove();
+                    comunasRemovidasListado++;
                 }
             });
-            
-            // Limpiar de seleccionados
+        }
+        
+        // Limpiar de seleccionados
+        if (selectedDepartmentsSet.has(nombre)) {
             selectedDepartmentsSet.delete(nombre);
-            selectedDepartments = selectedDepartments.filter(d => d !== nombre);
-        });
-    }
+            comunasDeseleccionadas++;
+        }
+        selectedDepartments = selectedDepartments.filter(d => d !== nombre);
+    });
     
     // Actualizar todo
     updateDepartmentGroups();
     updateMapColors();
     updateRemainingCount();
+    updateDivisionsTitle();
     
-    console.log('✅ Comunas ocultadas');
+    console.log(`👁️ Operación completada:`);
+    console.log(`   ✅ Comunas removidas de divisiones: ${comunasRemovidasDivisiones}`);
+    console.log(`   ✅ Comunas removidas del listado: ${comunasRemovidasListado}`);
+    console.log(`   ✅ Comunas deseleccionadas: ${comunasDeseleccionadas}`);
 }
 
 // =============================================
