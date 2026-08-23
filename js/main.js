@@ -30,6 +30,9 @@ let currentDivisionCount = 3; // Número actual de divisiones visibles
 let partidosData = null;    // Datos de superficie/población desde datos_partidos.json
 let regionesExistentes = null; // Regiones predefinidas desde regiones_administrativas.json
 
+// Control del estado de comunas visibles (para cambiar títulos dinámicamente)
+let comunasIncluidas = false;
+
 // Estado de regiones existentes
 let currentRegionType = null; // 'secciones_electorales' o 'regiones_sanitarias'
 
@@ -135,11 +138,7 @@ function initializeUI() {
     // Sistema de visualización de datos
     initializeComparisonTable();
     updateRemainingCount();
-    
-    console.log('✅ Interfaz de usuario inicializada');
-    // Sistema de visualización de datos
-    initializeComparisonTable();
-    updateRemainingCount();
+    updateDivisionsTitle();
     
     console.log('✅ Interfaz de usuario inicializada');
 }
@@ -188,6 +187,20 @@ function clearAllSelections() {
 // =============================================
 // FUNCIONES DE ACCESO GLOBAL (para otros módulos)
 // =============================================
+
+/**
+ * Actualiza el título de la columna de divisiones según si comunas están incluidas
+ */
+function updateDivisionsTitle() {
+    const titleElement = document.getElementById('divisions-title');
+    if (titleElement) {
+        if (comunasIncluidas) {
+            titleElement.textContent = 'Divisiones de (las) Buenos Aires';
+        } else {
+            titleElement.textContent = 'Divisiones de Buenos Aires';
+        }
+    }
+}
 
 /**
  * Obtiene un departamento por su nombre
