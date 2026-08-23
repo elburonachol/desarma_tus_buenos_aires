@@ -34,31 +34,14 @@
         
         <!-- Controles principales -->
         <div class="controls">
-            <button id="reset-btn" class="reset-button">Reestablecer valores</button>
+            <div class="controls-top-row">
+                <button id="reset-btn" class="reset-button">Reestablecer valores</button>
+            </div>
             
             <!-- Botón para armar polígono de selección -->
             <button id="polygon-btn" class="polygon-button">Armar polígono de selección</button>
             
-            <!-- Control: Regiones ya existentes -->
-            <div class="region-control">
-                <label for="existing-regions">Regiones ya existentes:</label>
-                <select id="existing-regions">
-                    <option value="">-- Seleccione una región --</option>
-                    <option value="secciones_electorales">Secciones electorales</option>
-                    <option value="regiones_sanitarias">Regiones sanitarias</option>
-                    <option value="regiones_educativas">Regiones educativas</option>
-                    <option value="deptos_judiciales">Departamentos judiciales</option>
-                </select>
-            </div>
-            
-            <!-- Control: Comunas de CABA -->
-            <div class="region-control">
-                <label for="toggle-comunas">
-                    <input type="checkbox" id="toggle-comunas">
-                    Mostrar Comunas de CABA (15)
-                </label>
-            </div>
-            
+            <!-- Control: Número de divisiones -->
             <div class="division-control">
                 <label for="division-count">Número de divisiones:</label>
                 <select id="division-count">
@@ -78,6 +61,26 @@
                     <option value="14">14</option>
                     <option value="15">15</option>
                 </select>
+            </div>
+            
+            <!-- Control: Regionalizaciones ya existentes -->
+            <div class="region-control">
+                <label for="existing-regions">Regionalizaciones ya existentes:</label>
+                <select id="existing-regions">
+                    <option value="">-- Seleccione una región --</option>
+                    <option value="secciones_electorales">Secciones electorales</option>
+                    <option value="regiones_sanitarias">Regiones sanitarias</option>
+                    <option value="regiones_educativas">Regiones educativas</option>
+                    <option value="deptos_judiciales">Departamentos judiciales</option>
+                </select>
+            </div>
+            
+            <!-- Control: Comunas de CABA -->
+            <div class="region-control">
+                <label for="toggle-comunas">
+                    <input type="checkbox" id="toggle-comunas">
+                    Incluir comunas de CABA
+                </label>
             </div>
             
             <!-- Controles de Regionalizaciones (Colapsable) -->
@@ -143,9 +146,9 @@
                 <div id="map"></div>
             </div>
             
-            <!-- Columna 2: Divisiones de la provincia -->
+            <!-- Columna 2: Divisiones de Buenos Aires -->
             <div class="divisions-column">
-                <h3>Divisiones de la Provincia</h3>
+                <h3 id="divisions-title">Divisiones de Buenos Aires</h3>
                 <div id="division-boxes-container" class="groups-container">
                     <!-- Las cajas de división se generan aquí mediante JavaScript -->
                 </div>
@@ -154,7 +157,7 @@
             <!-- Columna 3: Listado de departamentos -->
             <div class="list-column">
                 <h3>Listado de Departamentos 
-                    <span class="count-info">(Total: <span id="dept-count">0</span> | Restantes: <span id="dept-remaining-count">0</span>)</span>
+                    <span class="count-info">(<span id="dept-remaining-count">0</span> de <span id="dept-total-count">135</span>)</span>
                 </h3>
                 <div id="all-departments-list" class="departments-list"></div>
             </div>
