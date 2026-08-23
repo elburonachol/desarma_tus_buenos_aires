@@ -332,6 +332,8 @@ function initializeDragAndDrop() {
                     handleDepartmentMove(evt);
                     // Ordenar la división después del movimiento
                     sortDivisionList(index + 1);
+                    // Asegurar que no haya duplicados
+                    removeDuplicatesFromDivision(index + 1);
                     // Asegurar que se restauren los tamaños
                     restoreAllLists();
                 }
