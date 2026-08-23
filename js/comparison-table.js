@@ -73,47 +73,23 @@ function updateComparisonTable() {
     // Solo mostrar datos de superficie/población si están cargados
     if (partidosData && partidosData.datos) {
         // Fila: Superficie total
-        const filaSuperficie = document.createElement('tr');
-        const celdaVariableSuperficie = document.createElement('td');
-        celdaVariableSuperficie.textContent = 'Superficie total (km²)';
-        filaSuperficie.appendChild(celdaVariableSuperficie);
-        
-        for (let i = 1; i <= currentDivisionCount; i++) {
-            const superficieCell = document.createElement('td');
-            const superficie = calcularTotalDivision(i, 'superficie');
-            superficieCell.textContent = formatearNumero(superficie);
-            filaSuperficie.appendChild(superficieCell);
-        }
-        tbody.appendChild(filaSuperficie);
+        const superficieCell = document.createElement('td');
+        const superficie = calcularTotalDivision(i, 'superficie');
+        superficieCell.textContent = formatearNumero(superficie); // Sin decimales
+        filaSuperficie.appendChild(superficieCell);
         
         // Fila: Población total
-        const filaPoblacion = document.createElement('tr');
-        const celdaVariablePoblacion = document.createElement('td');
-        celdaVariablePoblacion.textContent = 'Población total';
-        filaPoblacion.appendChild(celdaVariablePoblacion);
-        
-        for (let i = 1; i <= currentDivisionCount; i++) {
-            const poblacionCell = document.createElement('td');
-            const poblacion = calcularTotalDivision(i, 'poblacion_total');
-            poblacionCell.textContent = formatearNumero(poblacion);
-            filaPoblacion.appendChild(poblacionCell);
-        }
-        tbody.appendChild(filaPoblacion);
+        const poblacionCell = document.createElement('td');
+        const poblacion = calcularTotalDivision(i, 'poblacion_total');
+        poblacionCell.textContent = formatearNumero(poblacion); // Sin decimales
+        filaPoblacion.appendChild(poblacionCell);
         
         // Fila: Densidad poblacional
-        const filaDensidad = document.createElement('tr');
-        const celdaVariableDensidad = document.createElement('td');
-        celdaVariableDensidad.textContent = 'Densidad (hab/km²)';
-        filaDensidad.appendChild(celdaVariableDensidad);
-        
-        for (let i = 1; i <= currentDivisionCount; i++) {
-            const densidadCell = document.createElement('td');
-            const densidad = calcularDensidadDivision(i);
-            densidadCell.textContent = formatearNumero(densidad);
-            filaDensidad.appendChild(densidadCell);
-        }
-        tbody.appendChild(filaDensidad);
-    } else {
+        const densidadCell = document.createElement('td');
+        const densidad = calcularDensidadDivision(i);
+        densidadCell.textContent = formatearNumero(densidad, 2); // 2 decimales con coma
+        filaDensidad.appendChild(densidadCell);
+            } else {
         // Mensaje mientras se cargan los datos
         const filaMensaje = document.createElement('tr');
         const celdaMensaje = document.createElement('td');
