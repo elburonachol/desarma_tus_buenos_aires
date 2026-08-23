@@ -211,12 +211,18 @@ function populateDepartmentsList(features) {
 
 /**
  * ACTUALIZA EL CONTADOR DE DEPARTAMENTOS RESTANTES EN EL LISTADO
- * Muestra cuántos departamentos quedan disponibles para asignar
+ * Muestra cuántos elementos quedan disponibles para asignar
+ * y el total de elementos según si comunas están incluidas
  */
 function updateRemainingCount() {
     const listContainer = document.getElementById('all-departments-list');
     const remainingCount = listContainer.querySelectorAll('.department-item').length;
+    
+    // Calcular total: 135 departamentos + 15 comunas si están incluidas
+    const totalCount = comunasIncluidas ? 150 : 135;
+    
     document.getElementById('dept-remaining-count').textContent = remainingCount;
+    document.getElementById('dept-total-count').textContent = totalCount;
 }
 
 /**
