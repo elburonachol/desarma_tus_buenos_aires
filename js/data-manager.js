@@ -308,15 +308,15 @@ function calcularTotalDivision(grupoId, variable) {
 /**
  * CALCULA LA DENSIDAD POBLACIONAL PARA UNA DIVISIÓN
  * @param {number} grupoId - ID de la división
- * @returns {string} - Densidad formateada con 1 decimal
+ * @returns {number} - Densidad sin redondear (para que formatearNumero maneje los decimales)
  */
 function calcularDensidadDivision(grupoId) {
     const poblacion = calcularTotalDivision(grupoId, 'poblacion_total');
     const superficie = calcularTotalDivision(grupoId, 'superficie');
     
-    // Evitar división por cero y retornar densidad calculada
+    // Evitar división por cero y retornar densidad calculada sin redondear
     if (superficie > 0 && poblacion > 0) {
-        return (poblacion / superficie).toFixed(1);
+        return poblacion / superficie;  // devuelve número con precisión completa
     }
-    return '0.0';
+    return 0;  // en lugar de '0.0', para que formatearNumero lo maneje
 }
