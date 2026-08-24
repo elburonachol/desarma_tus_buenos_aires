@@ -87,6 +87,11 @@ function loadExistingRegions(tipoRegion) {
 
     // Actualizar estado completo de la aplicación
     notifyStateChange();
+
+    // Si las comunas estaban incluidas, restaurarlas en el listado y el mapa
+    if (comunasIncluidas) {
+        showComunas();
+    }
 }
 
 /**
