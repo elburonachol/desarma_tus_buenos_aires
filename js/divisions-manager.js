@@ -264,7 +264,7 @@ function initializeDragAndDrop() {
     Sortable.create(allDepartmentsList, {
         group: {
             name: 'departments',
-            pull: 'clone', // Los elementos se clonan al arrastrar desde aquí
+            pull: true, // Los elementos se clonan al arrastrar desde aquí
             put: true      // Se pueden soltar elementos aquí
         },
         sort: true,        // Permitir reordenamiento interno
