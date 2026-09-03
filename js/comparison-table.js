@@ -9,6 +9,7 @@
 // TABLA COMPARATIVA
 // =============================================
 
+
 /**
  * INICIALIZA LA ESTRUCTURA DE LA TABLA COMPARATIVA
  */
