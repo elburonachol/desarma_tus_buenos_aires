@@ -20,7 +20,14 @@ window.SUPABASE_CONFIG = {
 };
 `;
 
-// Escribir el archivo en la carpeta de salida
-const outputPath = path.join(__dirname, 'config.js');
+// Escribir el archivo en la carpeta js/
+const outputPath = path.join(__dirname, 'js', 'config.js');
+
+// Asegurar que la carpeta existe
+const outputDir = path.dirname(outputPath);
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
+}
+
 fs.writeFileSync(outputPath, configContent.trim());
-console.log('✅ config.js generado correctamente');
+console.log('✅ config.js generado correctamente en js/config.js');
